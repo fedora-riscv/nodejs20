@@ -1,6 +1,6 @@
 %global with_debug 1
 
-%{!?_with_bootstrap: %global bootstrap 1}
+%{!?_with_bootstrap: %global bootstrap 0}
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
