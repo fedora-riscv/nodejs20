@@ -1,6 +1,6 @@
 %global with_debug 1
 
-%{!?_with_bootstrap: %global bootstrap 1}
+%{!?_with_bootstrap: %global bootstrap 0}
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -17,18 +17,18 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 6
-%global nodejs_minor 10
-%global nodejs_patch 3
+%global nodejs_minor 11
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 3
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 5
 %global v8_minor 1
 %global v8_build 281
-%global v8_patch 101
+%global v8_patch 102
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -98,10 +98,6 @@ Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
 # EPEL only has OpenSSL 1.0.1, so we need to carry a patch on that platform
 Patch2: 0002-Use-openssl-1.0.1.patch
-
-# use system certificates instead of the bundled ones
-# Backported from upstream 7.5.0+
-Patch3: 0003-crypto-Use-system-CAs-instead-of-using-bundled-ones.patch
 
 # Backported upstream patch to allow building with GCC 7 from
 # https://github.com/nodejs/node/commit/2bbee49e6f170a5d6628444a7c9a2235fe0dd929
@@ -254,9 +250,6 @@ The API documentation for the Node.js JavaScript runtime.
 rm -rf deps/icu-small \
        deps/uv \
        deps/zlib
-
-# Use system CA certificates
-%patch3 -p1
 
 # Fix GCC7 build
 %patch4 -p1
@@ -450,9 +443,13 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Tue Jun 06 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.10.3-3
+* Fri Jun 09 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.0-1
+- Update to 6.11.0
+- remove system CA patch since it was merged upstream
+- https://github.com/nodejs/node/pull/8334
+
+* Fri May 12 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.10.3-3
 - Require http-parser-devel when using system http-parser
-- enable bootstraping
 
 * Thu May 11 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.10.3-2
 - Provide bundled http-parser in case of boostraping
