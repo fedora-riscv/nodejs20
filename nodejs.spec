@@ -436,7 +436,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Tue Aug 01 2917 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.2-1
+* Tue Aug 01 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.2-1
 - Update to 6.11.2
 - https://nodejs.org/en/blog/release/v6.11.2/
 - gcc 7 patch was backported in upstream
