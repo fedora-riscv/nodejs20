@@ -18,7 +18,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 11
-%global nodejs_patch 1
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -98,10 +98,6 @@ Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
 # EPEL only has OpenSSL 1.0.1, so we need to carry a patch on that platform
 Patch2: 0002-Use-openssl-1.0.1.patch
-
-# Backported upstream patch to allow building with GCC 7 from
-# https://github.com/nodejs/node/commit/2bbee49e6f170a5d6628444a7c9a2235fe0dd929
-Patch4: 0004-Fix-compatibility-with-GCC-7.patch
 
 # RHEL 7 still uses OpenSSL 1.0.1 for now, and it segfaults on SSL
 # Revert this upstream patch until RHEL 7 upgrades to 1.0.2
@@ -250,9 +246,6 @@ The API documentation for the Node.js JavaScript runtime.
 rm -rf deps/icu-small \
        deps/uv \
        deps/zlib
-
-# Fix GCC7 build
-%patch4 -p1
 
 %if 0%{?epel}
 %patch2 -p1
@@ -443,6 +436,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Aug 01 2917 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.2-1
+- Update to 6.11.2
+- https://nodejs.org/en/blog/release/v6.11.2/
+- gcc 7 patch was backported in upstream
+
 * Fri Jul 14 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.1-1
 - Security update (https://nodejs.org/en/blog/vulnerability/july-2017-security-releases/)
 
