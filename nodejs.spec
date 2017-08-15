@@ -19,7 +19,7 @@
 %global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1.1
+%global nodejs_release 1.2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -106,6 +106,7 @@ BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.0
 BuildRequires: gcc-c++ >= 4.8.0
 #BuildRequires: http-parser-devel >= 2.7.0
+Provides: bundled(http-parser) = 2.7.0
 
 %if 0%{?epel} || 0%{?rhel}
 BuildRequires: openssl-devel >= 1:1.0.1
@@ -406,6 +407,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Aug 15 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.11.2-1.2
+- Add bundled Provides for http-parser
+
 * Tue Aug 15 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.11.2-1.1
 - Temporarily bundle http-parser
 - Resolves: RHBZ#1481470
