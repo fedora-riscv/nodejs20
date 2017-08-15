@@ -19,7 +19,7 @@
 %global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 1.1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -89,6 +89,8 @@ Source7: nodejs_native.attr
 Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
 # EPEL only has OpenSSL 1.0.1, so we need to carry a patch on that platform
+# RHEL 7.4 now has 1.0.2, but as of this writing, CentOS hasn't picked it up
+# yet. Drop the openssl 1.0.1 compatibility patches once this happens.
 Patch2: 0002-Use-openssl-1.0.1.patch
 
 # RHEL 7 still uses OpenSSL 1.0.1 for now, and it segfaults on SSL
@@ -98,12 +100,12 @@ Patch5: EPEL01-openssl101-compat.patch
 BuildRequires: python-devel
 BuildRequires: libuv-devel >= 1:1.9.1
 Requires: libuv >= 1:1.9.1
-Requires: http-parser >= 2.7.0
+#Requires: http-parser >= 2.7.0
 BuildRequires: libicu-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.0
 BuildRequires: gcc-c++ >= 4.8.0
-BuildRequires: http-parser-devel >= 2.7.0
+#BuildRequires: http-parser-devel >= 2.7.0
 
 %if 0%{?epel} || 0%{?rhel}
 BuildRequires: openssl-devel >= 1:1.0.1
@@ -179,7 +181,7 @@ Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: libuv-devel%{?_isa}
-Requires: http-parser-devel%{?_isa}
+#Requires: http-parser-devel%{?_isa}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
@@ -228,8 +230,7 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
-rm -rf deps/http-parser \
-       deps/icu-small \
+rm -rf deps/icu-small \
        deps/uv \
        deps/zlib
 
@@ -262,7 +263,6 @@ export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
            --shared-openssl \
            --shared-zlib \
            --shared-libuv \
-           --shared-http-parser \
            --without-dtrace \
            --with-intl=system-icu \
            --openssl-use-def-ca-store
@@ -406,6 +406,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Aug 15 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.11.2-1.1
+- Temporarily bundle http-parser
+- Resolves: RHBZ#1481470
+
 * Wed Aug 02 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.2-1
 - Update to 6.11.2
 - https://nodejs.org/en/blog/release/v6.11.2/

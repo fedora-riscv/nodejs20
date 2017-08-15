@@ -1,7 +1,20 @@
-diff -ru a/src/node_crypto.cc b/src/node_crypto.cc
---- a/src/node_crypto.cc	2017-03-31 22:39:56.483283868 +0200
-+++ b/src/node_crypto.cc	2017-03-31 22:45:36.250267750 +0200
-@@ -851,8 +851,6 @@
+From 655af65a132fe7cea8aeff4f8cbc9d06181f3d2e Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Tue, 15 Aug 2017 09:34:07 -0400
+Subject: [PATCH 3/3] EPEL openssl 1.0.1
+
+---
+ src/node_crypto.cc | 2 --
+ src/node_crypto.h  | 7 +++++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/src/node_crypto.cc b/src/node_crypto.cc
+index 7aaff07fb513945d6272f238814a4cd297da7b0e..b5fb547ce35b4c66e8a52de9324f83f9a25aff7a 100644
+--- a/src/node_crypto.cc
++++ b/src/node_crypto.cc
+@@ -959,12 +959,10 @@ void SecureContext::AddRootCerts(const FunctionCallbackInfo<Value>& args) {
+                            ERR_error_string(err, nullptr));
+       }
      }
    }
  
@@ -10,10 +23,15 @@ diff -ru a/src/node_crypto.cc b/src/node_crypto.cc
    SSL_CTX_set_cert_store(sc->ctx_, root_cert_store);
  }
  
-diff -ru a/src/node_crypto.h b/src/node_crypto.h
---- a/src/node_crypto.h	2017-03-21 20:43:33.000000000 +0100
-+++ b/src/node_crypto.h	2017-03-31 22:43:15.548183432 +0200
-@@ -145,6 +145,13 @@
+ 
+ void SecureContext::SetCiphers(const FunctionCallbackInfo<Value>& args) {
+diff --git a/src/node_crypto.h b/src/node_crypto.h
+index 8304e719719dae41757071b4463f8631cb1e442f..a5161aa502e56a6ceb9522ce0ad9c8a677291081 100644
+--- a/src/node_crypto.h
++++ b/src/node_crypto.h
+@@ -151,10 +151,17 @@ class SecureContext : public BaseObject {
+     if (!ctx_) {
+       return;
      }
  
      env()->isolate()->AdjustAmountOfExternalAllocatedMemory(-kExternalSize);
@@ -27,4 +45,8 @@ diff -ru a/src/node_crypto.h b/src/node_crypto.h
      SSL_CTX_free(ctx_);
      if (cert_ != nullptr)
        X509_free(cert_);
+     if (issuer_ != nullptr)
+       X509_free(issuer_);
+-- 
+2.13.5
 
