@@ -19,7 +19,7 @@
 %global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1.3
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -88,37 +88,23 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
-# EPEL only has OpenSSL 1.0.1, so we need to carry a patch on that platform
-# RHEL 7.4 now has 1.0.2, but as of this writing, CentOS hasn't picked it up
-# yet. Drop the openssl 1.0.1 compatibility patches once this happens.
-Patch2: 0002-Use-openssl-1.0.1.patch
-
-# RHEL 7 still uses OpenSSL 1.0.1 for now, and it segfaults on SSL
-# Revert this upstream patch until RHEL 7 upgrades to 1.0.2
-Patch5: EPEL01-openssl101-compat.patch
-
 BuildRequires: python-devel
 BuildRequires: libuv-devel >= 1:1.9.1
 Requires: libuv >= 1:1.9.1
-#Requires: http-parser >= 2.7.0
+Requires: http-parser >= 2.7.0
 BuildRequires: libicu-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.0
 BuildRequires: gcc-c++ >= 4.8.0
-#BuildRequires: http-parser-devel >= 2.7.0
-Provides: bundled(http-parser) = 2.7.0
+BuildRequires: http-parser-devel >= 2.7.0
 
-%if 0%{?epel} || 0%{?rhel}
-BuildRequires: openssl-devel >= 1:1.0.1
-%else
 %if 0%{?fedora} > 25
 BuildRequires: compat-openssl10-devel >= 1:1.0.2
 %else
 BuildRequires: openssl-devel >= 1:1.0.2
 %endif
-%endif
 
-# we need the system certificate store when Patch2 is applied
+# we need the system certificate store
 Requires: ca-certificates
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
@@ -182,7 +168,7 @@ Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: libuv-devel%{?_isa}
-#Requires: http-parser-devel%{?_isa}
+Requires: http-parser-devel%{?_isa}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
@@ -231,14 +217,10 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
-rm -rf deps/icu-small \
+rm -rf deps/http-parser \
+       deps/icu-small \
        deps/uv \
        deps/zlib
-
-%if 0%{?epel} || 0%{?rhel}
-%patch2 -p1
-%patch5 -p1
-%endif
 
 
 %build
@@ -264,6 +246,7 @@ export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
            --shared-openssl \
            --shared-zlib \
            --shared-libuv \
+           --shared-http-parser \
            --without-dtrace \
            --with-intl=system-icu \
            --openssl-use-def-ca-store
@@ -407,6 +390,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Aug 23 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.11.2-2
+- Move to requiring OpenSSL 1.0.2
+- Unbundle http-parser again
+
 * Tue Aug 22 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.2-1.3
 - Run gyp on http-parser
 
