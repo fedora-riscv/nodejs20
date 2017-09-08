@@ -1,5 +1,7 @@
 %global with_debug 1
 
+%{!?_with_bootstrap: %global bootstrap 0}
+
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
 # ARM builds currently break on the Debug builds, so we'll just
@@ -16,17 +18,17 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 11
-%global nodejs_patch 2
+%global nodejs_patch 3
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 5
 %global v8_minor 1
 %global v8_build 281
-%global v8_patch 103
+%global v8_patch 107
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -36,6 +38,12 @@
 %global c_ares_minor 10
 %global c_ares_patch 1
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
+
+# http-parser - from deps/http_parser/http_parser.h
+%global http_parser_major 2
+%global http_parser_minor 7
+%global http_parser_patch 0
+%global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -96,7 +104,13 @@ BuildRequires: libicu-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.0
 BuildRequires: gcc-c++ >= 4.8.0
+
+%if ! 0%{?bootstrap}
+BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
+%else
+Provides: bundled(http-parser) = %{http_parser_version}
+%endif
 
 %if 0%{?fedora} > 25
 BuildRequires: compat-openssl10-devel >= 1:1.0.2
@@ -148,7 +162,7 @@ Provides: bundled(c-ares) = %{c_ares_version}
 Provides: bundled(v8) = %{v8_version}
 
 # Make sure we keep NPM up to date when we update Node.js
-%if 0%{?epel} || 0%{?rhel}
+%if 0%{?epel}
 # EPEL doesn't support Recommends, so make it strict
 Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 %else
@@ -168,10 +182,12 @@ Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: libuv-devel%{?_isa}
-Requires: http-parser-devel%{?_isa}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
+%if ! 0%{?bootstrap}
+Requires: http-parser-devel%{?_isa}
+%endif
 
 %description devel
 Development headers for the Node.js JavaScript runtime.
@@ -242,6 +258,7 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
+%if ! 0%{?bootstrap}
 ./configure --prefix=%{_prefix} \
            --shared-openssl \
            --shared-zlib \
@@ -250,6 +267,15 @@ export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
            --without-dtrace \
            --with-intl=system-icu \
            --openssl-use-def-ca-store
+%else
+./configure --prefix=%{_prefix} \
+           --shared-openssl \
+           --shared-zlib \
+           --shared-libuv \
+           --without-dtrace \
+           --with-intl=system-icu \
+           --openssl-use-def-ca-store
+%endif
 
 %if %{?with_debug} == 1
 # Setting BUILDTYPE=Debug builds both release and debug binaries
@@ -390,6 +416,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Sep 07 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.3-1
+- Update to 6.11.3
+- https://nodejs.org/en/blog/release/v6.11.3/
+- remove openssl 1.0.1 patches
+
 * Wed Aug 23 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.11.2-2
 - Move to requiring OpenSSL 1.0.2
 - Unbundle http-parser again
