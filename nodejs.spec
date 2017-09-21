@@ -1,6 +1,7 @@
 %global with_debug 1
 
-%{!?_with_bootstrap: %global bootstrap 0}
+# bundle some dependencies missing in Modularity
+%{!?_with_bootstrap: %global bootstrap 1}
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -44,6 +45,12 @@
 %global http_parser_minor 7
 %global http_parser_patch 0
 %global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
+
+# libuv - from deps/uv/include/uv-version.h
+%global libuv_major 1
+%global libuv_minor 14
+%global libuv_patch 1
+%global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -96,25 +103,25 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
-BuildRequires: python-devel
-BuildRequires: libuv-devel >= 1:1.9.1
-Requires: libuv >= 1:1.9.1
-BuildRequires: libicu-devel
-BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.0
 BuildRequires: gcc-c++ >= 4.8.0
 
 %if ! 0%{?bootstrap}
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
+BuildRequires: libicu-devel
+BuildRequires: zlib-devel
+BuildRequires: python2-devel
+BuildRequires: compat-openssl10-devel >= 1:1.0.2
+BuildRequires: libuv-devel >= 1:1.9.1
+Requires: libuv >= 1:1.9.1
 %else
 Provides: bundled(http-parser) = %{http_parser_version}
-%endif
-
-%if 0%{?fedora} > 25
-BuildRequires: compat-openssl10-devel >= 1:1.0.2
-%else
-BuildRequires: openssl-devel >= 1:1.0.2
+Provides: bundled(libuv) = %{libuv_version}
+BuildRequires: python2
+BuildRequires: libicu
+BuildRequires: zlib
+BuildRequires: compat-openssl10
 %endif
 
 # we need the system certificate store when Patch2 is applied
@@ -160,6 +167,7 @@ Provides: bundled(c-ares) = %{c_ares_version}
 # See https://github.com/nodejs/node/commit/d726a177ed59c37cf5306983ed00ecd858cfbbef
 Provides: bundled(v8) = %{v8_version}
 
+%if ! 0%{?bootstrap}
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?epel}
 # EPEL doesn't support Recommends, so make it strict
@@ -167,6 +175,7 @@ Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 %else
 Recommends: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 %endif
+%endif 
 
 
 %description
@@ -180,12 +189,12 @@ real-time applications that run across distributed devices.
 Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-Requires: libuv-devel%{?_isa}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
 %if ! 0%{?bootstrap}
 Requires: http-parser-devel%{?_isa}
+Requires: libuv-devel%{?_isa}
 %endif
 
 %description devel
@@ -268,7 +277,6 @@ export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 ./configure --prefix=%{_prefix} \
            --shared-openssl \
            --shared-zlib \
-           --shared-libuv \
            --without-dtrace \
            --with-intl=system-icu \
            --openssl-use-def-ca-store
@@ -419,6 +427,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Sep 21 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6:11.3-2
+- Adjust spec for modularity
+
 * Thu Sep 07 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.3-1
 - Update to 6.11.3
 - https://nodejs.org/en/blog/release/v6.11.3/
