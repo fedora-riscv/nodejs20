@@ -22,7 +22,7 @@
 %global nodejs_patch 3
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -103,25 +103,26 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
+BuildRequires: python2-devel
+BuildRequires: libicu-devel
+BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.0
 BuildRequires: gcc-c++ >= 4.8.0
 
 %if ! 0%{?bootstrap}
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
-BuildRequires: libicu-devel
-BuildRequires: zlib-devel
-BuildRequires: python2-devel
-BuildRequires: compat-openssl10-devel >= 1:1.0.2
 BuildRequires: libuv-devel >= 1:1.9.1
 Requires: libuv >= 1:1.9.1
 %else
 Provides: bundled(http-parser) = %{http_parser_version}
 Provides: bundled(libuv) = %{libuv_version}
-BuildRequires: python2
-BuildRequires: libicu
-BuildRequires: zlib
-BuildRequires: compat-openssl10
+%endif
+
+%if 0%{?fedora} > 25
+BuildRequires: compat-openssl10-devel >= 1:1.0.2
+%else
+BuildRequires: openssl-devel >= 1:1.0.2
 %endif
 
 # we need the system certificate store when Patch2 is applied
@@ -242,7 +243,6 @@ The API documentation for the Node.js JavaScript runtime.
 # remove bundled dependencies that we aren't building
 %patch1 -p1
 rm -rf deps/icu-small \
-       deps/uv \
        deps/zlib
 
 %build
