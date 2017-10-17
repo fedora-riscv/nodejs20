@@ -1,6 +1,8 @@
 %global with_debug 1
 
-%{!?_with_bootstrap: %global bootstrap 0}
+# bundle some dependencies missing in Modularity
+#%{!?_with_bootstrap: %global bootstrap 1}
+%bcond_with bootstrap
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -18,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 11
-%global nodejs_patch 3
+%global nodejs_patch 4
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -28,7 +30,7 @@
 %global v8_major 5
 %global v8_minor 1
 %global v8_build 281
-%global v8_patch 107
+%global v8_patch 108
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -44,6 +46,12 @@
 %global http_parser_minor 7
 %global http_parser_patch 0
 %global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
+
+# libuv - from deps/uv/include/uv-version.h
+%global libuv_major 1
+%global libuv_minor 11
+%global libuv_patch 0
+%global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -96,20 +104,23 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
-BuildRequires: python-devel
-BuildRequires: libuv-devel >= 1:1.9.1
-Requires: libuv >= 1:1.9.1
+BuildRequires: python2-devel
 Requires: http-parser >= 2.7.0
 BuildRequires: libicu-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.0
 BuildRequires: gcc-c++ >= 4.8.0
 
-%if ! 0%{?bootstrap}
+#%if ! 0%{?bootstrap}
+%if %{with bootstrap}
+Provides: bundled(http-parser) = %{http_parser_version}
+Provides: bundled(libuv) = %{libuv_version}
+%else
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
-%else
-Provides: bundled(http-parser) = %{http_parser_version}
+BuildRequires: libuv-devel >= 1:1.9.1
+Requires: libuv >= 1:1.9.1
+
 %endif
 
 %if 0%{?fedora} > 25
@@ -161,7 +172,6 @@ Provides: bundled(c-ares) = %{c_ares_version}
 # See https://github.com/nodejs/node/commit/d726a177ed59c37cf5306983ed00ecd858cfbbef
 Provides: bundled(v8) = %{v8_version}
 
-# Make sure we keep NPM up to date when we update Node.js
 %if 0%{?epel}
 # EPEL doesn't support Recommends, so make it strict
 Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
@@ -181,12 +191,15 @@ real-time applications that run across distributed devices.
 Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-Requires: libuv-devel%{?_isa}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
-%if ! 0%{?bootstrap}
+#%if ! 0%{?bootstrap}
+%if %{with bootstrap}
+#deps are bundled
+%else
 Requires: http-parser-devel%{?_isa}
+Requires: libuv-devel%{?_isa}
 %endif
 
 %description devel
@@ -235,7 +248,6 @@ The API documentation for the Node.js JavaScript runtime.
 %patch1 -p1
 rm -rf deps/http-parser \
        deps/icu-small \
-       deps/uv \
        deps/zlib
 
 
@@ -258,12 +270,11 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
-%if ! 0%{?bootstrap}
+#%if ! 0%{?bootstrap}
+%if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
            --shared-openssl \
            --shared-zlib \
-           --shared-libuv \
-           --shared-http-parser \
            --without-dtrace \
            --with-intl=system-icu \
            --openssl-use-def-ca-store
@@ -272,7 +283,8 @@ export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
            --shared-openssl \
            --shared-zlib \
            --shared-libuv \
-           --without-dtrace \
+           --shared-http-parser \
+           --with-dtrace \
            --with-intl=system-icu \
            --openssl-use-def-ca-store
 %endif
@@ -382,6 +394,15 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %dir %{_datadir}/systemtap
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
+
+#%if ! 0%{?bootstrap}
+%if %{with bootstrap}
+#no dtrace
+%else
+%dir %{_usr}/lib/dtrace
+%{_usr}/lib/dtrace/node.d
+%endif
+
 %{_rpmconfigdir}/fileattrs/nodejs_native.attr
 %{_rpmconfigdir}/nodejs_native.req
 %license LICENSE
@@ -416,6 +437,14 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Oct 06 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.4-1
+- Update to 6.11.4
+- https://nodejs.org/en/blog/release/v6.11.3/
+- use bcond macro
+
+* Thu Sep 21 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6:11.3-2
+- Adjust spec for modularity
+
 * Thu Sep 07 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.3-1
 - Update to 6.11.3
 - https://nodejs.org/en/blog/release/v6.11.3/
