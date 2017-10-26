@@ -20,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 11
-%global nodejs_patch 4
+%global nodejs_patch 5
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -437,6 +437,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Oct 26 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.11.5-1
+- Update to 6.11.5 security release
+
 * Fri Oct 06 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.4-1
 - Update to 6.11.4
 - https://nodejs.org/en/blog/release/v6.11.3/
