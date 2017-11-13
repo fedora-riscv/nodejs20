@@ -1,7 +1,6 @@
 %global with_debug 1
 
 # bundle some dependencies missing in Modularity
-#%{!?_with_bootstrap: %global bootstrap 1}
 %bcond_with bootstrap
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
@@ -19,8 +18,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 6
-%global nodejs_minor 11
-%global nodejs_patch 5
+%global nodejs_minor 12
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -49,7 +48,7 @@
 
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
-%global libuv_minor 11
+%global libuv_minor 15
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -108,10 +107,9 @@ BuildRequires: python2-devel
 Requires: http-parser >= 2.7.0
 BuildRequires: libicu-devel
 BuildRequires: zlib-devel
-BuildRequires: gcc >= 4.8.0
-BuildRequires: gcc-c++ >= 4.8.0
+BuildRequires: gcc >= 4.8.5
+BuildRequires: gcc-c++ >= 4.8.5
 
-#%if ! 0%{?bootstrap}
 %if %{with bootstrap}
 Provides: bundled(http-parser) = %{http_parser_version}
 Provides: bundled(libuv) = %{libuv_version}
@@ -129,7 +127,7 @@ BuildRequires: compat-openssl10-devel >= 1:1.0.2
 BuildRequires: openssl-devel >= 1:1.0.2
 %endif
 
-# we need the system certificate store
+# we need the system certificate store when Patch2 is applied
 Requires: ca-certificates
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
@@ -246,8 +244,7 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
-rm -rf deps/http-parser \
-       deps/icu-small \
+rm -rf deps/icu-small \
        deps/zlib
 
 
@@ -270,7 +267,6 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
-#%if ! 0%{?bootstrap}
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
            --shared-openssl \
@@ -437,12 +433,15 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Nov 13 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.12.0-1
+- Update to 6.12.0
+
 * Thu Oct 26 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.11.5-1
 - Update to 6.11.5 security release
 
 * Fri Oct 06 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.11.4-1
 - Update to 6.11.4
-- https://nodejs.org/en/blog/release/v6.11.3/
+- https://nodejs.org/en/blog/release/v6.11.4/
 - use bcond macro
 
 * Thu Sep 21 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6:11.3-2
