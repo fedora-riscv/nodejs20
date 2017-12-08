@@ -19,7 +19,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 12
-%global nodejs_patch 0
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -29,7 +29,7 @@
 %global v8_major 5
 %global v8_minor 1
 %global v8_build 281
-%global v8_patch 108
+%global v8_patch 109
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -192,7 +192,7 @@ Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
-#%if ! 0%{?bootstrap}
+#%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 #deps are bundled
 %else
@@ -391,7 +391,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
 
-#%if ! 0%{?bootstrap}
+#%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 #no dtrace
 %else
@@ -433,6 +433,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Dec 08 2017 Stephen Gallagher <sgallagh@redhat.com> - -
+- Update to 6.12.2
+- https://nodejs.org/en/blog/release/v6.12.2/
+
 * Mon Nov 13 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:6.12.0-1
 - Update to 6.12.0
 
