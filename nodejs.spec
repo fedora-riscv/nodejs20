@@ -19,7 +19,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 12
-%global nodejs_patch 2
+%global nodejs_patch 3
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -29,7 +29,7 @@
 %global v8_major 5
 %global v8_minor 1
 %global v8_build 281
-%global v8_patch 109
+%global v8_patch 111
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -433,7 +433,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Fri Dec 08 2017 Stephen Gallagher <sgallagh@redhat.com> - -
+* Thu Jan 11 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.12.3-1
+- Update to 6.12.3
+- https://nodejs.org/en/blog/release/v6.12.3/
+
+* Fri Dec 08 2017 Stephen Gallagher <sgallagh@redhat.com> - 1:6.12.2-1
 - Update to 6.12.2
 - https://nodejs.org/en/blog/release/v6.12.2/
 
