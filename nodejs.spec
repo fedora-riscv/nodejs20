@@ -20,19 +20,19 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 8
-%global nodejs_minor 9
-%global nodejs_patch 4
+%global nodejs_major 9
+%global nodejs_minor 5
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
-%global v8_minor 1
-%global v8_build 534
-%global v8_patch 50
+%global v8_minor 2
+%global v8_build 414
+%global v8_patch 46
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -40,8 +40,8 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 10
-%global c_ares_patch 1
+%global c_ares_minor 13
+%global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
 # http-parser - from deps/http_parser/http_parser.h
@@ -52,13 +52,13 @@
 
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
-%global libuv_minor 15
-%global libuv_patch 0
+%global libuv_minor 19
+%global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 25
+%global nghttp2_minor 29
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
@@ -134,11 +134,11 @@ BuildRequires: http-parser-devel >= 2.7.0
 Requires: http-parser >= 2.7.0
 BuildRequires: libuv-devel >= 1:1.9.1
 Requires: libuv >= 1:1.9.1
-BuildRequires: libnghttp2-devel >= 1.25.0
-Requires: libnghttp2 >= 1.25.0
+BuildRequires: libnghttp2-devel >= %{nghttp2_version}
+Requires: libnghttp2 >= %{nghttp2_version}
 %endif
 
-BuildRequires: (openssl-devel <= 1:1.1.0 or compat-openssl10-devel)
+BuildRequires: openssl-devel
 
 # we need the system certificate store when Patch2 is applied
 Requires: ca-certificates
@@ -396,7 +396,7 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 %check
 # Fail the build if the versions don't match
 %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8, '%{v8_version}')"
+%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8.replace(/-node\.\d+$/, ''), '%{v8_version}')"
 %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.ares.replace(/-DEV$/, ''), '%{c_ares_version}')"
 
 # Ensure we have punycode and that the version matches
@@ -459,6 +459,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Feb 05 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.5.0-1
+- Package Node.js 9.5.0
+
 * Thu Jan 11 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.9.4-2
 - Fix incorrect Requires:
 
