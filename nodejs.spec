@@ -25,7 +25,7 @@
 %global nodejs_patch 4
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 3
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -91,7 +91,7 @@
 Name: nodejs
 Epoch: %{nodejs_epoch}
 Version: %{nodejs_version}
-Release: %{nodejs_release}%{?dist}.1
+Release: %{nodejs_release}%{?dist}
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
 Group: Development/Languages
@@ -222,7 +222,7 @@ Development headers for the Node.js JavaScript runtime.
 Summary: Node.js Package Manager
 Epoch: %{npm_epoch}
 Version: %{npm_version}
-Release: %{npm_release}%{?dist}.1
+Release: %{npm_release}%{?dist}
 
 # We used to ship npm separately, but it is so tightly integrated with Node.js
 # (and expected to be present on all Node.js systems) that we ship it bundled
@@ -283,6 +283,11 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
+# Work around Fedora 28 issue:
+# https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Quick_Opt-Out
+# Tracking BZ: https://bugzilla.redhat.com/show_bug.cgi?id=1550564
+export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
+
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
@@ -316,6 +321,11 @@ make BUILDTYPE=Release %{?_smp_mflags}
 
 
 %install
+# Work around Fedora 28 build issue:
+# https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Quick_Opt-Out
+# Tracking BZ: https://bugzilla.redhat.com/show_bug.cgi?id=1550564
+export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
+
 rm -rf %{buildroot}
 
 ./tools/install.py install %{buildroot} %{_prefix}
@@ -396,7 +406,7 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 %check
 # Fail the build if the versions don't match
 %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8, '%{v8_version}')"
+%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8.replace(/-node\.\d+$/, ''), '%{v8_version}')"
 %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.ares.replace(/-DEV$/, ''), '%{c_ares_version}')"
 
 # Ensure we have punycode and that the version matches
@@ -459,6 +469,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Mar 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.9.4-3
+- Work around build issue on F28
+
 * Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.9.4-2.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
