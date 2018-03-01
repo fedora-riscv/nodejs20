@@ -21,8 +21,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 9
-%global nodejs_minor 6
-%global nodejs_patch 1
+%global nodejs_minor 7
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -53,7 +53,7 @@
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
 %global libuv_minor 19
-%global libuv_patch 1
+%global libuv_patch 2
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -283,6 +283,11 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
+# Work around Fedora 28 issue:
+# https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Quick_Opt-Out
+# Tracking BZ: https://bugzilla.redhat.com/show_bug.cgi?id=1550564
+export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
+
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
@@ -316,6 +321,11 @@ make BUILDTYPE=Release %{?_smp_mflags}
 
 
 %install
+# Work around Fedora 28 build issue:
+# https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Quick_Opt-Out
+# Tracking BZ: https://bugzilla.redhat.com/show_bug.cgi?id=1550564
+export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
+
 rm -rf %{buildroot}
 
 ./tools/install.py install %{buildroot} %{_prefix}
@@ -459,6 +469,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Mar 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.7.0-1
+- Update to 9.7.0
+- https://nodejs.org/en/blog/release/v9.7.0/
+- Work around F28 build issue
+
 * Sun Feb 25 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.6.1-1
 - Update to 9.6.1
 - https://nodejs.org/en/blog/release/v9.6.1/
