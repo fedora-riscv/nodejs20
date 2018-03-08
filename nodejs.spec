@@ -249,6 +249,11 @@ rm -rf deps/icu-small \
 
 
 %build
+# Work around Fedora 28 build issue:
+# https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Quick_Opt-Out
+# Tracking BZ: https://bugzilla.redhat.com/show_bug.cgi?id=1550564
+export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
+
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
 # NULL objects. We need to pass -fno-delete-null-pointer-checks
@@ -294,6 +299,11 @@ make BUILDTYPE=Release %{?_smp_mflags}
 
 
 %install
+# Work around Fedora 28 build issue:
+# https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Quick_Opt-Out
+# Tracking BZ: https://bugzilla.redhat.com/show_bug.cgi?id=1550564
+export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
+
 rm -rf %{buildroot}
 
 ./tools/install.py install %{buildroot} %{_prefix}
