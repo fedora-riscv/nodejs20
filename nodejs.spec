@@ -18,8 +18,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 6
-%global nodejs_minor 12
-%global nodejs_patch 3
+%global nodejs_minor 13
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -48,8 +48,8 @@
 
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
-%global libuv_minor 15
-%global libuv_patch 0
+%global libuv_minor 16
+%global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # punycode - from lib/punycode.js
@@ -433,6 +433,13 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Mar 08 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.13.1-1
+- Update to 6.13.1
+- https://nodejs.org/en/blog/release/v6.12.4/
+- https://nodejs.org/en/blog/release/v6.12.5/
+- https://nodejs.org/en/blog/release/v6.13.0/
+- https://nodejs.org/en/blog/release/v6.13.1/
+
 * Thu Jan 11 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.12.3-1
 - Update to 6.12.3
 - https://nodejs.org/en/blog/release/v6.12.3/
