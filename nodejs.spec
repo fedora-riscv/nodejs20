@@ -21,8 +21,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 8
-%global nodejs_minor 9
-%global nodejs_patch 4
+%global nodejs_minor 10
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 3
@@ -30,8 +30,8 @@
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
-%global v8_minor 1
-%global v8_build 534
+%global v8_minor 2
+%global v8_build 414
 %global v8_patch 50
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
@@ -52,8 +52,8 @@
 
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
-%global libuv_minor 15
-%global libuv_patch 0
+%global libuv_minor 19
+%global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -469,6 +469,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Mar 08 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.10.0-1
+- Update to 8.10.0
+- https://nodejs.org/en/blog/release/v8.10.0/
+
 * Thu Mar 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.9.4-3
 - Work around build issue on F28
 
