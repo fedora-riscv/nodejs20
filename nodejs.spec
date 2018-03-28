@@ -56,6 +56,11 @@
 %global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
+# libicu
+%global libicu_major 60
+%global libicu_minor 0
+%global libicu_version %{libicu_major}.%{libicu_minor}
+
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
 %global nghttp2_minor 25
@@ -183,6 +188,14 @@ Provides: bundled(c-ares) = %{c_ares_version}
 # See https://github.com/nodejs/node/commit/d726a177ed59c37cf5306983ed00ecd858cfbbef
 Provides: bundled(v8) = %{v8_version}
 
+%if 0%{?fedora} && 0%{?fedora < 28}
+# Node.js requires up-to-date ICU
+%global config_intl --with-intl=small-icu
+Provides: bundled(icu) = %{libicu_version}
+%else
+%global config_intl --with-intl=system-icu
+%endif
+
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?rhel}
 # EPEL doesn't support Recommends, so make it strict
@@ -259,8 +272,13 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
+
+%if 0%{?fedora} && 0%{?fedora < 28}
+rm -rf deps/zlib
+%else
 rm -rf deps/icu-small \
        deps/zlib
+%endif
 
 %patch2 -p1
 
@@ -294,7 +312,7 @@ export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
            --shared-openssl \
            --shared-zlib \
            --without-dtrace \
-           --with-intl=system-icu \
+           %{config_intl} \
            --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
@@ -306,7 +324,7 @@ export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
            --shared-http-parser \
            --shared-nghttp2 \
            --with-dtrace \
-           --with-intl=system-icu \
+           %{config_intl} \
            --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
