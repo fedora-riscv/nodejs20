@@ -21,7 +21,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 9
-%global nodejs_minor 9
+%global nodejs_minor 10
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -469,6 +469,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Mar 28 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.10.0-1
+- Update to 9.10.0
+- https://nodejs.org/en/blog/release/v9.10.0/
+
 * Wed Mar 21 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.9.0-1
 - Update to 9.9.0
 - https://nodejs.org/en/blog/release/v9.9.0/
