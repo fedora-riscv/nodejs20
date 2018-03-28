@@ -21,11 +21,11 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 8
-%global nodejs_minor 10
+%global nodejs_minor 11
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 3
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -469,6 +469,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Mar 28 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.0-1
+- Update to 8.11.0
+- https://nodejs.org/en/blog/release/v8.11.0/
+
 * Thu Mar 08 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.10.0-1
 - Update to 8.10.0
 - https://nodejs.org/en/blog/release/v8.10.0/
