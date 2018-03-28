@@ -46,7 +46,7 @@
 
 # http-parser - from deps/http_parser/http_parser.h
 %global http_parser_major 2
-%global http_parser_minor 7
+%global http_parser_minor 8
 %global http_parser_patch 0
 %global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
 
