@@ -137,8 +137,8 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
 Requires: http-parser >= 2.7.0
-BuildRequires: libuv-devel >= 1:1.9.1
-Requires: libuv >= 1:1.9.1
+BuildRequires: libuv-devel >= 1:1.19.1
+Requires: libuv >= 1:1.19.1
 BuildRequires: libnghttp2-devel >= 1.25.0
 Requires: libnghttp2 >= 1.25.0
 %endif
