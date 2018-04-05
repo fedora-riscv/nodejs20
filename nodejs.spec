@@ -21,8 +21,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 9
-%global nodejs_minor 10
-%global nodejs_patch 0
+%global nodejs_minor 11
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -61,6 +61,11 @@
 %global nghttp2_minor 29
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
+
+# ICU - from configure in the configure_intl() function
+%global icu_major 61
+%global icu_minor 1
+%global icu_version %{icu_major}.%{icu_minor}
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -118,7 +123,6 @@ Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 Patch2: 0001-Fix-aarch64-debug.patch
 
 BuildRequires: python2-devel
-BuildRequires: libicu-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
@@ -182,6 +186,11 @@ Provides: bundled(c-ares) = %{c_ares_version}
 # against a shared system version entirely.
 # See https://github.com/nodejs/node/commit/d726a177ed59c37cf5306983ed00ecd858cfbbef
 Provides: bundled(v8) = %{v8_version}
+
+# Node.js is bound to a specific version of ICU which may not match the OS
+# We cannot pin the OS to this version of ICU because every update includes
+# an ABI-break, so we'll use the bundled copy.
+Provides: bundled(icu) = %{icu_version}
 
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?epel}
@@ -259,8 +268,7 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
-rm -rf deps/icu-small \
-       deps/zlib
+rm -rf deps/zlib
 
 %patch2 -p1
 
@@ -294,7 +302,6 @@ export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
            --shared-openssl \
            --shared-zlib \
            --without-dtrace \
-           --with-intl=system-icu \
            --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
@@ -306,7 +313,6 @@ export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
            --shared-http-parser \
            --shared-nghttp2 \
            --with-dtrace \
-           --with-intl=system-icu \
            --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
@@ -469,6 +475,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Apr 05 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.11.1-1
+- Update to 9.11.1
+- https://nodejs.org/en/blog/release/v9.11.0/
+- https://nodejs.org/en/blog/release/v9.11.1/
+
 * Wed Mar 28 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.10.0-1
 - Update to 9.10.0
 - https://nodejs.org/en/blog/release/v9.10.0/
