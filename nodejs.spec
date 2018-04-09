@@ -380,16 +380,18 @@ mv %{buildroot}/%{_datadir}/doc/node/gdbinit %{buildroot}/%{_pkgdocdir}/gdbinit
 # can backtrack on this if we decide to.
 
 # Rename the npm node_modules directory to node_modules.bundled
+mkdir -p %{buildroot}/%{_prefix}/lib/node/.bundled
 mv %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules \
-   %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules.bundled
+   %{buildroot}/%{_prefix}/lib/node/.bundled/npm
 
 # Recreate all the symlinks
 mkdir -p %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules
-FILES=%{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules.bundled/*
+FILES=%{buildroot}/%{_prefix}/lib/node/.bundled/npm/*
 for f in $FILES
 do
   module=`basename $f`
-  ln -s ../node_modules.bundled/$module %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/$module
+  ln -s %{_prefix}/lib/node/.bundled/npm/$module \
+        %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/$module
 done
 
 # install NPM docs to mandir
@@ -430,6 +432,8 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %files
 %{_bindir}/node
 %dir %{_prefix}/lib/node_modules
+%dir %{_prefix}/lib/node
+%dir %{_prefix}/lib/node/.bundled
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
 %dir %{_datadir}/systemtap/tapset
@@ -463,6 +467,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_bindir}/npm
 %{_bindir}/npx
 %{_prefix}/lib/node_modules/npm
+%{_prefix}/lib/node/.bundled/npm
 %ghost %{_sysconfdir}/npmrc
 %ghost %{_sysconfdir}/npmignore
 %doc %{_mandir}/man*/npm*
