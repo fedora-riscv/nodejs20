@@ -122,6 +122,10 @@ Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 # Follow https://bugs.chromium.org/p/v8/issues/detail?id=6939
 Patch2: 0001-Fix-aarch64-debug.patch
 
+# Suppress the message from npm to run `npm -g update npm`
+# This does bad things on an RPM-managed npm.
+Patch3: no-npm-update-msg.patch
+
 BuildRequires: python2-devel
 BuildRequires: libicu-devel
 BuildRequires: zlib-devel
@@ -281,6 +285,8 @@ rm -rf deps/icu-small \
 %endif
 
 %patch2 -p1
+
+%patch3 -p1
 
 %build
 # build with debugging symbols and add defines from libuv (#892601)
