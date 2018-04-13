@@ -22,7 +22,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -272,6 +272,8 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
+export LDFLAGS="%{build_ldflags}"
+
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
            --shared-openssl \
@@ -443,6 +445,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Apr 13 2018 Rafael dos Santos <rdossant@redhat.com> - 1:6.14.0-2
+- Use standard Fedora linker flags (bug #1543859)
+
 * Wed Mar 28 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.14.0-1
 - Update to 6.14.0
 - https://nodejs.org/en/blog/release/v6.14.0/
