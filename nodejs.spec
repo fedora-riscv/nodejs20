@@ -1,4 +1,6 @@
-%global with_debug 1
+# Debug builds are failing on GCC 8.0.2
+# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85587
+%global with_debug 0
 
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
@@ -7,32 +9,25 @@
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
-# ARM64 builds of 8.5.0 break on the Debug builds, so we'll just
-# build the standard runtime until that gets sorted out.
-# https://github.com/nodejs/node/issues/15395
-%ifarch aarch64
-%global with_debug 1
-%endif
-
 # == Node.js Version ==
 # Note: Fedora should only ship LTS versions of Node.js (currently expected
 # to be major versions with even numbers). The odd-numbered versions are new
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 9
-%global nodejs_minor 11
-%global nodejs_patch 1
+%global nodejs_major 10
+%global nodejs_minor 0
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
-%global v8_minor 2
-%global v8_build 414
-%global v8_patch 46
+%global v8_minor 6
+%global v8_build 346
+%global v8_patch 24
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -40,7 +35,7 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 13
+%global c_ares_minor 14
 %global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
@@ -52,7 +47,7 @@
 
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
-%global libuv_minor 19
+%global libuv_minor 20
 %global libuv_patch 2
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -118,10 +113,6 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
-# Being fixed upstream.
-# Follow https://bugs.chromium.org/p/v8/issues/detail?id=6939
-Patch2: 0001-Fix-aarch64-debug.patch
-
 # Suppress the message from npm to run `npm -g update npm`
 # This does bad things on an RPM-managed npm.
 Patch3: no-npm-update-msg.patch
@@ -140,15 +131,15 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
 Requires: http-parser >= 2.7.0
-BuildRequires: libuv-devel >= 1:1.9.1
-Requires: libuv >= 1:1.9.1
+BuildRequires: libuv-devel >= 1:1.20.2
+Requires: libuv >= 1:1.20.2
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
 %endif
 
 BuildRequires: openssl-devel
 
-# we need the system certificate store when Patch2 is applied
+# we need the system certificate store
 Requires: ca-certificates
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
@@ -274,7 +265,6 @@ The API documentation for the Node.js JavaScript runtime.
 %patch1 -p1
 rm -rf deps/zlib
 
-%patch2 -p1
 
 %patch3 -p1
 
@@ -392,7 +382,7 @@ FILES=%{buildroot}/%{_prefix}/lib/node/.bundled/npm/*
 for f in $FILES
 do
   module=`basename $f`
-  ln -s %{_prefix}/lib/node/.bundled/npm/$module \
+  ln -s ../../../node/.bundled/npm/$module \
         %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/$module
 done
 
@@ -429,7 +419,7 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
 
 # Ensure we have npm and that the version matches
-NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
 %files
 %{_bindir}/node
@@ -488,6 +478,13 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Apr 26 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.0.0-1
+- Update to 10.0.0
+- https://nodejs.org/en/blog/release/v10.0.0/
+- Drop workaround patch
+- Temporarily drop node_g binary due to
+  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85587
+
 * Fri Apr 13 2018 Rafael dos Santos <rdossant@redhat.com> - 1:9.11.1-2
 - Use standard Fedora linker flags (bug #1543859)
 
