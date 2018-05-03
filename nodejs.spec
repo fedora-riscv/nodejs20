@@ -272,7 +272,7 @@ export CXXFLAGS='%{optflags} -g \
 export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
-export LDFLAGS="%{build_ldflags}"
+export LDFLAGS="%{__global_ldflags}"
 
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
