@@ -19,10 +19,10 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 14
-%global nodejs_patch 0
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -445,6 +445,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu May 03 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.14.2-1
+- Update to 6.14.2
+- https://nodejs.org/en/blog/release/v6.14.2/
+- https://nodejs.org/en/blog/release/v6.14.1/
+
 * Fri Apr 13 2018 Rafael dos Santos <rdossant@redhat.com> - 1:6.14.0-2
 - Use standard Fedora linker flags (bug #1543859)
 
