@@ -1,6 +1,4 @@
-# Debug builds are failing on GCC 8.0.2
-# https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85587
-%global with_debug 0
+%global with_debug 1
 
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
@@ -16,7 +14,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 0
+%global nodejs_minor 1
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -27,7 +25,7 @@
 %global v8_major 6
 %global v8_minor 6
 %global v8_build 346
-%global v8_patch 24
+%global v8_patch 27
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -478,6 +476,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed May 09 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-1
+- Update to 10.1.0
+- https://nodejs.org/en/blog/release/v10.1.0/
+- Reenable node_g binary
+
 * Thu Apr 26 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.0.0-1
 - Update to 10.0.0
 - https://nodejs.org/en/blog/release/v10.0.0/
