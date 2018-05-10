@@ -1,5 +1,11 @@
 %global with_debug 1
 
+# PowerPC and s390x segfault during Debug builds
+# https://github.com/nodejs/node/issues/20642
+%ifarch %{ppc} s390x
+%global with_debug 0
+%endif
+
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
@@ -18,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -114,6 +120,9 @@ Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 # Suppress the message from npm to run `npm -g update npm`
 # This does bad things on an RPM-managed npm.
 Patch3: no-npm-update-msg.patch
+
+# Fix PowerPC builds
+Patch4: 0003-PATCH-PPC-use-pc-relative-address-to-init-constpool-.patch
 
 BuildRequires: python2-devel
 BuildRequires: zlib-devel
@@ -265,6 +274,7 @@ rm -rf deps/zlib
 
 
 %patch3 -p1
+%patch4 -p1
 
 %build
 # build with debugging symbols and add defines from libuv (#892601)
@@ -476,6 +486,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu May 10 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-2
+- Include upstream v8 fix for ppc64[le]
+- Disable debug build on ppc64[le] and s390x
+
 * Wed May 09 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-1
 - Update to 10.1.0
 - https://nodejs.org/en/blog/release/v10.1.0/
