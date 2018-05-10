@@ -2,7 +2,7 @@
 
 # PowerPC and s390x segfault during Debug builds
 # https://github.com/nodejs/node/issues/20642
-%ifarch %{ppc} s390x
+%ifarch %{power64} s390x
 %global with_debug 0
 %endif
 
@@ -24,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 3
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -486,6 +486,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu May 10 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-3
+- Fix incorrect rpm macro
+
 * Thu May 10 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-2
 - Include upstream v8 fix for ppc64[le]
 - Disable debug build on ppc64[le] and s390x
