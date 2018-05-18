@@ -1,0 +1,34 @@
+From 78ba46ffc5b0bd1dd30470a8b4fa21ce75b36c67 Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Fri, 18 May 2018 08:25:06 -0400
+Subject: [PATCH 3/4] Suppress message to update npm
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ deps/npm/bin/npm-cli.js | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/deps/npm/bin/npm-cli.js b/deps/npm/bin/npm-cli.js
+index e2c013b5df86371b5a0e5b5ac5cc73613f47fd2c..50691e6f82b7f102cbbf40ba568345836dc849fb 100755
+--- a/deps/npm/bin/npm-cli.js
++++ b/deps/npm/bin/npm-cli.js
+@@ -23,16 +23,10 @@
+   log.pause() // will be unpaused when config is loaded.
+   log.info('it worked if it ends with', 'ok')
+ 
+   unsupported.checkForUnsupportedNode()
+ 
+-  if (!unsupported.checkVersion(process.version).unsupported) {
+-    var updater = require('update-notifier')
+-    var pkg = require('../package.json')
+-    updater({pkg: pkg}).notify({defer: true})
+-  }
+-
+   var path = require('path')
+   var npm = require('../lib/npm.js')
+   var npmconf = require('../lib/config/core.js')
+   var errorHandler = require('../lib/utils/error-handler.js')
+   var output = require('../lib/utils/output.js')
+-- 
+2.17.0
+

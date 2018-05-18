@@ -1,0 +1,43 @@
+From 138926210083b2a9d1bd7a224204e02199242dab Mon Sep 17 00:00:00 2001
+From: Daniel Bevenius <daniel.bevenius@gmail.com>
+Date: Fri, 18 May 2018 09:58:37 +0200
+Subject: [PATCH 4/4] http2: pass session to DEBUG_HTTP2SESSION2
+
+When configure with --debug-http2 --debug-nghttp2 the following
+compilation error is generated:
+
+DEBUG_HTTP2SESSION2(this, "fatal error receiving data: %d", ret);
+                          ^
+../src/node_http2.cc:1690:27:
+error: invalid use of 'this' outside of a non-static member function
+
+1 errors generated.
+
+OnStreamReadImpl is static and I think the intention was to pass in the
+session variable here.
+
+Refs: https://github.com/nodejs/node/issues/20806
+---
+ src/node_http2.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/node_http2.cc b/src/node_http2.cc
+index b31878582301ed2fc974e1ff75bd0776bfd3293e..4aa9fceec18ced426195039da4814be3898d9689 100644
+--- a/src/node_http2.cc
++++ b/src/node_http2.cc
+@@ -1685,11 +1685,11 @@ void Http2Session::OnStreamReadImpl(ssize_t nread,
+ 
+     // Note: if ssize_t is not defined (e.g. on Win32), nghttp2 will typedef
+     // ssize_t to int. Cast here so that the < 0 check actually works on
+     // Windows.
+     if (static_cast<int>(ret) < 0) {
+-      DEBUG_HTTP2SESSION2(this, "fatal error receiving data: %d", ret);
++      DEBUG_HTTP2SESSION2(session, "fatal error receiving data: %d", ret);
+ 
+       Local<Value> argv[1] = {
+         Integer::New(isolate, ret),
+       };
+       session->MakeCallback(env->error_string(), arraysize(argv), argv);
+-- 
+2.17.0
+

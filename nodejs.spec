@@ -109,15 +109,19 @@ Source100: %{name}-tarball.sh
 Source7: nodejs_native.attr
 
 # Disable running gyp on bundled deps we don't use
-Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
+Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Being fixed upstream.
 # Follow https://bugs.chromium.org/p/v8/issues/detail?id=6939
-Patch2: 0001-Fix-aarch64-debug.patch
+Patch2: 0002-Fix-aarch64-debug.patch
 
 # Suppress the message from npm to run `npm -g update npm`
 # This does bad things on an RPM-managed npm.
-Patch3: no-npm-update-msg.patch
+Patch3: 0003-Suppress-message-to-update-npm.patch
+
+# Fix nghttp2 debug builds
+# https://github.com/nodejs/node/pull/20815
+Patch4: 0004-http2-pass-session-to-DEBUG_HTTP2SESSION2.patch
 
 BuildRequires: python2-devel
 BuildRequires: libicu-devel
@@ -280,6 +284,8 @@ rm -rf deps/icu-small \
 %patch2 -p1
 
 %patch3 -p1
+
+%patch4 -p1
 
 %build
 # build with debugging symbols and add defines from libuv (#892601)

@@ -1,17 +1,19 @@
-From c2aff16cc196a61f4ab1cdae4a91c7926123c239 Mon Sep 17 00:00:00 2001
+From c651b81df4132f5a1db173d1317ba64673de6f01 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Thu, 27 Apr 2017 14:25:42 +0200
-Subject: [PATCH] Disable running gyp on shared deps
+Subject: [PATCH 1/4] Disable running gyp on shared deps
 
 ---
  Makefile | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 0a217bd893..e1229ad07f 100644
+index 2c62bf29cd233479e7c56b86d293519dcf9cce6e..10198b11fac2171b6b1c381dbba72596f350870d 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -79,10 +79,9 @@ $(NODE_G_EXE): config.gypi out/Makefile
+@@ -90,14 +90,13 @@ $(NODE_EXE): config.gypi out/Makefile
+ 
+ $(NODE_G_EXE): config.gypi out/Makefile
  	$(MAKE) -C out BUILDTYPE=Debug V=$(V)
  	if [ ! -r $@ -o ! -L $@ ]; then ln -fs out/Debug/$(NODE_EXE) $@; fi
  
@@ -25,5 +27,8 @@ index 0a217bd893..e1229ad07f 100644
  	$(PYTHON) tools/gyp_node.py -f make
  
  config.gypi: configure
+ 	$(error Missing or stale $@, please run ./$<)
+ 
 -- 
-2.12.2
+2.17.0
+
