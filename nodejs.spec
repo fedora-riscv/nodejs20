@@ -7,13 +7,6 @@
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
-# ARM64 builds of 8.5.0 break on the Debug builds, so we'll just
-# build the standard runtime until that gets sorted out.
-# https://github.com/nodejs/node/issues/15395
-%ifarch aarch64
-%global with_debug 1
-%endif
-
 # == Node.js Version ==
 # Note: Fedora should only ship LTS versions of Node.js (currently expected
 # to be major versions with even numbers). The odd-numbered versions are new
