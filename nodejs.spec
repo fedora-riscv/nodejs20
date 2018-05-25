@@ -21,7 +21,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 10
 %global nodejs_minor 2
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -486,9 +486,13 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri May 25 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.1-1
+- Update to 10.2.1
+- https://nodejs.org/en/blog/release/v10.2.1/
+
 * Wed May 23 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.0-1
 - Update to 10.2.0
-- https://nodejs.org/en/blog/release/v10.0.0/
+- https://nodejs.org/en/blog/release/v10.2.0/
 
 * Thu May 10 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-3
 - Fix incorrect rpm macro
