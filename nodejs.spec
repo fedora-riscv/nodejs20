@@ -24,7 +24,7 @@
 %global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -487,6 +487,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue May 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.1-2
+- Fix up bare 'python' to be python2
+- Drop redundant entry in docs section
+
 * Fri May 25 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.1-1
 - Update to 10.2.1
 - https://nodejs.org/en/blog/release/v10.2.1/
