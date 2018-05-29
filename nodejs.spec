@@ -287,6 +287,13 @@ rm -rf deps/icu-small \
 
 %patch4 -p1
 
+# Replace any instances of unversioned python' with python2
+find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
+find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python2~" {} \;
+find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python2~" {} \;
+find . -type f -exec sed -i "s~python -c~python2 -c~" {} \;
+sed -i "s~which('python')~which('python2')~" configure
+
 %build
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
@@ -307,11 +314,6 @@ export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
 export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
 export LDFLAGS="%{build_ldflags}"
-
-# Work around Fedora 28 issue:
-# https://fedoraproject.org/wiki/Changes/Avoid_usr_bin_python_in_RPM_Build#Quick_Opt-Out
-# Tracking BZ: https://bugzilla.redhat.com/show_bug.cgi?id=1550564
-export PYTHON_DISALLOW_AMBIGUOUS_VERSION=0
 
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
@@ -489,7 +491,6 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %files docs
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
-%{_pkgdocdir}/npm*
 %{_pkgdocdir}/npm/html
 %{_pkgdocdir}/npm/doc
 
