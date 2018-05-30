@@ -1,7 +1,7 @@
-From a0048de40ceb91e0bf7b0ffd6eb5054c41b3a4a6 Mon Sep 17 00:00:00 2001
+From cefa0fd937cb48a8431e62268b2c9500b104d4e5 Mon Sep 17 00:00:00 2001
 From: Junliang Yan <jyan@ca.ibm.com>
 Date: Wed, 9 May 2018 18:39:49 -0400
-Subject: [PATCH 3/3] [PATCH] PPC: use pc-relative address to init constpool
+Subject: [PATCH 3/4] [PATCH] PPC: use pc-relative address to init constpool
  reg
 
 R=joransiu@ca.ibm.com

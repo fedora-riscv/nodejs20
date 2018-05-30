@@ -1,0 +1,74 @@
+From 396550f6e26912fe6ef774bc60e24ef73e2f5366 Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Tue, 1 May 2018 08:05:30 -0400
+Subject: [PATCH 2/4] Suppress NPM message to run global update
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ deps/npm/bin/npm-cli.js | 46 -----------------------------------------
+ 1 file changed, 46 deletions(-)
+
+diff --git a/deps/npm/bin/npm-cli.js b/deps/npm/bin/npm-cli.js
+index d7c14bc4b2cd0206448163c3a9bed765bde7fae7..98edb6f45fe073e03794a2ae6e7aa7f5500723ee 100755
+--- a/deps/npm/bin/npm-cli.js
++++ b/deps/npm/bin/npm-cli.js
+@@ -72,56 +72,10 @@
+   // now actually fire up npm and run the command.
+   // this is how to use npm programmatically:
+   conf._exit = true
+   npm.load(conf, function (er) {
+     if (er) return errorHandler(er)
+-    if (!unsupported.checkVersion(process.version).unsupported) {
+-      const pkg = require('../package.json')
+-      let notifier = require('update-notifier')({pkg})
+-      if (
+-        notifier.update &&
+-        notifier.update.latest !== pkg.version
+-      ) {
+-        const color = require('ansicolors')
+-        const useColor = npm.config.get('color')
+-        const useUnicode = npm.config.get('unicode')
+-        const old = notifier.update.current
+-        const latest = notifier.update.latest
+-        let type = notifier.update.type
+-        if (useColor) {
+-          switch (type) {
+-            case 'major':
+-              type = color.red(type)
+-              break
+-            case 'minor':
+-              type = color.yellow(type)
+-              break
+-            case 'patch':
+-              type = color.green(type)
+-              break
+-          }
+-        }
+-        const changelog = `https://github.com/npm/npm/releases/tag/v${latest}`
+-        notifier.notify({
+-          message: `New ${type} version of ${pkg.name} available! ${
+-            useColor ? color.red(old) : old
+-          } ${useUnicode ? '→' : '->'} ${
+-            useColor ? color.green(latest) : latest
+-          }\n` +
+-          `${
+-            useColor ? color.yellow('Changelog:') : 'Changelog:'
+-          } ${
+-            useColor ? color.cyan(changelog) : changelog
+-          }\n` +
+-          `Run ${
+-            useColor
+-              ? color.green(`npm install -g ${pkg.name}`)
+-              : `npm i -g ${pkg.name}`
+-          } to update!`
+-        })
+-      }
+-    }
+     npm.commands[npm.command](npm.argv, function (err) {
+       // https://genius.com/Lin-manuel-miranda-your-obedient-servant-lyrics
+       if (
+         !err &&
+         npm.config.get('ham-it-up') &&
+-- 
+2.17.0
+

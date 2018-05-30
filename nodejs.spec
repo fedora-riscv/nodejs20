@@ -20,11 +20,11 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 2
-%global nodejs_patch 1
+%global nodejs_minor 3
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -76,8 +76,8 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_major 5
-%global npm_minor 6
+%global npm_major 6
+%global npm_minor 1
 %global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
@@ -115,14 +115,14 @@ Source100: %{name}-tarball.sh
 Source7: nodejs_native.attr
 
 # Disable running gyp on bundled deps we don't use
-Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
+Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Suppress the message from npm to run `npm -g update npm`
 # This does bad things on an RPM-managed npm.
-Patch3: no-npm-update-msg.patch
+Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
 # Fix PowerPC builds
-Patch4: 0003-PATCH-PPC-use-pc-relative-address-to-init-constpool-.patch
+Patch3: 0003-PATCH-PPC-use-pc-relative-address-to-init-constpool-.patch
 
 BuildRequires: python2-devel
 BuildRequires: zlib-devel
@@ -272,9 +272,8 @@ The API documentation for the Node.js JavaScript runtime.
 %patch1 -p1
 rm -rf deps/zlib
 
-
+%patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 # Replace any instances of unversioned python' with python2
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
@@ -487,6 +486,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed May 30 2018 Stephen Gallagher <sgallagh@redhat.com> - -
+- Update to 10.3.0
+- Update npm to 6.1.0
+- https://nodejs.org/en/blog/release/v10.3.0/
+
 * Tue May 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.1-2
 - Fix up bare 'python' to be python2
 - Drop redundant entry in docs section
