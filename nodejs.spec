@@ -18,7 +18,7 @@
 %global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -144,7 +144,7 @@ BuildRequires: libnghttp2-devel >= 1.25.0
 Requires: libnghttp2 >= 1.25.0
 %endif
 
-BuildRequires: (openssl-devel <= 1:1.1.0 or compat-openssl10-devel)
+BuildRequires: openssl-devel
 
 # we need the system certificate store when Patch2 is applied
 Requires: ca-certificates
@@ -495,6 +495,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Jun 04 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.2-2
+- Build against OpenSSL 1.1
+
 * Thu May 17 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.2-1
 - Update to 8.11.2
 - https://nodejs.org/en/blog/release/v8.11.2/
