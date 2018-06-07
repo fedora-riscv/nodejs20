@@ -305,7 +305,6 @@ export LDFLAGS="%{build_ldflags}"
            --shared-openssl \
            --shared-zlib \
            --without-dtrace \
-           --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %else
@@ -316,7 +315,6 @@ export LDFLAGS="%{build_ldflags}"
            --shared-http-parser \
            --shared-nghttp2 \
            --with-dtrace \
-           --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %endif
