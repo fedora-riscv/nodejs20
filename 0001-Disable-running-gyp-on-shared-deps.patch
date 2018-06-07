@@ -1,14 +1,14 @@
-From 03d9247890c2755710a8208974d2919b6a217a63 Mon Sep 17 00:00:00 2001
+From b5b4b7f8acd2d67c79d1fc2c954aa88edff27511 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Thu, 27 Apr 2017 14:25:42 +0200
-Subject: [PATCH 1/4] Disable running gyp on shared deps
+Subject: [PATCH 1/2] Disable running gyp on shared deps
 
 ---
  Makefile | 7 +++----
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index a7099947c72a783a4b9d96c950ac084153532d94..bfd205d0992d4bb4b901a1f3d5595e01e6f88bf8 100644
+index b11168aaa456af019a32885f5495c4527a16e9a0..1297fbfc9f68261ea8ebfd1ac70f32581918d078 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -89,14 +89,13 @@ $(NODE_EXE): config.gypi out/Makefile

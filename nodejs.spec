@@ -20,7 +20,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 3
+%global nodejs_minor 4
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -29,9 +29,9 @@
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
-%global v8_minor 6
-%global v8_build 346
-%global v8_patch 32
+%global v8_minor 7
+%global v8_build 288
+%global v8_patch 43
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -120,9 +120,6 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 # Suppress the message from npm to run `npm -g update npm`
 # This does bad things on an RPM-managed npm.
 Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
-
-# Fix PowerPC builds
-Patch3: 0003-PATCH-PPC-use-pc-relative-address-to-init-constpool-.patch
 
 BuildRequires: python2-devel
 BuildRequires: zlib-devel
@@ -273,7 +270,6 @@ The API documentation for the Node.js JavaScript runtime.
 rm -rf deps/zlib
 
 %patch2 -p1
-%patch3 -p1
 
 # Replace any instances of unversioned python' with python2
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
@@ -481,6 +477,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Jun 07 2018 Stephen Gallagher <sgallagh@redhat.com> - -
+- Update to 10.4.0
+- https://nodejs.org/en/blog/release/v10.4.0/
+
 * Wed May 30 2018 Stephen Gallagher <sgallagh@redhat.com> - -
 - Update to 10.3.0
 - Update npm to 6.1.0
