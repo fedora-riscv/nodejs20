@@ -15,10 +15,10 @@
 %global nodejs_epoch 1
 %global nodejs_major 8
 %global nodejs_minor 11
-%global nodejs_patch 2
+%global nodejs_patch 3
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -56,7 +56,7 @@
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 29
+%global nghttp2_minor 32
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
@@ -490,6 +490,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Jun 14 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.3-1
+- Update to 8.11.3 for security fixes
+- https://nodejs.org/en/blog/release/v8.11.3/
+
 * Mon Jun 04 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.2-2
 - Build against OpenSSL 1.1
 
