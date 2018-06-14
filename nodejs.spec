@@ -19,7 +19,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 6
 %global nodejs_minor 14
-%global nodejs_patch 2
+%global nodejs_patch 3
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -445,6 +445,10 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Jun 14 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.14.3-1
+- Update to 6.14.3 security release
+- https://nodejs.org/en/blog/release/v6.14.3/
+
 * Thu May 03 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.14.2-1
 - Update to 6.14.2
 - https://nodejs.org/en/blog/release/v6.14.2/
