@@ -21,7 +21,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 10
 %global nodejs_minor 4
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -31,7 +31,7 @@
 %global v8_major 6
 %global v8_minor 7
 %global v8_build 288
-%global v8_patch 43
+%global v8_patch 45
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -57,7 +57,7 @@
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 29
+%global nghttp2_minor 32
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
@@ -475,11 +475,18 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Thu Jun 07 2018 Stephen Gallagher <sgallagh@redhat.com> - -
+* Thu Jun 14 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.4.1-1
+- Update to 10.4.1 to address security issues
+- https://nodejs.org/en/blog/release/v10.4.0/
+- Resolves: rhbz#1590801
+- Resolves: rhbz#1591014
+- Resolves: rhbz#1591019
+
+* Thu Jun 07 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.4.0-1
 - Update to 10.4.0
 - https://nodejs.org/en/blog/release/v10.4.0/
 
-* Wed May 30 2018 Stephen Gallagher <sgallagh@redhat.com> - -
+* Wed May 30 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.3.0-1
 - Update to 10.3.0
 - Update npm to 6.1.0
 - https://nodejs.org/en/blog/release/v10.3.0/
