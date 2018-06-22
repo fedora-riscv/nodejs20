@@ -1,5 +1,11 @@
 %global with_debug 1
 
+# PowerPC and s390x segfault during Debug builds
+# https://github.com/nodejs/node/issues/20642
+%ifarch %{power64} s390x
+%global with_debug 0
+%endif
+
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
@@ -13,9 +19,9 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 8
-%global nodejs_minor 11
-%global nodejs_patch 3
+%global nodejs_major 10
+%global nodejs_minor 5
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -23,9 +29,9 @@
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
-%global v8_minor 2
-%global v8_build 414
-%global v8_patch 54
+%global v8_minor 7
+%global v8_build 288
+%global v8_patch 46
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -33,8 +39,8 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 10
-%global c_ares_patch 1
+%global c_ares_minor 14
+%global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
 # http-parser - from deps/http_parser/http_parser.h
@@ -45,20 +51,20 @@
 
 # libuv - from deps/uv/include/uv-version.h
 %global libuv_major 1
-%global libuv_minor 19
-%global libuv_patch 1
+%global libuv_minor 20
+%global libuv_patch 3
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
-
-# ICU - from configure in the configure_intl() function
-%global libicu_major 60
-%global libicu_minor 1
-%global libicu_version %{libicu_major}.%{libicu_minor}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
 %global nghttp2_minor 32
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
+
+# ICU - from configure in the configure_intl() function
+%global icu_major 61
+%global icu_minor 1
+%global icu_version %{icu_major}.%{icu_minor}
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -70,8 +76,8 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_major 5
-%global npm_minor 6
+%global npm_major 6
+%global npm_minor 1
 %global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
@@ -111,20 +117,11 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
-# Being fixed upstream.
-# Follow https://bugs.chromium.org/p/v8/issues/detail?id=6939
-Patch2: 0002-Fix-aarch64-debug.patch
-
 # Suppress the message from npm to run `npm -g update npm`
 # This does bad things on an RPM-managed npm.
-Patch3: 0003-Suppress-message-to-update-npm.patch
-
-# Fix nghttp2 debug builds
-# https://github.com/nodejs/node/pull/20815
-Patch4: 0004-http2-pass-session-to-DEBUG_HTTP2SESSION2.patch
+Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
 BuildRequires: python2-devel
-BuildRequires: libicu-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
@@ -138,15 +135,15 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
 Requires: http-parser >= 2.7.0
-BuildRequires: libuv-devel >= 1:1.19.1
-Requires: libuv >= 1:1.19.1
-BuildRequires: libnghttp2-devel >= 1.25.0
-Requires: libnghttp2 >= 1.25.0
+BuildRequires: libuv-devel >= 1:1.20.2
+Requires: libuv >= 1:1.20.2
+BuildRequires: libnghttp2-devel >= %{nghttp2_version}
+Requires: libnghttp2 >= %{nghttp2_version}
 %endif
 
 BuildRequires: openssl-devel
 
-# we need the system certificate store when Patch2 is applied
+# we need the system certificate store
 Requires: ca-certificates
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
@@ -189,13 +186,10 @@ Provides: bundled(c-ares) = %{c_ares_version}
 # See https://github.com/nodejs/node/commit/d726a177ed59c37cf5306983ed00ecd858cfbbef
 Provides: bundled(v8) = %{v8_version}
 
-%if 0%{?fedora} && 0%{?fedora < 28}
-# Node.js requires up-to-date ICU
-%global config_intl --with-intl=small-icu
-Provides: bundled(icu) = %{libicu_version}
-%else
-%global config_intl --with-intl=system-icu
-%endif
+# Node.js is bound to a specific version of ICU which may not match the OS
+# We cannot pin the OS to this version of ICU because every update includes
+# an ABI-break, so we'll use the bundled copy.
+Provides: bundled(icu) = %{icu_version}
 
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?rhel}
@@ -273,19 +267,9 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 %patch1 -p1
-
-%if 0%{?fedora} && 0%{?fedora < 28}
 rm -rf deps/zlib
-%else
-rm -rf deps/icu-small \
-       deps/zlib
-%endif
 
 %patch2 -p1
-
-%patch3 -p1
-
-%patch4 -p1
 
 # Replace any instances of unversioned python' with python2
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
@@ -321,8 +305,6 @@ export LDFLAGS="%{build_ldflags}"
            --shared-openssl \
            --shared-zlib \
            --without-dtrace \
-           %{config_intl} \
-           --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %else
@@ -333,8 +315,6 @@ export LDFLAGS="%{build_ldflags}"
            --shared-http-parser \
            --shared-nghttp2 \
            --with-dtrace \
-           %{config_intl} \
-           --debug-http2 \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %endif
@@ -390,16 +370,18 @@ mv %{buildroot}/%{_datadir}/doc/node/gdbinit %{buildroot}/%{_pkgdocdir}/gdbinit
 # can backtrack on this if we decide to.
 
 # Rename the npm node_modules directory to node_modules.bundled
+mkdir -p %{buildroot}/%{_prefix}/lib/node/.bundled
 mv %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules \
-   %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules.bundled
+   %{buildroot}/%{_prefix}/lib/node/.bundled/npm
 
 # Recreate all the symlinks
 mkdir -p %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules
-FILES=%{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules.bundled/*
+FILES=%{buildroot}/%{_prefix}/lib/node/.bundled/npm/*
 for f in $FILES
 do
   module=`basename $f`
-  ln -s ../node_modules.bundled/$module %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/$module
+  ln -s ../../../node/.bundled/npm/$module \
+        %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/$module
 done
 
 # install NPM docs to mandir
@@ -435,11 +417,13 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
 
 # Ensure we have npm and that the version matches
-NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
 %files
 %{_bindir}/node
 %dir %{_prefix}/lib/node_modules
+%dir %{_prefix}/lib/node
+%dir %{_prefix}/lib/node/.bundled
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
 %dir %{_datadir}/systemtap/tapset
@@ -473,6 +457,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_bindir}/npm
 %{_bindir}/npx
 %{_prefix}/lib/node_modules/npm
+%{_prefix}/lib/node/.bundled/npm
 %ghost %{_sysconfdir}/npmrc
 %ghost %{_sysconfdir}/npmignore
 %doc %{_mandir}/man*/npm*
@@ -490,33 +475,89 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Thu Jun 14 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.3-1
-- Update to 8.11.3 for security fixes
-- https://nodejs.org/en/blog/release/v8.11.3/
+* Thu Jun 21 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.5.0-1
+- Update to 10.5.0
+- https://nodejs.org/en/blog/release/v10.5.0/
 
-* Mon Jun 04 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.2-2
-- Build against OpenSSL 1.1
+* Thu Jun 14 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.4.1-1
+- Update to 10.4.1 to address security issues
+- https://nodejs.org/en/blog/release/v10.4.1/
+- Resolves: rhbz#1590801
+- Resolves: rhbz#1591014
+- Resolves: rhbz#1591019
 
-* Thu May 17 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.2-1
-- Update to 8.11.2
-- https://nodejs.org/en/blog/release/v8.11.2/
+* Thu Jun 07 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.4.0-1
+- Update to 10.4.0
+- https://nodejs.org/en/blog/release/v10.4.0/
 
-* Fri Apr 13 2018 Rafael dos Santos <rdossant@redhat.com> - 1:8.11.0-2
+* Wed May 30 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.3.0-1
+- Update to 10.3.0
+- Update npm to 6.1.0
+- https://nodejs.org/en/blog/release/v10.3.0/
+
+* Tue May 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.1-2
+- Fix up bare 'python' to be python2
+- Drop redundant entry in docs section
+
+* Fri May 25 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.1-1
+- Update to 10.2.1
+- https://nodejs.org/en/blog/release/v10.2.1/
+
+* Wed May 23 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.2.0-1
+- Update to 10.2.0
+- https://nodejs.org/en/blog/release/v10.2.0/
+
+* Thu May 10 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-3
+- Fix incorrect rpm macro
+
+* Thu May 10 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-2
+- Include upstream v8 fix for ppc64[le]
+- Disable debug build on ppc64[le] and s390x
+
+* Wed May 09 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.1.0-1
+- Update to 10.1.0
+- https://nodejs.org/en/blog/release/v10.1.0/
+- Reenable node_g binary
+
+* Thu Apr 26 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.0.0-1
+- Update to 10.0.0
+- https://nodejs.org/en/blog/release/v10.0.0/
+- Drop workaround patch
+- Temporarily drop node_g binary due to
+  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85587
+
+* Fri Apr 13 2018 Rafael dos Santos <rdossant@redhat.com> - 1:9.11.1-2
 - Use standard Fedora linker flags (bug #1543859)
 
-* Wed Mar 28 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.11.0-1
-- Update to 8.11.0
-- https://nodejs.org/en/blog/release/v8.11.0/
+* Thu Apr 05 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.11.1-1
+- Update to 9.11.1
+- https://nodejs.org/en/blog/release/v9.11.0/
+- https://nodejs.org/en/blog/release/v9.11.1/
 
-* Thu Mar 08 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.10.0-1
-- Update to 8.10.0
-- https://nodejs.org/en/blog/release/v8.10.0/
+* Wed Mar 28 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.10.0-1
+- Update to 9.10.0
+- https://nodejs.org/en/blog/release/v9.10.0/
 
-* Thu Mar 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.9.4-3
-- Work around build issue on F28
+* Wed Mar 21 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.9.0-1
+- Update to 9.9.0
+- https://nodejs.org/en/blog/release/v9.9.0/
 
-* Thu Feb 08 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:8.9.4-2.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
+* Thu Mar 08 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.8.0-1
+- Update to 9.8.0
+- https://nodejs.org/en/blog/release/v9.8.0/
+
+* Thu Mar 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.7.0-1
+- Update to 9.7.0
+- https://nodejs.org/en/blog/release/v9.7.0/
+- Work around F28 build issue
+
+* Sun Feb 25 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.6.1-1
+- Update to 9.6.1
+- https://nodejs.org/en/blog/release/v9.6.1/
+- https://nodejs.org/en/blog/release/v9.6.0/
+
+* Mon Feb 05 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:9.5.0-1
+- Package Node.js 9.5.0
 
 * Thu Jan 11 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:8.9.4-2
 - Fix incorrect Requires:

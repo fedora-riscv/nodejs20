@@ -1,0 +1,128 @@
+From cefa0fd937cb48a8431e62268b2c9500b104d4e5 Mon Sep 17 00:00:00 2001
+From: Junliang Yan <jyan@ca.ibm.com>
+Date: Wed, 9 May 2018 18:39:49 -0400
+Subject: [PATCH 3/4] [PATCH] PPC: use pc-relative address to init constpool
+ reg
+
+R=joransiu@ca.ibm.com
+
+Change-Id: I67364f29d494b09786a14b13743f73bef4b64582
+Reviewed-on: https://chromium-review.googlesource.com/950242
+Commit-Queue: Junliang Yan <jyan@ca.ibm.com>
+Reviewed-by: Joran Siu <joransiu@ca.ibm.com>
+Cr-Commit-Position: refs/heads/master@{#51750}
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ deps/v8/src/ppc/macro-assembler-ppc.cc | 14 ++++++++++----
+ deps/v8/src/ppc/macro-assembler-ppc.h  |  9 +++++----
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/deps/v8/src/ppc/macro-assembler-ppc.cc b/deps/v8/src/ppc/macro-assembler-ppc.cc
+index 68efa84c72c7f6d781d508183b53ea83024944d1..3192e9cefb1c1b116c5e12b5c52e7971b92a111a 100644
+--- a/deps/v8/src/ppc/macro-assembler-ppc.cc
++++ b/deps/v8/src/ppc/macro-assembler-ppc.cc
+@@ -166,11 +166,11 @@ void TurboAssembler::Call(Register target) {
+ 
+   DCHECK_EQ(CallSize(target), SizeOfCodeGeneratedSince(&start));
+ }
+ 
+ void MacroAssembler::CallJSEntry(Register target) {
+-  DCHECK(target == ip);
++  CHECK(target == r5);
+   Call(target);
+ }
+ 
+ int TurboAssembler::CallSize(Address target, RelocInfo::Mode rmode,
+                              Condition cond) {
+@@ -823,20 +823,27 @@ void TurboAssembler::ShiftRightAlgPair(Register dst_low, Register dst_high,
+     srawi(dst_high, src_high, shift);
+   }
+ }
+ #endif
+ 
+-void MacroAssembler::LoadConstantPoolPointerRegisterFromCodeTargetAddress(
++void TurboAssembler::LoadConstantPoolPointerRegisterFromCodeTargetAddress(
+     Register code_target_address) {
+   lwz(kConstantPoolRegister,
+       MemOperand(code_target_address,
+                  Code::kConstantPoolOffset - Code::kHeaderSize));
+   add(kConstantPoolRegister, kConstantPoolRegister, code_target_address);
+ }
+ 
++void TurboAssembler::LoadPC(Register dst) {
++  b(4, SetLK);
++  mflr(dst);
++}
++
+ void TurboAssembler::LoadConstantPoolPointerRegister() {
+-  mov_label_addr(kConstantPoolRegister, ConstantPoolPosition());
++  LoadPC(kConstantPoolRegister);
++  add_label_offset(kConstantPoolRegister, kConstantPoolRegister,
++                   ConstantPoolPosition(), -pc_offset() + 4);
+ }
+ 
+ void TurboAssembler::StubPrologue(StackFrame::Type type) {
+   {
+     ConstantPoolUnavailableScope constant_pool_unavailable(this);
+@@ -848,11 +855,10 @@ void TurboAssembler::StubPrologue(StackFrame::Type type) {
+     set_constant_pool_available(true);
+   }
+ }
+ 
+ void TurboAssembler::Prologue() {
+-  DCHECK(base != no_reg);
+   PushStandardFrame(r4);
+   if (FLAG_enable_embedded_constant_pool) {
+     // base contains prologue address
+     LoadConstantPoolPointerRegister();
+     set_constant_pool_available(true);
+diff --git a/deps/v8/src/ppc/macro-assembler-ppc.h b/deps/v8/src/ppc/macro-assembler-ppc.h
+index f4d9afd47f150f9cd2e840c20a61e965a5d8f5f5..32e6219c41bbbfe8427e05f2f9a02ff800efcffb 100644
+--- a/deps/v8/src/ppc/macro-assembler-ppc.h
++++ b/deps/v8/src/ppc/macro-assembler-ppc.h
+@@ -214,10 +214,11 @@ class TurboAssembler : public Assembler {
+ 
+   void LoadSingle(DoubleRegister dst, const MemOperand& mem,
+                   Register scratch = no_reg);
+   void LoadSingleU(DoubleRegister dst, const MemOperand& mem,
+                    Register scratch = no_reg);
++  void LoadPC(Register dst);
+ 
+   void StoreDouble(DoubleRegister src, const MemOperand& mem,
+                    Register scratch = no_reg);
+   void StoreDoubleU(DoubleRegister src, const MemOperand& mem,
+                     Register scratch = no_reg);
+@@ -639,10 +640,14 @@ class TurboAssembler : public Assembler {
+ 
+   // Call a code stub.
+   void CallStubDelayed(CodeStub* stub);
+ 
+   void LoadConstantPoolPointerRegister();
++
++  // Loads the constant pool pointer (kConstantPoolRegister).
++  void LoadConstantPoolPointerRegisterFromCodeTargetAddress(
++      Register code_target_address);
+   void AbortConstantPoolBuilding() {
+ #ifdef DEBUG
+     // Avoid DCHECK(!is_linked()) failure in ~Label()
+     bind(ConstantPoolPosition());
+ #endif
+@@ -733,14 +738,10 @@ class MacroAssembler : public TurboAssembler {
+   // Push and pop the registers that can hold pointers, as defined by the
+   // RegList constant kSafepointSavedRegisters.
+   void PushSafepointRegisters();
+   void PopSafepointRegisters();
+ 
+-  // Loads the constant pool pointer (kConstantPoolRegister).
+-  void LoadConstantPoolPointerRegisterFromCodeTargetAddress(
+-      Register code_target_address);
+-
+   // Flush the I-cache from asm code. You should use CpuFeatures::FlushICache
+   // from C.
+   // Does not handle errors.
+   void FlushICache(Register address, size_t size, Register scratch);
+ 
+-- 
+2.17.0
+
