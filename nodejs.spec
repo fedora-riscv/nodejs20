@@ -95,7 +95,7 @@
 Name: nodejs
 Epoch: %{nodejs_epoch}
 Version: %{nodejs_version}
-Release: %{nodejs_release}%{?dist}
+Release: %{nodejs_release}%{?dist}.1
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
 Group: Development/Languages
@@ -230,7 +230,7 @@ Development headers for the Node.js JavaScript runtime.
 Summary: Node.js Package Manager
 Epoch: %{npm_epoch}
 Version: %{npm_version}
-Release: %{npm_release}%{?dist}
+Release: %{npm_release}%{?dist}.1
 
 # We used to ship npm separately, but it is so tightly integrated with Node.js
 # (and expected to be present on all Node.js systems) that we ship it bundled
@@ -475,6 +475,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:10.5.0-1.1
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
 * Thu Jun 21 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.5.0-1
 - Update to 10.5.0
 - https://nodejs.org/en/blog/release/v10.5.0/
