@@ -1,5 +1,8 @@
 %global with_debug 1
 
+# Annobin is currently breaking C++ builds
+%undefine _annotated_build
+
 # PowerPC and s390x segfault during Debug builds
 # https://github.com/nodejs/node/issues/20642
 %ifarch %{power64} s390x
@@ -20,7 +23,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 5
+%global nodejs_minor 7
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -31,7 +34,7 @@
 %global v8_major 6
 %global v8_minor 7
 %global v8_build 288
-%global v8_patch 46
+%global v8_patch 49
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -49,10 +52,10 @@
 %global http_parser_patch 0
 %global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
 
-# libuv - from deps/uv/include/uv-version.h
+# libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 20
-%global libuv_patch 3
+%global libuv_minor 22
+%global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -62,15 +65,22 @@
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from configure in the configure_intl() function
-%global icu_major 61
+%global icu_major 62
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
+
+%if 0%{?fedora} >= 29
+%global icu_flag system-icu
+%else
+%global icu_flag small-icu
+%endif
+
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
 # Note: this will be unmerged in an upcoming major release
 %global punycode_major 2
-%global punycode_minor 0
+%global punycode_minor 1
 %global punycode_patch 0
 %global punycode_version %{punycode_major}.%{punycode_minor}.%{punycode_patch}
 
@@ -86,10 +96,6 @@
 # to increment safely. Changing this can only be done during an update when the
 # base npm version number is increasing.
 %global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
-
-# Filter out the NPM bundled dependencies so we aren't providing them
-%global __provides_exclude_from ^%{_prefix}/lib/node_modules/npm/.*$
-%global __requires_exclude_from ^%{_prefix}/lib/node_modules/npm/.*$
 
 
 Name: nodejs
@@ -122,6 +128,7 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
 BuildRequires: python2-devel
+BuildRequires: python3-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
@@ -135,10 +142,15 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
 Requires: http-parser >= 2.7.0
-BuildRequires: libuv-devel >= 1:1.20.2
+BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:1.20.2
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
+%endif
+
+
+%if 0%{?fedora} >= 29
+BuildRequires: libicu-devel >= 62.1
 %endif
 
 BuildRequires: openssl-devel
@@ -272,13 +284,17 @@ rm -rf deps/zlib
 %patch2 -p1
 
 # Replace any instances of unversioned python' with python2
+pathfix.py -i %{__python2} -pn $(find -type f)
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
 find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python2~" {} \;
-find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python2~" {} \;
+sed -i "s~python~python2~" $(find . -type f | grep "gyp$")
+sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
+sed -i "s~usr\/bin\/python.*$~usr\/bin\/python2~" ./deps/v8/tools/mb/mb_unittest.py
 find . -type f -exec sed -i "s~python -c~python2 -c~" {} \;
 sed -i "s~which('python')~which('python2')~" configure
 
 %build
+
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
 # NULL objects. We need to pass -fno-delete-null-pointer-checks
@@ -305,6 +321,7 @@ export LDFLAGS="%{build_ldflags}"
            --shared-openssl \
            --shared-zlib \
            --without-dtrace \
+           --with-intl=small-icu \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %else
@@ -315,6 +332,7 @@ export LDFLAGS="%{build_ldflags}"
            --shared-http-parser \
            --shared-nghttp2 \
            --with-dtrace \
+           --with-intl=%{icu_flag} \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %endif
@@ -365,25 +383,6 @@ cp -p common.gypi %{buildroot}%{_datadir}/node
 # Install the GDB init tool into the documentation directory
 mv %{buildroot}/%{_datadir}/doc/node/gdbinit %{buildroot}/%{_pkgdocdir}/gdbinit
 
-# Since the old version of NPM was unbundled, there are a lot of symlinks in
-# it's node_modules directory. We need to keep these as symlinks to ensure we
-# can backtrack on this if we decide to.
-
-# Rename the npm node_modules directory to node_modules.bundled
-mkdir -p %{buildroot}/%{_prefix}/lib/node/.bundled
-mv %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules \
-   %{buildroot}/%{_prefix}/lib/node/.bundled/npm
-
-# Recreate all the symlinks
-mkdir -p %{buildroot}/%{_prefix}/lib/node_modules/npm/node_modules
-FILES=%{buildroot}/%{_prefix}/lib/node/.bundled/npm/*
-for f in $FILES
-do
-  module=`basename $f`
-  ln -s ../../../node/.bundled/npm/$module \
-        %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/$module
-done
-
 # install NPM docs to mandir
 mkdir -p %{buildroot}%{_mandir} \
          %{buildroot}%{_pkgdocdir}/npm
@@ -419,11 +418,20 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 # Ensure we have npm and that the version matches
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
+
+%pretrans -p <lua>
+-- Remove all of the symlinks from the bundled npm node_modules directory
+-- This scriptlet can be removed in Fedora 31
+for f in posix.files("%{_prefix}/lib/node_modules/npm/node_modules/") do
+  st = posix.stat(f)
+  if st and st.type == "link" then
+    os.remove(path)
+  end
+end
+
 %files
 %{_bindir}/node
 %dir %{_prefix}/lib/node_modules
-%dir %{_prefix}/lib/node
-%dir %{_prefix}/lib/node/.bundled
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
 %dir %{_datadir}/systemtap/tapset
@@ -457,7 +465,6 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_bindir}/npm
 %{_bindir}/npx
 %{_prefix}/lib/node_modules/npm
-%{_prefix}/lib/node/.bundled/npm
 %ghost %{_sysconfdir}/npmrc
 %ghost %{_sysconfdir}/npmignore
 %doc %{_mandir}/man*/npm*
@@ -475,6 +482,11 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Jul 19 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.6.0-1
+- Update to 10.7.0
+- https://nodejs.org/en/blog/release/v10.7.0/
+- https://nodejs.org/en/blog/release/v10.6.0/
+
 * Fri Jul 13 2018 Fedora Release Engineering <releng@fedoraproject.org> - 1:10.5.0-1.1
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
 
