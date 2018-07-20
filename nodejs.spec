@@ -27,7 +27,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -419,15 +419,17 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
 
-%pretrans -p <lua>
+%pretrans -n npm -p <lua>
 -- Remove all of the symlinks from the bundled npm node_modules directory
 -- This scriptlet can be removed in Fedora 31
 for f in posix.files("%{_prefix}/lib/node_modules/npm/node_modules/") do
-  st = posix.stat(f)
+  path = "%{_prefix}/lib/node_modules/npm/node_modules/"..f
+  st = posix.stat(path)
   if st and st.type == "link" then
     os.remove(path)
   end
 end
+
 
 %files
 %{_bindir}/node
