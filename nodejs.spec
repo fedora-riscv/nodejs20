@@ -24,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 3
+%global nodejs_release 4
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -239,7 +239,7 @@ Development headers for the Node.js JavaScript runtime.
 Summary: Node.js Package Manager
 Epoch: %{npm_epoch}
 Version: %{npm_version}
-Release: %{npm_release}%{?dist}.1
+Release: %{npm_release}%{?dist}
 
 # We used to ship npm separately, but it is so tightly integrated with Node.js
 # (and expected to be present on all Node.js systems) that we ship it bundled
@@ -419,14 +419,17 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 %pretrans -n npm -p <lua>
 -- Remove all of the symlinks from the bundled npm node_modules directory
 -- This scriptlet can be removed in Fedora 31
-for f in posix.files("%{_prefix}/lib/node_modules/npm/node_modules/") do
-  path = "%{_prefix}/lib/node_modules/npm/node_modules/"..f
-  st = posix.stat(path)
-  if st and st.type == "link" then
-    os.remove(path)
+base_path = "%{_prefix}/lib/node_modules/npm/node_modules/"
+d_st = posix.stat(base_path)
+if d_st then
+  for f in posix.files(base_path) do
+    path = base_path..f
+    st = posix.stat(path)
+    if st and st.type == "link" then
+      os.remove(path)
+    end
   end
 end
-
 
 %files
 %{_bindir}/node
@@ -481,6 +484,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Jul 20 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.7.0-4
+- Fix npm upgrade scriptlet
+- Fix unexpected trailing .1 in npm release field
+
 * Fri Jul 20 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.7.0-3
 - Restore annotations to binaries
 - Fix unexpected trailing .1 in release field
