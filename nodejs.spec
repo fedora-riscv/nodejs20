@@ -1,8 +1,5 @@
 %global with_debug 1
 
-# Annobin is currently breaking C++ builds
-%undefine _annotated_build
-
 # PowerPC and s390x segfault during Debug builds
 # https://github.com/nodejs/node/issues/20642
 %ifarch %{power64} s390x
@@ -27,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 3
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -484,7 +481,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Thu Jul 19 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.6.0-1
+* Fri Jul 20 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.7.0-3
+- Restore annotations to binaries
+- Fix unexpected trailing .1 in release field
+
+* Thu Jul 19 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.7.0-2
 - Update to 10.7.0
 - https://nodejs.org/en/blog/release/v10.7.0/
 - https://nodejs.org/en/blog/release/v10.6.0/
