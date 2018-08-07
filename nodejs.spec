@@ -20,11 +20,11 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 7
+%global nodejs_minor 8
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 4
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -84,7 +84,7 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 1
+%global npm_minor 2
 %global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
@@ -484,6 +484,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Aug 07 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.8.0-1
+- Update to 10.8.0
+- https://nodejs.org/en/blog/release/v10.8.0/
+
 * Fri Jul 20 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.7.0-4
 - Fix npm upgrade scriptlet
 - Fix unexpected trailing .1 in npm release field

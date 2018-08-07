@@ -1,24 +1,27 @@
-From 6c121f7eacbeaf07e51ec761b1794ebd00ffcc1b Mon Sep 17 00:00:00 2001
+From b88de8b58be60c6fc741e4d7d408fc2071e2722a Mon Sep 17 00:00:00 2001
 From: Stephen Gallagher <sgallagh@redhat.com>
 Date: Tue, 1 May 2018 08:05:30 -0400
 Subject: [PATCH 2/2] Suppress NPM message to run global update
 
 Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
 ---
- deps/npm/bin/npm-cli.js | 46 -----------------------------------------
- 1 file changed, 46 deletions(-)
+ deps/npm/bin/npm-cli.js | 49 -----------------------------------------
+ 1 file changed, 49 deletions(-)
 
 diff --git a/deps/npm/bin/npm-cli.js b/deps/npm/bin/npm-cli.js
-index d7c14bc4b2cd0206448163c3a9bed765bde7fae7..98edb6f45fe073e03794a2ae6e7aa7f5500723ee 100755
+index a38009d276e3bb7cb26e9536b62596c336ff8fb5..98edb6f45fe073e03794a2ae6e7aa7f5500723ee 100755
 --- a/deps/npm/bin/npm-cli.js
 +++ b/deps/npm/bin/npm-cli.js
-@@ -72,56 +72,10 @@
+@@ -72,59 +72,10 @@
    // now actually fire up npm and run the command.
    // this is how to use npm programmatically:
    conf._exit = true
    npm.load(conf, function (er) {
      if (er) return errorHandler(er)
--    if (!unsupported.checkVersion(process.version).unsupported) {
+-    if (
+-      npm.config.get('update-notifier') &&
+-      !unsupported.checkVersion(process.version).unsupported
+-    ) {
 -      const pkg = require('../package.json')
 -      let notifier = require('update-notifier')({pkg})
 -      if (
@@ -44,7 +47,7 @@ index d7c14bc4b2cd0206448163c3a9bed765bde7fae7..98edb6f45fe073e03794a2ae6e7aa7f5
 -              break
 -          }
 -        }
--        const changelog = `https://github.com/npm/npm/releases/tag/v${latest}`
+-        const changelog = `https://github.com/npm/cli/releases/tag/v${latest}`
 -        notifier.notify({
 -          message: `New ${type} version of ${pkg.name} available! ${
 -            useColor ? color.red(old) : old
