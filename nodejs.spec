@@ -20,7 +20,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 8
+%global nodejs_minor 9
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -29,9 +29,9 @@
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
-%global v8_minor 7
-%global v8_build 288
-%global v8_patch 49
+%global v8_minor 8
+%global v8_build 275
+%global v8_patch 24
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -484,6 +484,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Aug 16 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.9.0-1
+- Update to 10.9.0
+- https://nodejs.org/en/blog/release/v10.9.0/
+
 * Tue Aug 07 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.8.0-1
 - Update to 10.8.0
 - https://nodejs.org/en/blog/release/v10.8.0/

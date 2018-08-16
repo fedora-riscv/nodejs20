@@ -1,4 +1,4 @@
-From 89c2a359e3c813dd9c3e076f0f91e4fcc46d0274 Mon Sep 17 00:00:00 2001
+From 3775a1669913db89c042859fd87c349fb5459e55 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Thu, 27 Apr 2017 14:25:42 +0200
 Subject: [PATCH 1/2] Disable running gyp on shared deps
@@ -8,10 +8,10 @@ Subject: [PATCH 1/2] Disable running gyp on shared deps
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 81dbd9f4d19434c39ab58ff377b0205c7beee557..0db2f5490701068e930d6f108ec4f0447a9fab19 100644
+index 231948c15b95bdcdf5cbe2ada9dcb54207cde1cc..ce48995b92feb55d2c307296f3899937d60b16ae 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -105,14 +105,13 @@ with-code-cache:
+@@ -109,14 +109,13 @@ with-code-cache:
  
  .PHONY: test-code-cache
  test-code-cache: with-code-cache
@@ -30,5 +30,5 @@ index 81dbd9f4d19434c39ab58ff377b0205c7beee557..0db2f5490701068e930d6f108ec4f044
  	@if [ -x config.status ]; then \
  		./config.status; \
 -- 
-2.17.1
+2.18.0
 
