@@ -24,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -403,6 +403,11 @@ ln -sf %{_pkgdocdir}/npm/html %{buildroot}%{_prefix}/lib/node_modules/npm/doc
 rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
       %{buildroot}/%{_defaultdocdir}/node/lldbinit
 
+# Some NPM bundled deps are executable but should not be. This causes
+# unnecessary automatic dependencies to be added. Make them not executable.
+find %{buildroot}%{_prefix}/lib/node_modules/npm -type f -exectuable -exec chmod -x {} \;
+
+
 %check
 # Fail the build if the versions don't match
 %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
@@ -484,6 +489,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Aug 21 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.9.0-2
+- Clean up automatic dependencies for npm
+
 * Thu Aug 16 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.9.0-1
 - Update to 10.9.0
 - https://nodejs.org/en/blog/release/v10.9.0/
