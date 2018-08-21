@@ -405,7 +405,7 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 
 # Some NPM bundled deps are executable but should not be. This causes
 # unnecessary automatic dependencies to be added. Make them not executable.
-find %{buildroot}%{_prefix}/lib/node_modules/npm -type f -exectuable -exec chmod -x {} \;
+find %{buildroot}%{_prefix}/lib/node_modules/npm -type f -executable -exec chmod -x {} \;
 
 
 %check
