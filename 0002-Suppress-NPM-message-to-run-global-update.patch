@@ -1,32 +1,42 @@
-From 5fa6ec054f98e7e2e480feab792d51ff4100f1d9 Mon Sep 17 00:00:00 2001
+From 6fa6df3e7ec585d1bf1386dcf29f608a039bbbe9 Mon Sep 17 00:00:00 2001
 From: Stephen Gallagher <sgallagh@redhat.com>
 Date: Tue, 1 May 2018 08:05:30 -0400
 Subject: [PATCH 2/2] Suppress NPM message to run global update
 
 Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
 ---
- deps/npm/bin/npm-cli.js | 49 -----------------------------------------
- 1 file changed, 49 deletions(-)
+ deps/npm/bin/npm-cli.js | 54 -----------------------------------------
+ 1 file changed, 54 deletions(-)
 
 diff --git a/deps/npm/bin/npm-cli.js b/deps/npm/bin/npm-cli.js
-index a38009d276e3bb7cb26e9536b62596c336ff8fb5..98edb6f45fe073e03794a2ae6e7aa7f5500723ee 100755
+index 6f76b23828531e7af98a7e3cd7d5abfaac09b40c..98edb6f45fe073e03794a2ae6e7aa7f5500723ee 100755
 --- a/deps/npm/bin/npm-cli.js
 +++ b/deps/npm/bin/npm-cli.js
-@@ -72,59 +72,10 @@
+@@ -67,69 +67,15 @@
+   if (conf.usage && npm.command !== 'help') {
+     npm.argv.unshift(npm.command)
+     npm.command = 'help'
+   }
+ 
+-  var isGlobalNpmUpdate = conf.global && ['install', 'update'].includes(npm.command) && npm.argv.includes('npm')
+-
    // now actually fire up npm and run the command.
    // this is how to use npm programmatically:
    conf._exit = true
    npm.load(conf, function (er) {
      if (er) return errorHandler(er)
 -    if (
+-      !isGlobalNpmUpdate &&
 -      npm.config.get('update-notifier') &&
 -      !unsupported.checkVersion(process.version).unsupported
 -    ) {
 -      const pkg = require('../package.json')
 -      let notifier = require('update-notifier')({pkg})
+-      const isCI = require('ci-info').isCI
 -      if (
 -        notifier.update &&
--        notifier.update.latest !== pkg.version
+-        notifier.update.latest !== pkg.version &&
+-        !isCI
 -      ) {
 -        const color = require('ansicolors')
 -        const useColor = npm.config.get('color')
@@ -73,5 +83,5 @@ index a38009d276e3bb7cb26e9536b62596c336ff8fb5..98edb6f45fe073e03794a2ae6e7aa7f5
          !err &&
          npm.config.get('ham-it-up') &&
 -- 
-2.18.0
+2.19.0.rc1
 

@@ -20,18 +20,18 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 9
+%global nodejs_minor 10
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
 %global v8_minor 8
 %global v8_build 275
-%global v8_patch 24
+%global v8_patch 30
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -51,13 +51,13 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 22
+%global libuv_minor 23
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 32
+%global nghttp2_minor 33
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
@@ -84,8 +84,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 2
-%global npm_patch 0
+%global npm_minor 4
+%global npm_patch 1
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -405,7 +405,10 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 
 # Some NPM bundled deps are executable but should not be. This causes
 # unnecessary automatic dependencies to be added. Make them not executable.
-find %{buildroot}%{_prefix}/lib/node_modules/npm -type f -executable -exec chmod -x {} \;
+# Skip the npm bin directory or the npm binary will not work.
+find %{buildroot}%{_prefix}/lib/node_modules/npm \
+    -path bin -o -prune \
+    -type f -executable -exec chmod -x {} \;
 
 
 %check
@@ -489,6 +492,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Sep 11 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.10.0-1
+- Update to 10.10.0
+- https://nodejs.org/en/blog/release/v10.10.0/
+- Fix issue with npm permissions
+
 * Tue Aug 21 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.9.0-2
 - Clean up automatic dependencies for npm
 
