@@ -24,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -407,8 +407,9 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 # unnecessary automatic dependencies to be added. Make them not executable.
 # Skip the npm bin directory or the npm binary will not work.
 find %{buildroot}%{_prefix}/lib/node_modules/npm \
-    -path bin -o -prune \
-    -type f -executable -exec chmod -x {} \;
+    -not -path %{buildroot}%{_prefix}/lib/node_modules/npm/bin/* \
+    -executable -type f \
+    -exec chmod -x {} \;
 
 
 %check
@@ -492,6 +493,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Sep 19 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.10.0-2
+- Really, finally fix npm dep executable permissions
+
 * Tue Sep 11 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.10.0-1
 - Update to 10.10.0
 - https://nodejs.org/en/blog/release/v10.10.0/
