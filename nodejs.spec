@@ -20,18 +20,18 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 10
+%global nodejs_minor 11
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 %global v8_major 6
 %global v8_minor 8
 %global v8_build 275
-%global v8_patch 30
+%global v8_patch 32
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -61,7 +61,7 @@
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
-# ICU - from configure in the configure_intl() function
+# ICU - from configure.py in the configure_intl() function
 %global icu_major 62
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
@@ -493,6 +493,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Sep 20 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.11.0-1
+- Update to 10.11.0
+- https://nodejs.org/en/blog/release/v10.11.0/
+
 * Wed Sep 19 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.10.0-2
 - Really, finally fix npm dep executable permissions
 
