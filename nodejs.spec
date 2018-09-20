@@ -407,7 +407,7 @@ rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
 # unnecessary automatic dependencies to be added. Make them not executable.
 # Skip the npm bin directory or the npm binary will not work.
 find %{buildroot}%{_prefix}/lib/node_modules/npm \
-    -not -path %{buildroot}%{_prefix}/lib/node_modules/npm/bin/* \
+    -not -path "%{buildroot}%{_prefix}/lib/node_modules/npm/bin/*" \
     -executable -type f \
     -exec chmod -x {} \;
 
