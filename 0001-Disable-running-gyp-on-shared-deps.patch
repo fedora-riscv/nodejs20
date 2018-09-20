@@ -1,4 +1,4 @@
-From dc60fa79586e5e8681f019e80080aebc227d0c03 Mon Sep 17 00:00:00 2001
+From def28d29f907050d8bcd94ed2e341d128ffa3fa6 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Thu, 27 Apr 2017 14:25:42 +0200
 Subject: [PATCH 1/2] Disable running gyp on shared deps
@@ -8,7 +8,7 @@ Subject: [PATCH 1/2] Disable running gyp on shared deps
  1 file changed, 3 insertions(+), 4 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 7f9a57804b77606a3bec03f6be707969d71d3562..dd68e1ba2d3928f46c5d1f8991ded98bc1465323 100644
+index 5fc2bb0c58f5532044a14e9f9595b2316f562726..f1c1545caa220d7442d6d92c49412ec7554de123 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -121,14 +121,13 @@ with-code-cache:
@@ -26,9 +26,9 @@ index 7f9a57804b77606a3bec03f6be707969d71d3562..dd68e1ba2d3928f46c5d1f8991ded98b
 +			  deps/v8/gypfiles/v8.gyp node.gyp config.gypi
  	$(PYTHON) tools/gyp_node.py -f make
  
- config.gypi: configure
+ config.gypi: configure configure.py
  	@if [ -x config.status ]; then \
  		./config.status; \
 -- 
-2.19.0.rc1
+2.19.0
 
