@@ -140,7 +140,7 @@ BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
 Requires: http-parser >= 2.7.0
 BuildRequires: libuv-devel >= 1:%{libuv_version}
-Requires: libuv >= 1:1.20.2
+Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
 %endif
