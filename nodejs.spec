@@ -20,11 +20,11 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 11
+%global nodejs_minor 12
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -52,12 +52,12 @@
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
 %global libuv_minor 23
-%global libuv_patch 0
+%global libuv_patch 2
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 33
+%global nghttp2_minor 34
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
@@ -494,6 +494,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Oct 11 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.12.0-1
+- Update to 10.12.0
+- https://nodejs.org/en/blog/release/v10.12.0/
+
 * Wed Oct 10 2018 Jan Staněk <jstanek@redhat.com> - 1:10.11.0-2
 - Add non-bootstrap BR for nodejs-packaging
 
