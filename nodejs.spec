@@ -24,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -136,6 +136,7 @@ Provides: bundled(http-parser) = %{http_parser_version}
 Provides: bundled(libuv) = %{libuv_version}
 Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
+BuildRequires: nodejs-packaging
 BuildRequires: systemtap-sdt-devel
 BuildRequires: http-parser-devel >= 2.7.0
 Requires: http-parser >= 2.7.0
@@ -493,6 +494,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Oct 10 2018 Jan Staněk <jstanek@redhat.com> - 1:10.11.0-2
+- Add non-bootstrap BR for nodejs-packaging
+
 * Thu Sep 20 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.11.0-1
 - Update to 10.11.0
 - https://nodejs.org/en/blog/release/v10.11.0/
@@ -717,7 +721,7 @@ end
 
 * Thu Jun 29 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:8.1.3-1
 - Update to v8.1.3
-- https://nodejs.org/en/blog/release/v8.1.3/ 
+- https://nodejs.org/en/blog/release/v8.1.3/
 
 * Wed Jun 28 2017 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:8.1.2-1
 - Update to v8.1.2
