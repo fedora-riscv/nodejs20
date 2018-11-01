@@ -1,5 +1,11 @@
 %global with_debug 1
 
+# PowerPC and s390x segfault during Debug builds
+# https://github.com/nodejs/node/issues/20642
+%ifarch %{power64} s390x
+%global with_debug 0
+%endif
+
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
