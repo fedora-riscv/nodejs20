@@ -13,8 +13,8 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 10
-%global nodejs_minor 13
+%global nodejs_major 11
+%global nodejs_minor 0
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -22,10 +22,10 @@
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
-%global v8_major 6
-%global v8_minor 8
-%global v8_build 275
-%global v8_patch 32
+%global v8_major 7
+%global v8_minor 0
+%global v8_build 276
+%global v8_patch 28
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -55,7 +55,7 @@
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
-# ICU - from configure.py in the configure_intl() function
+# ICU - from tools/icu/current_ver.dep
 %global icu_major 62
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
@@ -488,6 +488,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Nov 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:11.0.0-1
+- Update to 11.0.0
+- https://nodejs.org/en/blog/release/v11.0.0/
+
 * Thu Nov 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.13.0-1
 - Update to 10.13.0
 - https://nodejs.org/en/blog/release/v10.13.0/
