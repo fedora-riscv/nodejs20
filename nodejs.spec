@@ -20,7 +20,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 11
-%global nodejs_minor 1
+%global nodejs_minor 3
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -31,7 +31,7 @@
 %global v8_major 7
 %global v8_minor 0
 %global v8_build 276
-%global v8_patch 32
+%global v8_patch 38
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -39,7 +39,7 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 14
+%global c_ares_minor 15
 %global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
@@ -490,6 +490,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Nov 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:11.3.0-1
+- Update to 11.3.0
+- https://nodejs.org/en/blog/release/v11.2.0/
+- https://nodejs.org/en/blog/release/v11.3.0/
+
 * Fri Nov 02 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:11.1.0-1
 - Update to 11.1.0
 - https://nodejs.org/en/blog/release/v11.1.0/
