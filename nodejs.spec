@@ -20,8 +20,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 13
-%global nodejs_patch 0
+%global nodejs_minor 14
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -412,6 +412,10 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
     -executable -type f \
     -exec chmod -x {} \;
 
+# The above command is a little overzealous. Add a few permissions back.
+chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin/node-gyp
+chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
+
 
 %check
 # Fail the build if the versions don't match
@@ -494,6 +498,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Nov 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.14.1-1
+- Update to 10.14.1
+- https://nodejs.org/en/blog/release/v10.14.0/
+- https://nodejs.org/en/blog/release/v10.14.1/
+
 * Thu Nov 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.13.0-1
 - Update to 10.13.0
 - https://nodejs.org/en/blog/release/v10.13.0/
