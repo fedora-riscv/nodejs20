@@ -20,8 +20,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 14
-%global nodejs_patch 1
+%global nodejs_minor 15
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -39,7 +39,7 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 14
+%global c_ares_minor 15
 %global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
@@ -61,7 +61,7 @@
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
-# ICU - from configure.py in the configure_intl() function
+# ICU - from tools/icu/current_ver.dep
 %global icu_major 62
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
@@ -138,8 +138,8 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
 BuildRequires: nodejs-packaging
 BuildRequires: systemtap-sdt-devel
-BuildRequires: http-parser-devel >= 2.7.0
-Requires: http-parser >= 2.7.0
+BuildRequires: http-parser-devel >= 2.9.0
+Requires: http-parser >= 2.9.0
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
@@ -498,6 +498,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Jan 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.0-1
+- Update to 10.15.0
+- https://nodejs.org/en/blog/release/v10.15.0/
+
 * Thu Nov 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.14.1-1
 - Update to 10.14.1
 - https://nodejs.org/en/blog/release/v10.14.0/
