@@ -18,8 +18,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 6
-%global nodejs_minor 14
-%global nodejs_patch 3
+%global nodejs_minor 16
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -54,7 +54,6 @@
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
-# Note: this will be unmerged in v7 or v8
 %global punycode_major 2
 %global punycode_minor 0
 %global punycode_patch 0
@@ -445,6 +444,13 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Jan 10 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:6.16.0-1
+- Update to 6.16.0 security release
+- https://nodejs.org/en/blog/release/v6.16.0/
+- https://nodejs.org/en/blog/release/v6.15.1/
+- https://nodejs.org/en/blog/release/v6.15.0/
+- https://nodejs.org/en/blog/release/v6.14.4/
+
 * Thu Jun 14 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:6.14.3-1
 - Update to 6.14.3 security release
 - https://nodejs.org/en/blog/release/v6.14.3/
