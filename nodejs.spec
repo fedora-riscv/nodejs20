@@ -103,21 +103,18 @@ Source7: nodejs_native.attr
 Patch1: 0001-Disable-running-gyp-files-for-bundled-deps.patch
 
 BuildRequires: python2-devel
-Requires: http-parser >= 2.7.0
 BuildRequires: libicu-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.8.5
 BuildRequires: gcc-c++ >= 4.8.5
+Provides: bundled(http-parser) = %{http_parser_version}
 
 %if %{with bootstrap}
-Provides: bundled(http-parser) = %{http_parser_version}
 Provides: bundled(libuv) = %{libuv_version}
 %else
 BuildRequires: systemtap-sdt-devel
-BuildRequires: http-parser-devel >= 2.7.0
 BuildRequires: libuv-devel >= 1:1.9.1
 Requires: libuv >= 1:1.9.1
-
 %endif
 
 %if 0%{?fedora} > 25
@@ -195,7 +192,6 @@ Requires: nodejs-packaging
 %if %{with bootstrap}
 #deps are bundled
 %else
-Requires: http-parser-devel%{?_isa}
 Requires: libuv-devel%{?_isa}
 %endif
 
@@ -285,7 +281,6 @@ export LDFLAGS="%{__global_ldflags}"
            --shared-openssl \
            --shared-zlib \
            --shared-libuv \
-           --shared-http-parser \
            --with-dtrace \
            --with-intl=system-icu \
            --openssl-use-def-ca-store
@@ -444,6 +439,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Jan 10 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:6.16.0-2
+- Bundle http-parser since it uses backported features not available in RHEL
+
 * Thu Jan 10 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:6.16.0-1
 - Update to 6.16.0 security release
 - https://nodejs.org/en/blog/release/v6.16.0/
