@@ -20,7 +20,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 11
-%global nodejs_minor 3
+%global nodejs_minor 7
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
@@ -51,8 +51,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 23
-%global libuv_patch 2
+%global libuv_minor 24
+%global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -80,8 +80,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 4
-%global npm_patch 1
+%global npm_minor 5
+%global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -490,6 +490,13 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Jan 18 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.7.0-1
+- Update to 11.7.0
+- https://nodejs.org/en/blog/release/v11.7.0/
+- https://nodejs.org/en/blog/release/v11.6.0/
+- https://nodejs.org/en/blog/release/v11.5.0/
+- https://nodejs.org/en/blog/release/v11.4.0/
+
 * Thu Nov 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:11.3.0-1
 - Update to 11.3.0
 - https://nodejs.org/en/blog/release/v11.2.0/
