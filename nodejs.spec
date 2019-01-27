@@ -24,7 +24,7 @@
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -98,7 +98,7 @@
 Name: nodejs
 Epoch: %{nodejs_epoch}
 Version: %{nodejs_version}
-Release: %{nodejs_release}%{?dist}.1
+Release: %{nodejs_release}%{?dist}
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
 Group: Development/Languages
@@ -240,7 +240,7 @@ Development headers for the Node.js JavaScript runtime.
 Summary: Node.js Package Manager
 Epoch: %{npm_epoch}
 Version: %{npm_version}
-Release: %{npm_release}%{?dist}.1
+Release: %{npm_release}%{?dist}
 
 # We used to ship npm separately, but it is so tightly integrated with Node.js
 # (and expected to be present on all Node.js systems) that we ship it bundled
@@ -494,6 +494,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Sun Jan 27 2019 Tom Hughes <tom@compton.nu> - 1:10.13.0-2
+- Bump release to fix dependencies
+
 * Wed Jan 23 2019 Pete Walter <pwalter@fedoraproject.org> - 1:10.13.0-1.1
 - Rebuild for ICU 63
 
