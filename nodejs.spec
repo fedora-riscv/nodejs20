@@ -101,7 +101,6 @@ Version: %{nodejs_version}
 Release: %{nodejs_release}%{?dist}
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
-Group: Development/Languages
 URL: http://nodejs.org/
 
 ExclusiveArch: %{nodejs_arches}
@@ -219,7 +218,6 @@ real-time applications that run across distributed devices.
 
 %package devel
 Summary: JavaScript runtime - development headers
-Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
@@ -259,7 +257,6 @@ your node programs. It manages dependencies and does other cool stuff.
 
 %package docs
 Summary: Node.js API documentation
-Group: Documentation
 BuildArch: noarch
 
 # We don't require that the main package be installed to
