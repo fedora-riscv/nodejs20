@@ -1,11 +1,5 @@
 %global with_debug 1
 
-# PowerPC and s390x segfault during Debug builds
-# https://github.com/nodejs/node/issues/20642
-%ifarch %{power64} s390x
-%global with_debug 0
-%endif
-
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
@@ -20,8 +14,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 11
-%global nodejs_minor 7
-%global nodejs_patch 0
+%global nodejs_minor 10
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -51,8 +45,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 24
-%global libuv_patch 1
+%global libuv_minor 26
+%global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -66,8 +60,11 @@
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
-# Currently, we have to use the bundled copy since Fedora is still on 62.1
+%if 0%{?fedora} >= 30
+%global icu_flag system-icu
+%else
 %global icu_flag small-icu
+%endif
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -80,7 +77,7 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 5
+%global npm_minor 7
 %global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
@@ -490,6 +487,13 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.10.1-1
+- Update to 11.10.1
+- https://nodejs.org/en/blog/release/v11.10.1/
+- https://nodejs.org/en/blog/release/v11.10.0/
+- https://nodejs.org/en/blog/release/v11.9.0/
+- https://nodejs.org/en/blog/release/v11.8.0/
+
 * Fri Jan 18 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.7.0-1
 - Update to 11.7.0
 - https://nodejs.org/en/blog/release/v11.7.0/
