@@ -1,11 +1,5 @@
 %global with_debug 1
 
-# PowerPC and s390x segfault during Debug builds
-# https://github.com/nodejs/node/issues/20642
-%ifarch %{power64} s390x
-%global with_debug 0
-%endif
-
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
@@ -21,7 +15,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 10
 %global nodejs_minor 15
-%global nodejs_patch 0
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -123,6 +117,10 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 # Suppress the message from npm to run `npm -g update npm`
 # This does bad things on an RPM-managed npm.
 Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
+
+
+# Upstream patch to fix debug generation on PowerPC
+Patch3: 0003-deps-V8-cherry-pick-d0468de.patch
 
 BuildRequires: python2-devel
 BuildRequires: python3-devel
@@ -273,13 +271,10 @@ The API documentation for the Node.js JavaScript runtime.
 
 
 %prep
-%setup -q -n node-v%{nodejs_version}
+%autosetup -p1 -n node-v%{nodejs_version}
 
 # remove bundled dependencies that we aren't building
-%patch1 -p1
 rm -rf deps/zlib
-
-%patch2 -p1
 
 # Replace any instances of unversioned python' with python2
 pathfix.py -i %{__python2} -pn $(find -type f)
@@ -498,6 +493,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-1
+- Update to 10.15.2
+- https://nodejs.org/en/blog/release/v10.15.1/
+- https://nodejs.org/en/blog/release/v10.15.2/
+
 * Wed Jan 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.0-1
 - Update to 10.15.0
 - https://nodejs.org/en/blog/release/v10.15.0/
