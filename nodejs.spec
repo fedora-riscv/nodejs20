@@ -1,11 +1,5 @@
 %global with_debug 1
 
-# PowerPC and s390x segfault during Debug builds
-# https://github.com/nodejs/node/issues/20642
-%ifarch %{power64} s390x
-%global with_debug 0
-%endif
-
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
@@ -20,11 +14,11 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 13
-%global nodejs_patch 0
+%global nodejs_minor 15
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 3
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -39,7 +33,7 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 14
+%global c_ares_minor 15
 %global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
@@ -61,7 +55,7 @@
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
-# ICU - from configure.py in the configure_intl() function
+# ICU - from tools/icu/current_ver.dep
 %global icu_major 62
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
@@ -101,6 +95,7 @@ Version: %{nodejs_version}
 Release: %{nodejs_release}%{?dist}
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
+Group: Development/Languages
 URL: http://nodejs.org/
 
 ExclusiveArch: %{nodejs_arches}
@@ -123,6 +118,10 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 # This does bad things on an RPM-managed npm.
 Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
+
+# Upstream patch to fix debug generation on PowerPC
+Patch3: 0003-deps-V8-cherry-pick-d0468de.patch
+
 BuildRequires: python2-devel
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
@@ -137,8 +136,8 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
 BuildRequires: nodejs-packaging
 BuildRequires: systemtap-sdt-devel
-BuildRequires: http-parser-devel >= 2.7.0
-Requires: http-parser >= 2.7.0
+BuildRequires: http-parser-devel >= 2.9.0
+Requires: http-parser >= 2.9.0
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
@@ -218,6 +217,7 @@ real-time applications that run across distributed devices.
 
 %package devel
 Summary: JavaScript runtime - development headers
+Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
@@ -257,6 +257,7 @@ your node programs. It manages dependencies and does other cool stuff.
 
 %package docs
 Summary: Node.js API documentation
+Group: Documentation
 BuildArch: noarch
 
 # We don't require that the main package be installed to
@@ -270,13 +271,10 @@ The API documentation for the Node.js JavaScript runtime.
 
 
 %prep
-%setup -q -n node-v%{nodejs_version}
+%autosetup -p1 -n node-v%{nodejs_version}
 
 # remove bundled dependencies that we aren't building
-%patch1 -p1
 rm -rf deps/zlib
-
-%patch2 -p1
 
 # Replace any instances of unversioned python' with python2
 pathfix.py -i %{__python2} -pn $(find -type f)
@@ -409,6 +407,10 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
     -executable -type f \
     -exec chmod -x {} \;
 
+# The above command is a little overzealous. Add a few permissions back.
+chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin/node-gyp
+chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
+
 
 %check
 # Fail the build if the versions don't match
@@ -491,17 +493,19 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Fri Feb  8 2019 Tom Hughes <tom@compton.nu> - 1:%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}-3%{?dist}
-- Bump release to fix dependencies
+* Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-1
+- Update to 10.15.2
+- https://nodejs.org/en/blog/release/v10.15.1/
+- https://nodejs.org/en/blog/release/v10.15.2/
 
-* Fri Feb 01 2019 Fedora Release Engineering <releng@fedoraproject.org> - 1:10.13.0-2.1
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_30_Mass_Rebuild
+* Wed Jan 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.0-1
+- Update to 10.15.0
+- https://nodejs.org/en/blog/release/v10.15.0/
 
-* Sun Jan 27 2019 Tom Hughes <tom@compton.nu> - 1:10.13.0-2
-- Bump release to fix dependencies
-
-* Wed Jan 23 2019 Pete Walter <pwalter@fedoraproject.org> - 1:10.13.0-1.1
-- Rebuild for ICU 63
+* Thu Nov 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.14.1-1
+- Update to 10.14.1
+- https://nodejs.org/en/blog/release/v10.14.0/
+- https://nodejs.org/en/blog/release/v10.14.1/
 
 * Thu Nov 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.13.0-1
 - Update to 10.13.0
