@@ -1,5 +1,3 @@
-%global with_debug 1
-
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
@@ -18,7 +16,7 @@
 %global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -330,12 +328,7 @@ export LDFLAGS="%{build_ldflags}"
            --openssl-use-def-ca-store
 %endif
 
-%if %{?with_debug} == 1
-# Setting BUILDTYPE=Debug builds both release and debug binaries
-make BUILDTYPE=Debug %{?_smp_mflags}
-%else
 make BUILDTYPE=Release %{?_smp_mflags}
-%endif
 
 
 %install
@@ -345,11 +338,6 @@ rm -rf %{buildroot}
 
 # Set the binary permissions properly
 chmod 0755 %{buildroot}/%{_bindir}/node
-
-%if %{?with_debug} == 1
-# Install the debug binary and set its permissions
-install -Dpm0755 out/Debug/node %{buildroot}/%{_bindir}/node_g
-%endif
 
 # own the sitelib directory
 mkdir -p %{buildroot}%{_prefix}/lib/node_modules
@@ -464,9 +452,6 @@ end
 
 
 %files devel
-%if %{?with_debug} == 1
-%{_bindir}/node_g
-%endif
 %{_includedir}/node
 %{_datadir}/node/common.gypi
 %{_pkgdocdir}/gdbinit
@@ -493,6 +478,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Mar 14 2019 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1:10.15.2-2
+- Drop debug executable
+
 * Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-1
 - Update to 10.15.2
 - https://nodejs.org/en/blog/release/v10.15.1/
