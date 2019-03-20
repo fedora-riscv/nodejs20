@@ -157,6 +157,22 @@ BuildRequires: openssl-devel
 # we need the system certificate store
 Requires: ca-certificates
 
+# Compatibility for obsolete v8 package
+%ifarch %{ix86} x86_64 %{arm}
+%ifarch x86_64
+Provides: libv8.so.%{v8_major}()(64bit)
+Provides: libv8_libbase.so.%{v8_major}()(64bit)
+Provides: libv8_libplatform.so.%{v8_major}()(64bit)
+%else
+Provides: libv8.so.%{v8_major}
+Provides: libv8_libbase.so.%{v8_major}
+Provides: libv8_libplatform.so.%{v8_major}
+%endif
+Provides: v8 = %{epoch}:%{v8_version}-%{nodejs_release}%{?dist}
+Provides: v8%{?_isa} = %{epoch}:%{v8_version}-%{nodejs_release}%{?dist}
+Obsoletes: v8 < 1:6.7.17-10
+%endif
+
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
 #break when binary compatibility is broken
 Provides: nodejs(abi) = %{nodejs_abi}
@@ -236,6 +252,14 @@ Requires: libuv-devel%{?_isa}
 
 %description devel
 Development headers for the Node.js JavaScript runtime.
+
+%package -n v8-devel
+Summary: v8 - development headers
+Version: %{v8_version}
+Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+
+%description -n v8-devel
+Development headers for the v8 runtime.
 
 %package -n npm
 Summary: Node.js Package Manager
@@ -352,6 +376,18 @@ chrpath --delete %{buildroot}%{_bindir}/node
 # Install library symlink
 ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/libnode.so
 
+# Install v8 compatibility symlinks
+for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_includedir}/node/v8*.h; do
+    header=$(basename ${header})
+    ln -s %{_includedir}/node/${header} %{buildroot}%{_includedir}/${header}
+done
+for soname in libv8 libv8_libbase libv8_libplatform; do
+    ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
+%ifarch %{ix86} x86_64 %{arm}
+    ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
+%endif
+done
+
 # own the sitelib directory
 mkdir -p %{buildroot}%{_prefix}/lib/node_modules
 
@@ -444,6 +480,11 @@ end
 %files
 %{_bindir}/node
 %{_libdir}/libnode.so.%{nodejs_soversion}
+%ifarch %{ix86} x86_64 %{arm}
+%{_libdir}/libv8.so.%{v8_major}
+%{_libdir}/libv8_libbase.so.%{v8_major}
+%{_libdir}/libv8_libplatform.so.%{v8_major}
+%endif
 %dir %{_prefix}/lib/node_modules
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
@@ -472,6 +513,14 @@ end
 %{_pkgdocdir}/gdbinit
 
 
+%files -n v8-devel
+%{_includedir}/libplatform
+%{_includedir}/v8*.h
+%{_libdir}/libv8.so
+%{_libdir}/libv8_libbase.so
+%{_libdir}/libv8_libplatform.so
+
+
 %files -n npm
 %{_bindir}/npm
 %{_bindir}/npx
@@ -493,9 +542,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Thu Mar 14 2019 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1:10.15.2-2
+* Sun Mar 17 2019 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1:10.15.2-2
 - Drop debug executable
 - Build with a shared library
+- Add v8 compatibility subpackage
 
 * Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-1
 - Update to 10.15.2
