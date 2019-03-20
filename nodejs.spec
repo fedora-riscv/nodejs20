@@ -15,6 +15,7 @@
 %global nodejs_minor 15
 %global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
+%global nodejs_soversion 64
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 2
 
@@ -120,11 +121,15 @@ Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 # Upstream patch to fix debug generation on PowerPC
 Patch3: 0003-deps-V8-cherry-pick-d0468de.patch
 
+# Patch to install both node and libnode.so, using the correct libdir
+Patch5: 0001-Install-both-binaries-and-use-libdir.patch
+
 BuildRequires: python2-devel
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
+BuildRequires: chrpath
 
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
@@ -309,6 +314,8 @@ export LDFLAGS="%{build_ldflags}"
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
+           --shared \
+           --libdir=%{_lib} \
            --shared-openssl \
            --shared-zlib \
            --without-dtrace \
@@ -317,6 +324,8 @@ export LDFLAGS="%{build_ldflags}"
            --openssl-use-def-ca-store
 %else
 ./configure --prefix=%{_prefix} \
+           --shared \
+           --libdir=%{_lib} \
            --shared-openssl \
            --shared-zlib \
            --shared-libuv \
@@ -338,6 +347,10 @@ rm -rf %{buildroot}
 
 # Set the binary permissions properly
 chmod 0755 %{buildroot}/%{_bindir}/node
+chrpath --delete %{buildroot}%{_bindir}/node
+
+# Install library symlink
+ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/libnode.so
 
 # own the sitelib directory
 mkdir -p %{buildroot}%{_prefix}/lib/node_modules
@@ -402,15 +415,15 @@ chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin
 
 %check
 # Fail the build if the versions don't match
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8.replace(/-node\.\d+$/, ''), '%{v8_version}')"
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.ares.replace(/-DEV$/, ''), '%{c_ares_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8.replace(/-node\.\d+$/, ''), '%{v8_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.ares.replace(/-DEV$/, ''), '%{c_ares_version}')"
 
 # Ensure we have punycode and that the version matches
-%{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
 
 # Ensure we have npm and that the version matches
-NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
 
 %pretrans -n npm -p <lua>
@@ -430,6 +443,7 @@ end
 
 %files
 %{_bindir}/node
+%{_libdir}/libnode.so.%{nodejs_soversion}
 %dir %{_prefix}/lib/node_modules
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
@@ -453,6 +467,7 @@ end
 
 %files devel
 %{_includedir}/node
+%{_libdir}/libnode.so
 %{_datadir}/node/common.gypi
 %{_pkgdocdir}/gdbinit
 
@@ -480,6 +495,7 @@ end
 %changelog
 * Thu Mar 14 2019 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1:10.15.2-2
 - Drop debug executable
+- Build with a shared library
 
 * Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-1
 - Update to 10.15.2
