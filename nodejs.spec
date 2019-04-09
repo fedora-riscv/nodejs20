@@ -17,10 +17,12 @@
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_soversion 64
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 3
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
+# Epoch is set to ensure clean upgrades from the old v8 package
+%global v8_epoch 1
 %global v8_major 6
 %global v8_minor 8
 %global v8_build 275
@@ -157,21 +159,8 @@ BuildRequires: openssl-devel
 # we need the system certificate store
 Requires: ca-certificates
 
-# Compatibility for obsolete v8 package
-%ifarch %{ix86} x86_64 %{arm}
-%ifarch x86_64
-Provides: libv8.so.%{v8_major}()(64bit)
-Provides: libv8_libbase.so.%{v8_major}()(64bit)
-Provides: libv8_libplatform.so.%{v8_major}()(64bit)
-%else
-Provides: libv8.so.%{v8_major}
-Provides: libv8_libbase.so.%{v8_major}
-Provides: libv8_libplatform.so.%{v8_major}
-%endif
-Provides: v8 = %{epoch}:%{v8_version}-%{nodejs_release}%{?dist}
-Provides: v8%{?_isa} = %{epoch}:%{v8_version}-%{nodejs_release}%{?dist}
-Obsoletes: v8 < 1:6.7.17-10
-%endif
+Requires: nodejs-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
 #break when binary compatibility is broken
@@ -253,8 +242,30 @@ Requires: libuv-devel%{?_isa}
 %description devel
 Development headers for the Node.js JavaScript runtime.
 
+%package libs
+Summary: Node.js and v8 libraries
+
+# Compatibility for obsolete v8 package
+%if 0%{?__isa_bits} == 64
+Provides: libv8.so.%{v8_major}()(64bit)
+Provides: libv8_libbase.so.%{v8_major}()(64bit)
+Provides: libv8_libplatform.so.%{v8_major}()(64bit)
+%else # 32-bits
+Provides: libv8.so.%{v8_major}
+Provides: libv8_libbase.so.%{v8_major}
+Provides: libv8_libplatform.so.%{v8_major}
+%endif
+
+Provides: v8 = %{v8_epoch}:%{v8_version}-%{nodejs_release}%{?dist}
+Provides: v8%{?_isa} = %{v8_epoch}:%{v8_version}-%{nodejs_release}%{?dist}
+Obsoletes: v8 < 1:6.7.17-10
+
+%description libs
+Libraries to support Node.js and provide stable v8 interfaces.
+
 %package -n v8-devel
 Summary: v8 - development headers
+Epoch: %{v8_epoch}
 Version: %{v8_version}
 Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
@@ -383,9 +394,7 @@ for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_include
 done
 for soname in libv8 libv8_libbase libv8_libplatform; do
     ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
-%ifarch %{ix86} x86_64 %{arm}
     ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
-%endif
 done
 
 # own the sitelib directory
@@ -479,12 +488,6 @@ end
 
 %files
 %{_bindir}/node
-%{_libdir}/libnode.so.%{nodejs_soversion}
-%ifarch %{ix86} x86_64 %{arm}
-%{_libdir}/libv8.so.%{v8_major}
-%{_libdir}/libv8_libbase.so.%{v8_major}
-%{_libdir}/libv8_libplatform.so.%{v8_major}
-%endif
 %dir %{_prefix}/lib/node_modules
 %dir %{_datadir}/node
 %dir %{_datadir}/systemtap
@@ -511,6 +514,13 @@ end
 %{_libdir}/libnode.so
 %{_datadir}/node/common.gypi
 %{_pkgdocdir}/gdbinit
+
+
+%files libs
+%{_libdir}/libnode.so.%{nodejs_soversion}
+%{_libdir}/libv8.so.%{v8_major}
+%{_libdir}/libv8_libbase.so.%{v8_major}
+%{_libdir}/libv8_libplatform.so.%{v8_major}
 
 
 %files -n v8-devel
@@ -542,6 +552,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Apr 09 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-3
+- Separate nodejs-libs out to its own subpackage
+- Clean up compatibility virtual Provides
+- Set epoch for v8-devel to maintain upgrade path
+
 * Sun Mar 17 2019 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1:10.15.2-2
 - Drop debug executable
 - Build with a shared library
