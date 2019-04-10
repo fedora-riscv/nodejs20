@@ -119,12 +119,8 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 # This does bad things on an RPM-managed npm.
 Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
-
-# Upstream patch to fix debug generation on PowerPC
-Patch3: 0003-deps-V8-cherry-pick-d0468de.patch
-
 # Patch to install both node and libnode.so, using the correct libdir
-Patch5: 0001-Install-both-binaries-and-use-libdir.patch
+Patch3: 0003-Install-both-binaries-and-use-libdir.patch
 
 BuildRequires: python2-devel
 BuildRequires: python3-devel
@@ -555,6 +551,7 @@ end
 * Tue Apr 09 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.3-1
 - Update to 10.15.3
 - https://nodejs.org/en/blog/release/v10.15.3/
+- Drop upstreamed patch
 
 * Tue Apr 09 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-3
 - Separate nodejs-libs out to its own subpackage

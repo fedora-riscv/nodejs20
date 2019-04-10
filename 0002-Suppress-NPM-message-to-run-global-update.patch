@@ -1,4 +1,4 @@
-From 0fd4649d1943f45cb06bda6febdc7ffa7d5859b2 Mon Sep 17 00:00:00 2001
+From 945b762887c65c2c70024de259e27db8a0a31859 Mon Sep 17 00:00:00 2001
 From: Stephen Gallagher <sgallagh@redhat.com>
 Date: Tue, 1 May 2018 08:05:30 -0400
 Subject: [PATCH 2/3] Suppress NPM message to run global update
@@ -83,5 +83,5 @@ index 6f76b23828531e7af98a7e3cd7d5abfaac09b40c..98edb6f45fe073e03794a2ae6e7aa7f5
          !err &&
          npm.config.get('ham-it-up') &&
 -- 
-2.20.1
+2.21.0
 
