@@ -13,11 +13,11 @@
 %global nodejs_epoch 1
 %global nodejs_major 10
 %global nodejs_minor 15
-%global nodejs_patch 2
+%global nodejs_patch 3
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_soversion 64
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 3
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -552,6 +552,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Apr 09 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.3-1
+- Update to 10.15.3
+- https://nodejs.org/en/blog/release/v10.15.3/
+
 * Tue Apr 09 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-3
 - Separate nodejs-libs out to its own subpackage
 - Clean up compatibility virtual Provides
