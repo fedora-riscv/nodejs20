@@ -14,8 +14,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 11
-%global nodejs_minor 10
-%global nodejs_patch 1
+%global nodejs_minor 13
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -45,7 +45,7 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 26
+%global libuv_minor 27
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -487,6 +487,12 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Apr 11 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.13.0-1
+- Update to 11.13.0
+- https://nodejs.org/en/blog/release/v11.13.0/
+- https://nodejs.org/en/blog/release/v11.12.0/
+- https://nodejs.org/en/blog/release/v11.11.0/
+
 * Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.10.1-1
 - Update to 11.10.1
 - https://nodejs.org/en/blog/release/v11.10.1/
