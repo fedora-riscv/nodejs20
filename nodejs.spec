@@ -1,5 +1,3 @@
-%global with_debug 1
-
 # bundle dependencies that are not available as Fedora modules
 # %%{!?_with_bootstrap: %%global bootstrap 1}
 # use bcond for building modules
@@ -14,14 +12,17 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 11
-%global nodejs_minor 13
+%global nodejs_minor 14
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
+%global nodejs_soversion 64
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
+# Epoch is set to ensure clean upgrades from the old v8 package
+%global v8_epoch 1
 %global v8_major 7
 %global v8_minor 0
 %global v8_build 276
@@ -42,6 +43,12 @@
 %global http_parser_minor 8
 %global http_parser_patch 0
 %global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
+
+# llhttp - from deps/llhttp/include/llhttp.h
+%global llhttp_major 1
+%global llhttp_minor 1
+%global llhttp_patch 0
+%global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
@@ -117,11 +124,15 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 # This does bad things on an RPM-managed npm.
 Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
+# Patch to install both node and libnode.so, using the correct libdir
+Patch3: 0003-Install-both-binaries-and-use-libdir.patch
+
 BuildRequires: python2-devel
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
+BuildRequires: chrpath
 
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
@@ -131,12 +142,19 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
 BuildRequires: nodejs-packaging
 BuildRequires: systemtap-sdt-devel
-BuildRequires: http-parser-devel >= 2.7.0
-Requires: http-parser >= 2.7.0
+BuildRequires: http-parser-devel >= 2.9.0
+Requires: http-parser >= 2.9.0
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
+
+# Temporarily bundle http-parser and llhttp because the latter
+# isn't packaged yet and they are controlled by the same
+# configure flag.
+Provides: bundled(http-parser) = %{http_parser_version}
+Provides: bundled(llhttp) = %{llhttp_version}
+
 %endif
 
 
@@ -148,6 +166,9 @@ BuildRequires: openssl-devel
 
 # we need the system certificate store
 Requires: ca-certificates
+
+Requires: nodejs-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
 #break when binary compatibility is broken
@@ -229,6 +250,36 @@ Requires: libuv-devel%{?_isa}
 %description devel
 Development headers for the Node.js JavaScript runtime.
 
+%package libs
+Summary: Node.js and v8 libraries
+
+# Compatibility for obsolete v8 package
+%if 0%{?__isa_bits} == 64
+Provides: libv8.so.%{v8_major}()(64bit)
+Provides: libv8_libbase.so.%{v8_major}()(64bit)
+Provides: libv8_libplatform.so.%{v8_major}()(64bit)
+%else # 32-bits
+Provides: libv8.so.%{v8_major}
+Provides: libv8_libbase.so.%{v8_major}
+Provides: libv8_libplatform.so.%{v8_major}
+%endif
+
+Provides: v8 = %{v8_epoch}:%{v8_version}-%{nodejs_release}%{?dist}
+Provides: v8%{?_isa} = %{v8_epoch}:%{v8_version}-%{nodejs_release}%{?dist}
+Obsoletes: v8 < 1:6.7.17-10
+
+%description libs
+Libraries to support Node.js and provide stable v8 interfaces.
+
+%package -n v8-devel
+Summary: v8 - development headers
+Epoch: %{v8_epoch}
+Version: %{v8_version}
+Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+
+%description -n v8-devel
+Development headers for the v8 runtime.
+
 %package -n npm
 Summary: Node.js Package Manager
 Epoch: %{npm_epoch}
@@ -266,13 +317,10 @@ The API documentation for the Node.js JavaScript runtime.
 
 
 %prep
-%setup -q -n node-v%{nodejs_version}
+%autosetup -p1 -n node-v%{nodejs_version}
 
 # remove bundled dependencies that we aren't building
-%patch1 -p1
 rm -rf deps/zlib
-
-%patch2 -p1
 
 # Replace any instances of unversioned python' with python2
 pathfix.py -i %{__python2} -pn $(find -type f)
@@ -309,6 +357,8 @@ export LDFLAGS="%{build_ldflags}"
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
+           --shared \
+           --libdir=%{_lib} \
            --shared-openssl \
            --shared-zlib \
            --without-dtrace \
@@ -317,10 +367,11 @@ export LDFLAGS="%{build_ldflags}"
            --openssl-use-def-ca-store
 %else
 ./configure --prefix=%{_prefix} \
+           --shared \
+           --libdir=%{_lib} \
            --shared-openssl \
            --shared-zlib \
            --shared-libuv \
-           --shared-http-parser \
            --shared-nghttp2 \
            --with-dtrace \
            --with-intl=%{icu_flag} \
@@ -328,12 +379,7 @@ export LDFLAGS="%{build_ldflags}"
            --openssl-use-def-ca-store
 %endif
 
-%if %{?with_debug} == 1
-# Setting BUILDTYPE=Debug builds both release and debug binaries
-make BUILDTYPE=Debug %{?_smp_mflags}
-%else
 make BUILDTYPE=Release %{?_smp_mflags}
-%endif
 
 
 %install
@@ -343,11 +389,20 @@ rm -rf %{buildroot}
 
 # Set the binary permissions properly
 chmod 0755 %{buildroot}/%{_bindir}/node
+chrpath --delete %{buildroot}%{_bindir}/node
 
-%if %{?with_debug} == 1
-# Install the debug binary and set its permissions
-install -Dpm0755 out/Debug/node %{buildroot}/%{_bindir}/node_g
-%endif
+# Install library symlink
+ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/libnode.so
+
+# Install v8 compatibility symlinks
+for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_includedir}/node/v8*.h; do
+    header=$(basename ${header})
+    ln -s %{_includedir}/node/${header} %{buildroot}%{_includedir}/${header}
+done
+for soname in libv8 libv8_libbase libv8_libplatform; do
+    ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
+    ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
+done
 
 # own the sitelib directory
 mkdir -p %{buildroot}%{_prefix}/lib/node_modules
@@ -405,18 +460,22 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
     -executable -type f \
     -exec chmod -x {} \;
 
+# The above command is a little overzealous. Add a few permissions back.
+chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin/node-gyp
+chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
+
 
 %check
 # Fail the build if the versions don't match
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8.replace(/-node\.\d+$/, ''), '%{v8_version}')"
-%{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.ares.replace(/-DEV$/, ''), '%{c_ares_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.v8.replace(/-node\.\d+$/, ''), '%{v8_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.ares.replace(/-DEV$/, ''), '%{c_ares_version}')"
 
 # Ensure we have punycode and that the version matches
-%{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
 
 # Ensure we have npm and that the version matches
-NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
 
 %pretrans -n npm -p <lua>
@@ -458,12 +517,25 @@ end
 
 
 %files devel
-%if %{?with_debug} == 1
-%{_bindir}/node_g
-%endif
 %{_includedir}/node
+%{_libdir}/libnode.so
 %{_datadir}/node/common.gypi
 %{_pkgdocdir}/gdbinit
+
+
+%files libs
+%{_libdir}/libnode.so.%{nodejs_soversion}
+%{_libdir}/libv8.so.%{v8_major}
+%{_libdir}/libv8_libbase.so.%{v8_major}
+%{_libdir}/libv8_libplatform.so.%{v8_major}
+
+
+%files -n v8-devel
+%{_includedir}/libplatform
+%{_includedir}/v8*.h
+%{_libdir}/libv8.so
+%{_libdir}/libv8_libbase.so
+%{_libdir}/libv8_libplatform.so
 
 
 %files -n npm
