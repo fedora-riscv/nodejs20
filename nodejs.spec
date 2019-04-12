@@ -15,7 +15,8 @@
 %global nodejs_minor 14
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
-%global nodejs_soversion 64
+# nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
+%global nodejs_soversion 67
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
 
