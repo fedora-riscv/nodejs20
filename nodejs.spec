@@ -18,7 +18,7 @@
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -67,6 +67,9 @@
 %global icu_major 63
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
+
+# OpenSSL minimum version
+%global openssl_minimum 1:1.1.1
 
 %if 0%{?fedora} >= 30
 %global icu_flag system-icu
@@ -163,7 +166,8 @@ Provides: bundled(llhttp) = %{llhttp_version}
 BuildRequires: libicu-devel >= 62.1
 %endif
 
-BuildRequires: openssl-devel
+BuildRequires: openssl-devel >= %{openssl_minimum}
+Requires: openssl >= %{openssl_minimum}
 
 # we need the system certificate store
 Requires: ca-certificates
@@ -560,6 +564,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Apr 23 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-2
+- Node.js 12.x requires OpenSSL 1.1.1+
+
 * Tue Apr 23 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-1
 - Release 12.0.0
 - https://nodejs.org/en/blog/release/v12.0.0/
