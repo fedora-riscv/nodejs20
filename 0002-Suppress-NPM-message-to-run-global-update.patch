@@ -1,4 +1,4 @@
-From aa203e18cd0a5398e5b7e1900ba71a0816c1fd3d Mon Sep 17 00:00:00 2001
+From a3aeb06b2ed164e220d1ef1ff42256c3e7d0ad25 Mon Sep 17 00:00:00 2001
 From: Stephen Gallagher <sgallagh@redhat.com>
 Date: Tue, 1 May 2018 08:05:30 -0400
 Subject: [PATCH 2/3] Suppress NPM message to run global update
@@ -9,10 +9,10 @@ Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
  1 file changed, 54 deletions(-)
 
 diff --git a/deps/npm/bin/npm-cli.js b/deps/npm/bin/npm-cli.js
-index 6f76b23828531e7af98a7e3cd7d5abfaac09b40c..98edb6f45fe073e03794a2ae6e7aa7f5500723ee 100755
+index 705aa472e7e5502311f24767adfb0aebab396772..e8aebe644f610bb09c3748338fd70e6c8c422cea 100755
 --- a/deps/npm/bin/npm-cli.js
 +++ b/deps/npm/bin/npm-cli.js
-@@ -67,69 +67,15 @@
+@@ -66,69 +66,15 @@
    if (conf.usage && npm.command !== 'help') {
      npm.argv.unshift(npm.command)
      npm.command = 'help'
