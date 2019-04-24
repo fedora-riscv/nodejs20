@@ -18,7 +18,7 @@
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 3
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -583,6 +583,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Apr 24 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-3
+- Fix upgrade bug for v8-devel (BZ #1702609)
+
 * Tue Apr 23 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-2
 - Node.js 12.x requires OpenSSL 1.1.1+
 
