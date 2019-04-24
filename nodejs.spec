@@ -486,7 +486,7 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 
 %pretrans -n npm -p <lua>
 -- Remove all of the symlinks from the bundled npm node_modules directory
--- This scriptlet can be removed in Fedora 31
+-- Drop this scriptlet when F29 is EOL
 base_path = "%{_prefix}/lib/node_modules/npm/node_modules/"
 d_st = posix.stat(base_path)
 if d_st then
@@ -496,6 +496,23 @@ if d_st then
     if st and st.type == "link" then
       os.remove(path)
     end
+  end
+end
+
+%pretrans -n v8-devel -p <lua>
+-- Replace the v8 libplatform include directory with a symlink
+-- Drop this scriptlet when F30 is EOL
+path = "%{_includedir}/libplatform"
+st = posix.stat(path)
+if st and st.type == "directory" then
+  status = os.rename(path, path .. ".rpmmoved")
+  if not status then
+    suffix = 0
+    while not status do
+      suffix = suffix + 1
+      status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
+    end
+    os.rename(path, path .. ".rpmmoved")
   end
 end
 
@@ -542,6 +559,7 @@ end
 %{_libdir}/libv8.so
 %{_libdir}/libv8_libbase.so
 %{_libdir}/libv8_libplatform.so
+%ghost %{_includedir}/libplatform.rpmmoved
 
 
 %files -n npm
