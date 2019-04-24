@@ -137,6 +137,7 @@ BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
 BuildRequires: chrpath
+BuildRequires: libatomic
 
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
