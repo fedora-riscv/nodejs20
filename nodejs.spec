@@ -12,13 +12,13 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 0
+%global nodejs_minor 1
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 3
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -64,18 +64,13 @@
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 63
-%global icu_minor 1
+%global icu_major 64
+%global icu_minor 2
 %global icu_version %{icu_major}.%{icu_minor}
+%global icu_flag small-icu
 
 # OpenSSL minimum version
 %global openssl_minimum 1:1.1.1
-
-%if 0%{?fedora} >= 30
-%global icu_flag system-icu
-%else
-%global icu_flag small-icu
-%endif
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -583,6 +578,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Apr 30 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.1.0-1
+- Update to 12.1.0
+- https://nodejs.org/en/blog/release/v12.1.0/
+
 * Wed Apr 24 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-3
 - Fix upgrade bug for v8-devel (BZ #1702609)
 

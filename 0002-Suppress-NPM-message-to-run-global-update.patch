@@ -1,4 +1,4 @@
-From a3aeb06b2ed164e220d1ef1ff42256c3e7d0ad25 Mon Sep 17 00:00:00 2001
+From f60c5f106a993adee0f66e44f70a1fee562108e0 Mon Sep 17 00:00:00 2001
 From: Stephen Gallagher <sgallagh@redhat.com>
 Date: Tue, 1 May 2018 08:05:30 -0400
 Subject: [PATCH 2/3] Suppress NPM message to run global update
