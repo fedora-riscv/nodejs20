@@ -12,8 +12,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 2
-%global nodejs_patch 0
+%global nodejs_minor 3
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -27,7 +27,7 @@
 %global v8_major 7
 %global v8_minor 4
 %global v8_build 288
-%global v8_patch 21
+%global v8_patch 27
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -53,8 +53,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 28
-%global libuv_patch 0
+%global libuv_minor 29
+%global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -578,6 +578,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri May 24 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.3.1-1
+- Update to 12.3.1
+- https://nodejs.org/en/blog/release/v12.3.1/
+- https://nodejs.org/en/blog/release/v12.3.0/
+
 * Wed May 15 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.2.0-1
 - Update to 12.2.0
 - https://nodejs.org/en/blog/release/v12.2.0/
