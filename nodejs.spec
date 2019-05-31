@@ -12,12 +12,12 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 10
-%global nodejs_minor 15
-%global nodejs_patch 3
+%global nodejs_minor 16
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_soversion 64
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -46,8 +46,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 23
-%global libuv_patch 2
+%global libuv_minor 28
+%global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -57,15 +57,12 @@
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 62
-%global icu_minor 1
+%global icu_major 64
+%global icu_minor 2
 %global icu_version %{icu_major}.%{icu_minor}
 
-%if 0%{?fedora} >= 29
-%global icu_flag system-icu
-%else
+# No Fedora release has 64.2 yet
 %global icu_flag small-icu
-%endif
 
 
 # punycode - from lib/punycode.js
@@ -79,8 +76,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 4
-%global npm_patch 1
+%global npm_minor 9
+%global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -566,6 +563,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri May 31 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-1
+- Update to 10.16.0
+- https://nodejs.org/en/blog/release/v10.16.0/
+
 * Wed Apr 24 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.3-2
 - Fix upgrade bug for v8-devel (BZ #1702609)
 
