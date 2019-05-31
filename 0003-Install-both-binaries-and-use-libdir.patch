@@ -1,4 +1,4 @@
-From ec52fb7c987b3fe68560ae878b4b0f522f01f8a5 Mon Sep 17 00:00:00 2001
+From c340b54b10858215eaa10fd2775e2c0f3c113dd6 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 3/3] Install both binaries and use libdir.
@@ -13,7 +13,7 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index 0ad986ab82e29fdc436794b7f24e49afe1239dca..a58420fc618fe9ad79dcdc27bb6758f34ffaa481 100755
+index cfd4207d32b8b99fda9ec2b2c0f92695f89ef8a3..eb26f7dfe761aa2585252ced28693b9d441b7452 100755
 --- a/configure.py
 +++ b/configure.py
 @@ -550,10 +550,16 @@ parser.add_option('--shared',
