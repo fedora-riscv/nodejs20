@@ -17,7 +17,7 @@
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_soversion 64
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release 3
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -261,7 +261,7 @@ Libraries to support Node.js and provide stable v8 interfaces.
 Summary: v8 - development headers
 Epoch: %{v8_epoch}
 Version: %{v8_version}
-Release: %{v8_release}
+Release: %{v8_release}%{?dist}
 Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
 %description -n v8-devel
@@ -565,7 +565,7 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Mon Jun 03 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-2
+* Mon Jun 03 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-3
 - Change v8-devel release stream to avoid duplicate NEVRAs
 
 * Fri May 31 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-1
