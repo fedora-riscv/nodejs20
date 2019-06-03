@@ -17,7 +17,7 @@
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_soversion 64
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 1
+%global nodejs_release 2
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -30,6 +30,7 @@
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
+%global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
@@ -260,6 +261,7 @@ Libraries to support Node.js and provide stable v8 interfaces.
 Summary: v8 - development headers
 Epoch: %{v8_epoch}
 Version: %{v8_version}
+Release: %{v8_release}
 Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
 %description -n v8-devel
@@ -563,6 +565,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Jun 03 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-2
+- Change v8-devel release stream to avoid duplicate NEVRAs
+
 * Fri May 31 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-1
 - Update to 10.16.0
 - https://nodejs.org/en/blog/release/v10.16.0/
