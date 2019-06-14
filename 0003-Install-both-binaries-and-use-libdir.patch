@@ -1,4 +1,4 @@
-From c340b54b10858215eaa10fd2775e2c0f3c113dd6 Mon Sep 17 00:00:00 2001
+From a3e5296fcb14cf3e00f31864f305fb40720e8718 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 3/3] Install both binaries and use libdir.
@@ -13,10 +13,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index cfd4207d32b8b99fda9ec2b2c0f92695f89ef8a3..eb26f7dfe761aa2585252ced28693b9d441b7452 100755
+index 15ea5687cf1cd8e4ebe449ea2fc39eea95fb29b6..a738e300d6098bef4975930422b3fa55b3f5421d 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -550,10 +550,16 @@ parser.add_option('--shared',
+@@ -534,10 +534,16 @@ parser.add_option('--shared',
      action='store_true',
      dest='shared',
      help='compile shared library for embedding node in another project. ' +
@@ -33,11 +33,11 @@ index cfd4207d32b8b99fda9ec2b2c0f92695f89ef8a3..eb26f7dfe761aa2585252ced28693b9d
      dest='without_v8_platform',
      default=False,
      help='do not initialize v8 platform during node.js startup. ' +
-@@ -1093,10 +1099,11 @@ def configure_node(o):
- 
+@@ -1065,10 +1071,11 @@ def configure_node(o):
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
-   if options.code_cache_path:
-     o['variables']['node_code_cache_path'] = options.code_cache_path
+   # TODO(refack): fix this when implementing embedded code-cache when cross-compiling.
+   if o['variables']['want_separate_host_toolset'] == 0:
+     o['variables']['node_code_cache_path'] = 'yes'
    o['variables']['node_shared'] = b(options.shared)
 +  o['variables']['libdir'] = options.libdir
    node_module_version = getmoduleversion.get_version()
@@ -46,12 +46,12 @@ index cfd4207d32b8b99fda9ec2b2c0f92695f89ef8a3..eb26f7dfe761aa2585252ced28693b9d
      shlib_suffix = '%s.dylib'
    elif sys.platform.startswith('aix'):
 diff --git a/tools/install.py b/tools/install.py
-index 028c32ecbbdf9625238dfcc2baef66df9408b539..bf443c4d15a3b3ebf1e10a5dd802e9c5999691e5 100755
+index 655802980a6ea94d1d4ca1dc63c8c8e905fbb83a..fe4723bf15012c8aacacb0393dc8294c049b0503 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -115,30 +115,27 @@ def subdir_files(path, dest, action):
-   for subdir, files in ret.items():
-     action(files, subdir + '/')
+@@ -119,30 +119,27 @@ def subdir_files(path, dest, action):
+   for subdir, files_in_path in ret.items():
+     action(files_in_path, subdir + '/')
  
  def files(action):
    is_windows = sys.platform == 'win32'

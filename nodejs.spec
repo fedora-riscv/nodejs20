@@ -11,26 +11,26 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 10
-%global nodejs_minor 16
+%global nodejs_major 12
+%global nodejs_minor 4
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
-%global nodejs_soversion 64
+# nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
+%global nodejs_soversion 72
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 3
+%global nodejs_release 1
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 1
-%global v8_major 6
-%global v8_minor 8
-%global v8_build 275
-%global v8_patch 32
+%global v8_major 7
+%global v8_minor 4
+%global v8_build 288
+%global v8_patch 27
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
-%global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
@@ -45,15 +45,21 @@
 %global http_parser_patch 0
 %global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
 
+# llhttp - from deps/llhttp/include/llhttp.h
+%global llhttp_major 1
+%global llhttp_minor 1
+%global llhttp_patch 3
+%global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
+
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 28
-%global libuv_patch 0
+%global libuv_minor 29
+%global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 34
+%global nghttp2_minor 38
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
@@ -61,10 +67,10 @@
 %global icu_major 64
 %global icu_minor 2
 %global icu_version %{icu_major}.%{icu_minor}
-
-# No Fedora release has 64.2 yet
 %global icu_flag small-icu
 
+# OpenSSL minimum version
+%global openssl_minimum 1:1.1.1
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -126,6 +132,7 @@ BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
 BuildRequires: chrpath
+BuildRequires: libatomic
 
 #%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
@@ -141,6 +148,13 @@ BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
+
+# Temporarily bundle http-parser and llhttp because the latter
+# isn't packaged yet and they are controlled by the same
+# configure flag.
+Provides: bundled(http-parser) = %{http_parser_version}
+Provides: bundled(llhttp) = %{llhttp_version}
+
 %endif
 
 
@@ -148,7 +162,8 @@ Requires: libnghttp2 >= %{nghttp2_version}
 BuildRequires: libicu-devel >= 62.1
 %endif
 
-BuildRequires: openssl-devel
+BuildRequires: openssl-devel >= %{openssl_minimum}
+Requires: openssl >= %{openssl_minimum}
 
 # we need the system certificate store
 Requires: ca-certificates
@@ -261,7 +276,6 @@ Libraries to support Node.js and provide stable v8 interfaces.
 Summary: v8 - development headers
 Epoch: %{v8_epoch}
 Version: %{v8_version}
-Release: %{v8_release}%{?dist}
 Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
 %description -n v8-devel
@@ -310,7 +324,7 @@ The API documentation for the Node.js JavaScript runtime.
 rm -rf deps/zlib
 
 # Replace any instances of unversioned python' with python2
-pathfix.py -i %{__python2} -pn $(find -type f)
+pathfix.py -i %{__python2} -pn $(find -type f ! -name "*.js")
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
 find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python2~" {} \;
 sed -i "s~python~python2~" $(find . -type f | grep "gyp$")
@@ -359,7 +373,6 @@ export LDFLAGS="%{build_ldflags}"
            --shared-openssl \
            --shared-zlib \
            --shared-libuv \
-           --shared-http-parser \
            --shared-nghttp2 \
            --with-dtrace \
            --with-intl=%{icu_flag} \
@@ -565,44 +578,65 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Mon Jun 03 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-3
-- Change v8-devel release stream to avoid duplicate NEVRAs
+* Tue Jun 04 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.4.0-1
+- Update to 12.4.0
+- https://nodejs.org/en/blog/release/v12.4.0/
 
-* Fri May 31 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.16.0-1
-- Update to 10.16.0
-- https://nodejs.org/en/blog/release/v10.16.0/
+* Fri May 24 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.3.1-1
+- Update to 12.3.1
+- https://nodejs.org/en/blog/release/v12.3.1/
+- https://nodejs.org/en/blog/release/v12.3.0/
 
-* Wed Apr 24 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.3-2
+* Wed May 15 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.2.0-1
+- Update to 12.2.0
+- https://nodejs.org/en/blog/release/v12.2.0/
+
+* Tue Apr 30 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.1.0-1
+- Update to 12.1.0
+- https://nodejs.org/en/blog/release/v12.1.0/
+
+* Wed Apr 24 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-3
 - Fix upgrade bug for v8-devel (BZ #1702609)
 
-* Tue Apr 09 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.3-1
-- Update to 10.15.3
-- https://nodejs.org/en/blog/release/v10.15.3/
-- Drop upstreamed patch
+* Tue Apr 23 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-2
+- Node.js 12.x requires OpenSSL 1.1.1+
 
-* Tue Apr 09 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-3
-- Separate nodejs-libs out to its own subpackage
-- Clean up compatibility virtual Provides
-- Set epoch for v8-devel to maintain upgrade path
+* Tue Apr 23 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.0.0-1
+- Release 12.0.0
+- https://nodejs.org/en/blog/release/v12.0.0/
 
-* Sun Mar 17 2019 Elliott Sales de Andrade <quantum.analyst@gmail.com> - 1:10.15.2-2
-- Drop debug executable
-- Build with a shared library
-- Add v8 compatibility subpackage
+* Thu Apr 11 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.13.0-1
+- Update to 11.13.0
+- https://nodejs.org/en/blog/release/v11.13.0/
+- https://nodejs.org/en/blog/release/v11.12.0/
+- https://nodejs.org/en/blog/release/v11.11.0/
 
-* Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.2-1
-- Update to 10.15.2
-- https://nodejs.org/en/blog/release/v10.15.1/
-- https://nodejs.org/en/blog/release/v10.15.2/
+* Fri Mar 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.10.1-1
+- Update to 11.10.1
+- https://nodejs.org/en/blog/release/v11.10.1/
+- https://nodejs.org/en/blog/release/v11.10.0/
+- https://nodejs.org/en/blog/release/v11.9.0/
+- https://nodejs.org/en/blog/release/v11.8.0/
 
-* Wed Jan 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:10.15.0-1
-- Update to 10.15.0
-- https://nodejs.org/en/blog/release/v10.15.0/
+* Fri Jan 18 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:11.7.0-1
+- Update to 11.7.0
+- https://nodejs.org/en/blog/release/v11.7.0/
+- https://nodejs.org/en/blog/release/v11.6.0/
+- https://nodejs.org/en/blog/release/v11.5.0/
+- https://nodejs.org/en/blog/release/v11.4.0/
 
-* Thu Nov 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.14.1-1
-- Update to 10.14.1
-- https://nodejs.org/en/blog/release/v10.14.0/
-- https://nodejs.org/en/blog/release/v10.14.1/
+* Thu Nov 29 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:11.3.0-1
+- Update to 11.3.0
+- https://nodejs.org/en/blog/release/v11.2.0/
+- https://nodejs.org/en/blog/release/v11.3.0/
+
+* Fri Nov 02 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:11.1.0-1
+- Update to 11.1.0
+- https://nodejs.org/en/blog/release/v11.1.0/
+
+* Thu Nov 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:11.0.0-1
+- Update to 11.0.0
+- https://nodejs.org/en/blog/release/v11.0.0/
 
 * Thu Nov 01 2018 Stephen Gallagher <sgallagh@redhat.com> - 1:10.13.0-1
 - Update to 10.13.0

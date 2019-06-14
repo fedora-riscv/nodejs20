@@ -1,34 +1,29 @@
-From 99ed2ea42371e85b8df10c99bb70ccedbd0c3884 Mon Sep 17 00:00:00 2001
+From 684bbd3b112afbb575f971ea23a03d3d228922f7 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Thu, 27 Apr 2017 14:25:42 +0200
 Subject: [PATCH 1/3] Disable running gyp on shared deps
 
 ---
- Makefile | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 92d98f0351c4cec030a0725c8f7adbb37a830787..5b1a4816c354b76d1d7240d4cebefa85b28dc532 100644
+index 5834df883b0c232d2c9187f20e61f35dff4f6cef..ba3cacad0382dc17c4a911ea0c0bb39ced96c650 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -121,14 +121,13 @@ with-code-cache:
- 
+@@ -139,11 +139,11 @@ with-code-cache:
  .PHONY: test-code-cache
  test-code-cache: with-code-cache
- 	$(PYTHON) tools/test.py $(PARALLEL_ARGS) --mode=$(BUILDTYPE_LOWER) code-cache
+ 	echo "'test-code-cache' target is a noop"
  
--out/Makefile: common.gypi deps/uv/uv.gyp deps/http_parser/http_parser.gyp \
--              deps/zlib/zlib.gyp deps/v8/gypfiles/toolchain.gypi \
--              deps/v8/gypfiles/features.gypi deps/v8/gypfiles/v8.gyp node.gyp \
--              config.gypi
-+out/Makefile: common.gypi deps/http_parser/http_parser.gyp \
-+              deps/v8/gypfiles/toolchain.gypi deps/v8/gypfiles/features.gypi \
-+			  deps/v8/gypfiles/v8.gyp node.gyp config.gypi
+ out/Makefile: config.gypi common.gypi node.gyp \
+-  deps/uv/uv.gyp deps/http_parser/http_parser.gyp deps/zlib/zlib.gyp \
++  deps/http_parser/http_parser.gyp \
+   tools/v8_gypfiles/toolchain.gypi tools/v8_gypfiles/features.gypi \
+   tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
  	$(PYTHON) tools/gyp_node.py -f make
  
  config.gypi: configure configure.py
- 	@if [ -x config.status ]; then \
- 		./config.status; \
 -- 
 2.21.0
 
