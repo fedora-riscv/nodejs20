@@ -1,15 +1,7 @@
-%global with_debug 1
-
 # bundle some dependencies missing in Modularity
 %bcond_with bootstrap
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
-
-# ARM builds currently break on the Debug builds, so we'll just
-# build the standard runtime until that gets sorted out.
-%ifarch %{arm} aarch64 %{power64}
-%global with_debug 0
-%endif
 
 # == Node.js Version ==
 # Note: Fedora should only ship LTS versions of Node.js (currently expected
@@ -18,8 +10,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 6
-%global nodejs_minor 16
-%global nodejs_patch 0
+%global nodejs_minor 17
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release 1
@@ -286,12 +278,7 @@ export LDFLAGS="%{__global_ldflags}"
            --openssl-use-def-ca-store
 %endif
 
-%if %{?with_debug} == 1
-# Setting BUILDTYPE=Debug builds both release and debug binaries
-make BUILDTYPE=Debug %{?_smp_mflags}
-%else
 make BUILDTYPE=Release %{?_smp_mflags}
-%endif
 
 
 %install
@@ -306,11 +293,6 @@ rm -rf %{buildroot}
 
 # Set the binary permissions properly
 chmod 0755 %{buildroot}/%{_bindir}/node
-
-%if %{?with_debug} == 1
-# Install the debug binary and set its permissions
-install -Dpm0755 out/Debug/node %{buildroot}/%{_bindir}/node_g
-%endif
 
 # own the sitelib directory
 mkdir -p %{buildroot}%{_prefix}/lib/node_modules
@@ -413,9 +395,6 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 
 
 %files devel
-%if %{?with_debug} == 1
-%{_bindir}/node_g
-%endif
 %{_includedir}/node
 %{_datadir}/node/common.gypi
 %{_pkgdocdir}/gdbinit
@@ -439,6 +418,12 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules %{buildroot}/%{_bindir}/node -
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Jun 18 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:6.17.1-1
+- Update to 6.17.1 security release
+- https://nodejs.org/en/blog/release/v6.17.1/
+- https://nodejs.org/en/blog/release/v6.17.0/
+- Drop debug build
+
 * Thu Jan 10 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:6.16.0-2
 - Bundle http-parser since it uses backported features not available in RHEL
 
