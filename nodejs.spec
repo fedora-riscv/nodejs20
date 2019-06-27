@@ -12,7 +12,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 4
+%global nodejs_minor 5
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -25,9 +25,9 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 1
 %global v8_major 7
-%global v8_minor 4
+%global v8_minor 5
 %global v8_build 288
-%global v8_patch 27
+%global v8_patch 22
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -48,7 +48,7 @@
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 1
 %global llhttp_minor 1
-%global llhttp_patch 3
+%global llhttp_patch 4
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
@@ -578,6 +578,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Jun 27 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.5.0-1
+- Update to 12.5.0
+- https://nodejs.org/en/blog/release/v12.5.0/
+
 * Tue Jun 04 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.4.0-1
 - Update to 12.4.0
 - https://nodejs.org/en/blog/release/v12.4.0/
