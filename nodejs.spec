@@ -12,7 +12,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 5
+%global nodejs_minor 6
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -53,7 +53,7 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 29
+%global libuv_minor 30
 %global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -259,7 +259,8 @@ Summary: Node.js and v8 libraries
 Provides: libv8.so.%{v8_major}()(64bit)
 Provides: libv8_libbase.so.%{v8_major}()(64bit)
 Provides: libv8_libplatform.so.%{v8_major}()(64bit)
-%else # 32-bits
+%else
+# 32-bits
 Provides: libv8.so.%{v8_major}
 Provides: libv8_libbase.so.%{v8_major}
 Provides: libv8_libplatform.so.%{v8_major}
@@ -335,15 +336,21 @@ sed -i "s~which('python')~which('python2')~" configure
 
 %build
 
+%ifarch s390 s390x %{arm} %ix86
+# Decrease debuginfo verbosity to reduce memory consumption during final
+# library linking
+%global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
+%endif
+
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
 # NULL objects. We need to pass -fno-delete-null-pointer-checks
-export CFLAGS='%{optflags} -g \
+export CFLAGS='%{optflags} \
                -D_LARGEFILE_SOURCE \
                -D_FILE_OFFSET_BITS=64 \
                -DZLIB_CONST \
                -fno-delete-null-pointer-checks'
-export CXXFLAGS='%{optflags} -g \
+export CXXFLAGS='%{optflags} \
                  -D_LARGEFILE_SOURCE \
                  -D_FILE_OFFSET_BITS=64 \
                  -DZLIB_CONST \
@@ -578,8 +585,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Thu Jun 27 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.5.0-1
-- Update to 12.5.0
+* Thu Jun 27 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.6.0-1
+- Update to 12.6.0
+- https://nodejs.org/en/blog/release/v12.6.0/
 - https://nodejs.org/en/blog/release/v12.5.0/
 
 * Tue Jun 04 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.4.0-1
