@@ -12,7 +12,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 5
+%global nodejs_minor 6
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -53,7 +53,7 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 29
+%global libuv_minor 30
 %global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -578,8 +578,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Thu Jun 27 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.5.0-1
-- Update to 12.5.0
+* Thu Jun 27 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.6.0-1
+- Update to 12.6.0
+- https://nodejs.org/en/blog/release/v12.6.0/
 - https://nodejs.org/en/blog/release/v12.5.0/
 
 * Tue Jun 04 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.4.0-1
