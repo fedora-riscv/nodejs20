@@ -259,7 +259,8 @@ Summary: Node.js and v8 libraries
 Provides: libv8.so.%{v8_major}()(64bit)
 Provides: libv8_libbase.so.%{v8_major}()(64bit)
 Provides: libv8_libplatform.so.%{v8_major}()(64bit)
-%else # 32-bits
+%else
+# 32-bits
 Provides: libv8.so.%{v8_major}
 Provides: libv8_libbase.so.%{v8_major}
 Provides: libv8_libplatform.so.%{v8_major}
@@ -335,15 +336,21 @@ sed -i "s~which('python')~which('python2')~" configure
 
 %build
 
+%ifarch s390 s390x %{arm} %ix86
+# Decrease debuginfo verbosity to reduce memory consumption during final
+# library linking
+%global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
+%endif
+
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
 # NULL objects. We need to pass -fno-delete-null-pointer-checks
-export CFLAGS='%{optflags} -g \
+export CFLAGS='%{optflags} \
                -D_LARGEFILE_SOURCE \
                -D_FILE_OFFSET_BITS=64 \
                -DZLIB_CONST \
                -fno-delete-null-pointer-checks'
-export CXXFLAGS='%{optflags} -g \
+export CXXFLAGS='%{optflags} \
                  -D_LARGEFILE_SOURCE \
                  -D_FILE_OFFSET_BITS=64 \
                  -DZLIB_CONST \
