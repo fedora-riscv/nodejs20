@@ -168,7 +168,7 @@ Requires: openssl >= %{openssl_minimum}
 # we need the system certificate store
 Requires: ca-certificates
 
-Requires: nodejs-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: nodejs-libs%{?_isa} = %{epoch}:%{version}-%{release}
 
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
@@ -219,9 +219,9 @@ Provides: bundled(icu) = %{icu_version}
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?rhel}
 # EPEL doesn't support Recommends, so make it strict
-Requires: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}
 %else
-Recommends: npm = %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}
 %endif
 
 
@@ -293,7 +293,7 @@ Release: %{npm_release}%{?dist}
 # now.
 Obsoletes: npm < 0:3.5.4-6
 Provides: npm = %{npm_epoch}:%{npm_version}
-Requires: nodejs = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: nodejs = %{epoch}:%{version}-%{release}
 
 # Do not add epoch to the virtual NPM provides or it will break
 # the automatic dependency-generation script.
