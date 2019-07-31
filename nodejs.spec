@@ -1,5 +1,5 @@
 # uncomment to enable bootstrap mode
-%global _with_bootstrap 1
+# %%global _with_bootstrap 1
 
 # bundle dependencies that are not available as Fedora modules
 %bcond_with bootstrap
