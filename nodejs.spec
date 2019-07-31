@@ -1,6 +1,7 @@
+# uncomment to enable bootstrap mode
+# %%global _with_bootstrap 1
+
 # bundle dependencies that are not available as Fedora modules
-# %%{!?_with_bootstrap: %%global bootstrap 1}
-# use bcond for building modules
 %bcond_with bootstrap
 
 # == Master Relase ==
@@ -140,7 +141,6 @@ BuildRequires: gcc-c++ >= 4.9.4
 BuildRequires: chrpath
 BuildRequires: libatomic
 
-#%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 Provides: bundled(http-parser) = %{http_parser_version}
 Provides: bundled(libuv) = %{libuv_version}
@@ -246,7 +246,6 @@ Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
 Requires: nodejs-packaging
 
-#%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 # deps are bundled
 %else
@@ -368,7 +367,6 @@ export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 
 export LDFLAGS="%{build_ldflags}"
 
-#%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 ./configure --prefix=%{_prefix} \
            --shared \
@@ -532,7 +530,6 @@ end
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
 
-#%if ! 0%%{?bootstrap}
 %if %{with bootstrap}
 # no dtrace
 %else
