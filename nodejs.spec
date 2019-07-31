@@ -3,6 +3,12 @@
 # use bcond for building modules
 %bcond_with bootstrap
 
+# == Master Relase ==
+# This is used by both the nodejs package and the npm subpackage thar
+# has a separate version - the name is special so that rpmdev-bumpspec
+# will bump this rather than adding .1 to the end.
+%global baserelease 2
+
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
 # == Node.js Version ==
@@ -18,7 +24,7 @@
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
-%global nodejs_release 2
+%global nodejs_release %{baserelease}
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
