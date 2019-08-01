@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,7 +19,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 6
+%global nodejs_minor 7
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -66,8 +66,8 @@
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 38
-%global nghttp2_patch 0
+%global nghttp2_minor 39
+%global nghttp2_patch 1
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
@@ -90,7 +90,7 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 9
+%global npm_minor 10
 %global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
@@ -132,6 +132,9 @@ Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch3: 0003-Install-both-binaries-and-use-libdir.patch
+
+# Upstream patch to include stubs in libnode. Drop in 12.8.0
+Patch4: 0004-build-include-stubs-in-shared-library.patch
 
 BuildRequires: python2-devel
 BuildRequires: python3-devel
@@ -588,6 +591,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Aug 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.7.0-1
+- Update to 12.7.0
+- https://nodejs.org/en/blog/release/v12.7.0/
+
 * Tue Jul 30 2019 Tom Hughes <tom@compton.nu> - 1:12.6.0-2
 - Bump release to fix dependencies
 
