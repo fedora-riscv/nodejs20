@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -30,7 +30,7 @@
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
-%global v8_epoch 1
+%global v8_epoch 2
 %global v8_major 7
 %global v8_minor 5
 %global v8_build 288
@@ -38,6 +38,7 @@
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
+%global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
@@ -285,6 +286,7 @@ Libraries to support Node.js and provide stable v8 interfaces.
 Summary: v8 - development headers
 Epoch: %{v8_epoch}
 Version: %{v8_version}
+Release: %{v8_release}%{?dist}
 Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
 %description -n v8-devel
@@ -591,6 +593,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Fri Aug 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.7.0-2
+- Change v8-devel release field to avoid duplicated package names
+
 * Thu Aug 01 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.7.0-1
 - Update to 12.7.0
 - https://nodejs.org/en/blog/release/v12.7.0/
