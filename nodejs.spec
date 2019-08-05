@@ -75,7 +75,17 @@
 %global icu_major 64
 %global icu_minor 2
 %global icu_version %{icu_major}.%{icu_minor}
+
+%global bundled_icu 1
+
+%if 0%{?bundled_icu}
 %global icu_flag small-icu
+%else
+%global icu_flag system-icu
+%endif
+%{!?little_endian: %global little_endian %(%{__python3} -c "import sys;print (0 if sys.byteorder=='big' else 1)")}
+# " this line just fixes syntax highlighting for vim that is confused by the above and continues literal
+
 
 # OpenSSL minimum version
 %global openssl_minimum 1:1.1.1
@@ -421,6 +431,17 @@ for soname in libv8 libv8_libbase libv8_libplatform; do
     ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
 done
 
+# When using small-icu, carry the icudt64{l,b}.dat
+%if 0%{?bundled_icu}
+%if 0%{?little_endian}
+cp -a out/Release/obj/gen/icutmp/icudt64l.dat \
+      %{buildroot}%{_libdir}/icudt64l.dat
+%else
+cp -a out/Release/obj/gen/icutmp/icudt64b.dat \
+      %{buildroot}%{_libdir}/icudt64b.dat
+%endif
+%endif
+
 # own the sitelib directory
 mkdir -p %{buildroot}%{_prefix}/lib/node_modules
 
@@ -561,6 +582,14 @@ end
 %{_libdir}/libv8.so.%{v8_major}
 %{_libdir}/libv8_libbase.so.%{v8_major}
 %{_libdir}/libv8_libplatform.so.%{v8_major}
+
+%if 0%{?bundled_icu}
+%if 0%{?little_endian}
+%{_libdir}/icudt64l.dat
+%else
+%{_libdir}/icudt64b.dat
+%endif
+%endif
 
 
 %files -n v8-devel
