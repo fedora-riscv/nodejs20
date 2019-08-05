@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -188,7 +188,7 @@ Requires: openssl >= %{openssl_minimum}
 # we need the system certificate store
 Requires: ca-certificates
 
-Requires: nodejs-libs%{?_isa} = %{epoch}:%{version}-%{release}
+Requires: nodejs-libs%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
@@ -239,9 +239,9 @@ Provides: bundled(icu) = %{icu_version}
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?rhel}
 # EPEL doesn't support Recommends, so make it strict
-Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}
+Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 %else
-Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}
+Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 %endif
 
 
@@ -297,7 +297,7 @@ Summary: v8 - development headers
 Epoch: %{v8_epoch}
 Version: %{v8_version}
 Release: %{v8_release}%{?dist}
-Requires: %{name}-devel%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
 %description -n v8-devel
 Development headers for the v8 runtime.
@@ -313,7 +313,7 @@ Release: %{npm_release}%{?dist}
 # now.
 Obsoletes: npm < 0:3.5.4-6
 Provides: npm = %{npm_epoch}:%{npm_version}
-Requires: nodejs = %{epoch}:%{version}-%{release}
+Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
 # Do not add epoch to the virtual NPM provides or it will break
 # the automatic dependency-generation script.
@@ -331,8 +331,8 @@ BuildArch: noarch
 # We don't require that the main package be installed to
 # use the docs, but if it is installed, make sure the
 # version always matches
-Conflicts: %{name} > %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-Conflicts: %{name} < %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Conflicts: %{name} > %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Conflicts: %{name} < %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
 %description docs
 The API documentation for the Node.js JavaScript runtime.
@@ -622,6 +622,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Aug 05 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.7.0-3
+- Fix epoch dependencies
+- Carry data files for ICU
+
 * Fri Aug 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.7.0-2
 - Change v8-devel release field to avoid duplicated package names
 
