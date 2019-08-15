@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 7
-%global nodejs_patch 0
+%global nodejs_minor 8
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -68,7 +68,7 @@
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
 %global nghttp2_minor 39
-%global nghttp2_patch 1
+%global nghttp2_patch 2
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
@@ -102,7 +102,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 10
-%global npm_patch 0
+%global npm_patch 2
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -143,9 +143,6 @@ Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch3: 0003-Install-both-binaries-and-use-libdir.patch
-
-# Upstream patch to include stubs in libnode. Drop in 12.8.0
-Patch4: 0004-build-include-stubs-in-shared-library.patch
 
 BuildRequires: python2-devel
 BuildRequires: python3-devel
@@ -622,6 +619,18 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Thu Aug 15 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.8.2-1
+- Update to 12.8.1
+- Resolves: CVE-2019-9511 "Data Dribble"
+- Resolves: CVE-2019-9512 "Ping Flood"
+- Resolves: CVE-2019-9513 "Resource Loop"
+- Resolves: CVE-2019-9514 "Reset Flood"
+- Resolves: CVE-2019-9515 "Settings Flood"
+- Resolves: CVE-2019-9516 "0-Length Headers Leak"
+- Resolves: CVE-2019-9517 "Internal Data Buffering"
+- Resolves: CVE-2019-9518 "Empty Frames Flood"
+- https://github.com/nodejs/node/blob/v12.8.1/doc/changelogs/CHANGELOG_V12.md#12.8.1
+
 * Mon Aug 05 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.7.0-3
 - Fix epoch dependencies
 - Carry data files for ICU
