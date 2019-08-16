@@ -120,4 +120,56 @@ fedpkg new-sources node-v${version}-stripped.tar.gz
 
 rm -f node-v${version}.tar.gz
 
+# Determine the bundled versions of the various packages
+echo "Bundled software versions"
+echo "-------------------------"
+echo
+echo "V8"
+echo "========================="
+grep "define V8_MAJOR_VERSION" node-v${version}/deps/v8/include/v8-version.h
+grep "define V8_MINOR_VERSION" node-v${version}/deps/v8/include/v8-version.h
+grep "define V8_BUILD_NUMBER" node-v${version}/deps/v8/include/v8-version.h
+grep "define V8_PATCH_LEVEL" node-v${version}/deps/v8/include/v8-version.h
+echo
+echo "c-ares"
+echo "========================="
+grep "define ARES_VERSION_MAJOR" node-v${version}/deps/cares/include/ares_version.h
+grep "define ARES_VERSION_MINOR" node-v${version}/deps/cares/include/ares_version.h
+grep "define ARES_VERSION_PATCH" node-v${version}/deps/cares/include/ares_version.h
+echo
+echo "http-parser"
+echo "========================="
+grep "define HTTP_PARSER_VERSION_MAJOR" node-v${version}/deps/http_parser/http_parser.h
+grep "define HTTP_PARSER_VERSION_MINOR" node-v${version}/deps/http_parser/http_parser.h
+grep "define HTTP_PARSER_VERSION_PATCH" node-v${version}/deps/http_parser/http_parser.h
+echo
+echo "llhttp"
+echo "========================="
+grep "define LLHTTP_VERSION_MAJOR" node-v${version}/deps/llhttp/include/llhttp.h
+grep "define LLHTTP_VERSION_MINOR" node-v${version}/deps/llhttp/include/llhttp.h
+grep "define LLHTTP_VERSION_PATCH" node-v${version}/deps/llhttp/include/llhttp.h
+echo
+echo "libuv"
+echo "========================="
+grep "define UV_VERSION_MAJOR" node-v${version}/deps/uv/include/uv/version.h
+grep "define UV_VERSION_MINOR" node-v${version}/deps/uv/include/uv/version.h
+grep "define UV_VERSION_PATCH" node-v${version}/deps/uv/include/uv/version.h
+echo
+echo "libuv"
+echo "========================="
+grep "define NGHTTP2_VERSION " node-v${version}/deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
+echo
+echo "ICU"
+echo "========================="
+grep "url" node-v${version}/tools/icu/current_ver.dep
+echo
+echo "punycode"
+echo "========================="
+grep "'version'" node-v${version}/lib/punycode.js
+echo
+echo "npm"
+echo "========================="
+grep "\"version\":" node-v${version}/deps/npm/package.json
+echo
+echo "Make sure these versions match what is in the RPM spec file"
 # ] <-- needed because of Argbash
