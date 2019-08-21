@@ -1,4 +1,4 @@
-From bc1d8e49a42cb88d86b2accba6ee1776baba4ca5 Mon Sep 17 00:00:00 2001
+From 4a32f1d071d7275d5b946047b5cc59116c46bab1 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 3/3] Install both binaries and use libdir.
@@ -13,10 +13,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index cc805d3fd165fd2abe4c8581ffdb8829341ad2ba..64f50439bc09827f99786c3b0d574ba454954ca9 100755
+index beab9ceccce9adc8ec564350a732382d186ffdf1..8d08988ed6245f43928ad65af02b7bd29f1d47a7 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -550,10 +550,16 @@ parser.add_option('--shared',
+@@ -554,10 +554,16 @@ parser.add_option('--shared',
      action='store_true',
      dest='shared',
      help='compile shared library for embedding node in another project. ' +
@@ -33,7 +33,7 @@ index cc805d3fd165fd2abe4c8581ffdb8829341ad2ba..64f50439bc09827f99786c3b0d574ba4
      dest='without_v8_platform',
      default=False,
      help='do not initialize v8 platform during node.js startup. ' +
-@@ -1094,10 +1100,11 @@ def configure_node(o):
+@@ -1093,10 +1099,11 @@ def configure_node(o):
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
    # TODO(refack): fix this when implementing embedded code-cache when cross-compiling.
    if o['variables']['want_separate_host_toolset'] == 0:

@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 8
-%global nodejs_patch 1
+%global nodejs_minor 9
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -32,9 +32,9 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major 7
-%global v8_minor 5
-%global v8_build 288
-%global v8_patch 22
+%global v8_minor 6
+%global v8_build 303
+%global v8_patch 29
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -61,8 +61,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 30
-%global libuv_patch 1
+%global libuv_minor 31
+%global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -619,6 +619,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Wed Aug 21 2019 Stephen Gallagher <sgallagh@redhat.com> - -
+- Update to 12.9.0
+- https://github.com/nodejs/node/blob/v12.9.0/doc/changelogs/CHANGELOG_V12.md#12.9.0
+
 * Thu Aug 15 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.8.2-1
 - Update to 12.8.1
 - Resolves: CVE-2019-9511 "Data Dribble"
