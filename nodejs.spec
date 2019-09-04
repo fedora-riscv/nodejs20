@@ -19,7 +19,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 9
+%global nodejs_minor 10
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -102,7 +102,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 10
-%global npm_patch 2
+%global npm_patch 3
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -619,7 +619,11 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
-* Wed Aug 21 2019 Stephen Gallagher <sgallagh@redhat.com> - -
+* Wed Sep 04 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.10.0-1
+- Update to 12.10.0
+- https://github.com/nodejs/node/blob/v12.10.0/doc/changelogs/CHANGELOG_V12.md#12.10.0
+
+* Wed Aug 21 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.9.0-1
 - Update to 12.9.0
 - https://github.com/nodejs/node/blob/v12.9.0/doc/changelogs/CHANGELOG_V12.md#12.9.0
 
