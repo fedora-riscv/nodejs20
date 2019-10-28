@@ -502,6 +502,7 @@ chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin
 
 
 # Drop the NPM default configuration in place
+mkdir -p %{buildroot}%{_sysconfdir}
 cp %{SOURCE1} %{buildroot}%{_sysconfdir}/
 
 
