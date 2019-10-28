@@ -1,4 +1,4 @@
-From f35fcd689dce64e7d6b5f3496e5e5358a24ae4e0 Mon Sep 17 00:00:00 2001
+From 68a68c00f78bade05487d34412f3a4b773c4363e Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 3/3] Install both binaries and use libdir.
@@ -13,12 +13,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index ce01a14566e65ad9d568e0cb8594b35bacd698c6..180f0b4861463e3d4fab979fce4b4c8dfc6ceee2 100755
+index 473bbfeb294b34e0cb4ead9db607adfc3781be29..a1f98be9a68c360f3bd17c8f5e0a1478adce9a55 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -554,10 +554,16 @@ parser.add_option('--shared',
-     action='store_true',
-     dest='shared',
+@@ -556,6 +556,12 @@ parser.add_option('--shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -31,11 +29,7 @@ index ce01a14566e65ad9d568e0cb8594b35bacd698c6..180f0b4861463e3d4fab979fce4b4c8d
  parser.add_option('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-     default=False,
-     help='do not initialize v8 platform during node.js startup. ' +
-@@ -1096,10 +1102,11 @@ def configure_node(o):
-   o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
-   # TODO(refack): fix this when implementing embedded code-cache when cross-compiling.
+@@ -1098,6 +1104,7 @@ def configure_node(o):
    if o['variables']['want_separate_host_toolset'] == 0:
      o['variables']['node_code_cache'] = 'yes' # For testing
    o['variables']['node_shared'] = b(options.shared)
@@ -43,15 +37,11 @@ index ce01a14566e65ad9d568e0cb8594b35bacd698c6..180f0b4861463e3d4fab979fce4b4c8d
    node_module_version = getmoduleversion.get_version()
  
    if sys.platform == 'darwin':
-     shlib_suffix = '%s.dylib'
-   elif sys.platform.startswith('aix'):
 diff --git a/tools/install.py b/tools/install.py
 index 655802980a6ea94d1d4ca1dc63c8c8e905fbb83a..fe4723bf15012c8aacacb0393dc8294c049b0503 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -119,30 +119,27 @@ def subdir_files(path, dest, action):
-   for subdir, files_in_path in ret.items():
-     action(files_in_path, subdir + '/')
+@@ -121,26 +121,23 @@ def subdir_files(path, dest, action):
  
  def files(action):
    is_windows = sys.platform == 'win32'
@@ -91,8 +81,6 @@ index 655802980a6ea94d1d4ca1dc63c8c8e905fbb83a..fe4723bf15012c8aacacb0393dc8294c
  
    if 'true' == variables.get('node_use_dtrace'):
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
- 
-   # behave similarly for systemtap
 -- 
-2.21.0
+2.23.0
 

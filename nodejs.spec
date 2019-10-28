@@ -19,7 +19,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 10
+%global nodejs_minor 13
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -32,9 +32,9 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major 7
-%global v8_minor 6
-%global v8_build 303
-%global v8_patch 29
+%global v8_minor 7
+%global v8_build 299
+%global v8_patch 13
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -61,7 +61,7 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 31
+%global libuv_minor 32
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -101,8 +101,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 10
-%global npm_patch 3
+%global npm_minor 12
+%global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -127,6 +127,7 @@ ExclusiveArch: %{nodejs_arches}
 # because openssl contains prohibited code, we remove openssl completely from
 # the tarball, using the script in Source100
 Source0: node-v%{nodejs_version}-stripped.tar.gz
+Source1: npmrc
 Source100: %{name}-tarball.sh
 
 # The native module Requires generator remains in the nodejs SRPM, so it knows
@@ -137,9 +138,9 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
-# Suppress the message from npm to run `npm -g update npm`
-# This does bad things on an RPM-managed npm.
-Patch2: 0002-Suppress-NPM-message-to-run-global-update.patch
+# Use /etc/npmrc for the default configuration
+# We'll use this to set the prefix to /usr/local for `npm -g install`
+Patch2: 0002-Use-etc-npmrc-for-the-default-configuration.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch3: 0003-Install-both-binaries-and-use-libdir.patch
@@ -500,6 +501,10 @@ chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycl
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
 
 
+# Drop the NPM default configuration in place
+cp %{SOURCE1} %{buildroot}%{_sysconfdir}/
+
+
 %check
 # Fail the build if the versions don't match
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
@@ -602,7 +607,7 @@ end
 %{_bindir}/npm
 %{_bindir}/npx
 %{_prefix}/lib/node_modules/npm
-%ghost %{_sysconfdir}/npmrc
+%config(noreplace) %{_sysconfdir}/npmrc
 %ghost %{_sysconfdir}/npmignore
 %doc %{_mandir}/man*/npm*
 %doc %{_mandir}/man*/npx*
@@ -619,6 +624,12 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Oct 28 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-1
+- Update to 12.13.0 (LTS)
+- https://github.com/nodejs/node/blob/v12.13.0/doc/changelogs/CHANGELOG_V12.md
+- NPM no longer clobbers RPM-installed Node.js modules
+- Drop no-longer needed patch to suppress `npm update -g npm` message
+
 * Wed Sep 04 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.10.0-1
 - Update to 12.10.0
 - https://github.com/nodejs/node/blob/v12.10.0/doc/changelogs/CHANGELOG_V12.md#12.10.0
