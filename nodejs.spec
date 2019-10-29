@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -231,7 +231,7 @@ Provides: bundled(v8) = %{v8_version}
 Provides: bundled(icu) = %{icu_version}
 
 # Make sure we keep NPM up to date when we update Node.js
-%if 0%{?rhel}
+%if 0%{?rhel} < 8
 # EPEL doesn't support Recommends, so make it strict
 Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 %else
@@ -308,6 +308,9 @@ Release: %{npm_release}%{?dist}
 Obsoletes: npm < 0:3.5.4-6
 Provides: npm = %{npm_epoch}:%{npm_version}
 Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+%if 0%{?fedora} || 0%{?rhel} >= 8
+Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+%endif
 
 # Do not add epoch to the virtual NPM provides or it will break
 # the automatic dependency-generation script.
@@ -534,6 +537,23 @@ if d_st then
   end
 end
 
+-- Replace the npm docs directory with a symlink
+-- Drop this scriptlet when F31 is EOL
+path = "%{_prefix}/lib/node_modules/npm/doc"
+st = posix.stat(path)
+if st and st.type == "directory" then
+  status = os.rename(path, path .. ".rpmmoved")
+  if not status then
+    suffix = 0
+    while not status do
+      suffix = suffix + 1
+      status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
+    end
+    os.rename(path, path .. ".rpmmoved")
+  end
+end
+
+
 %pretrans -n v8-devel -p <lua>
 -- Replace the v8 libplatform include directory with a symlink
 -- Drop this scriptlet when F30 is EOL
@@ -626,6 +646,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Oct 29 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-3
+- Fix issue with NPM docs being replaced with a symlink
+
 * Mon Oct 28 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-2
 - Simplify npmrc default configuration
 
