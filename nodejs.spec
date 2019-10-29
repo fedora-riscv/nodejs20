@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -137,10 +137,6 @@ Source7: nodejs_native.attr
 
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
-
-# Use /etc/npmrc for the default configuration
-# We'll use this to set the prefix to /usr/local for `npm -g install`
-Patch2: 0002-Use-etc-npmrc-for-the-default-configuration.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch3: 0003-Install-both-binaries-and-use-libdir.patch
@@ -503,8 +499,12 @@ chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin
 
 # Drop the NPM default configuration in place
 mkdir -p %{buildroot}%{_sysconfdir}
-cp %{SOURCE1} %{buildroot}%{_sysconfdir}/
+cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
 
+# NPM upstream expectes it to be in /usr/etc/npmrc, so we'll put a symlink here
+# This is done in the interests of keeping /usr read-only.
+mkdir -p %{buildroot}%{_prefix}/etc
+ln -s %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
 
 %check
 # Fail the build if the versions don't match
@@ -609,6 +609,7 @@ end
 %{_bindir}/npx
 %{_prefix}/lib/node_modules/npm
 %config(noreplace) %{_sysconfdir}/npmrc
+%{_prefix}/etc/npmrc
 %ghost %{_sysconfdir}/npmignore
 %doc %{_mandir}/man*/npm*
 %doc %{_mandir}/man*/npx*
@@ -625,6 +626,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Oct 28 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-2
+- Simplify npmrc default configuration
+
 * Mon Oct 28 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-1
 - Update to 12.13.0 (LTS)
 - https://github.com/nodejs/node/blob/v12.13.0/doc/changelogs/CHANGELOG_V12.md
