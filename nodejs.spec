@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 5
+%global baserelease 6
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -76,15 +76,15 @@
 %global icu_minor 2
 %global icu_version %{icu_major}.%{icu_minor}
 
-%global bundled_icu 1
+%global sys_icu_version %(/usr/bin/icu-config --version)
 
-%if 0%{?bundled_icu}
-%global icu_flag small-icu
-%else
+%if sys_icu_version >= icu_version
+%global bundled_icu 0
 %global icu_flag system-icu
+%else
+%global bundled_icu 1
+%global icu_flag full-icu
 %endif
-%{!?little_endian: %global little_endian %(%{__python3} -c "import sys;print (0 if sys.byteorder=='big' else 1)")}
-# " this line just fixes syntax highlighting for vim that is confused by the above and continues literal
 
 
 # OpenSSL minimum version
@@ -128,6 +128,8 @@ ExclusiveArch: %{nodejs_arches}
 # the tarball, using the script in Source100
 Source0: node-v%{nodejs_version}-stripped.tar.gz
 Source1: npmrc
+Source2: btest402.js
+Source3: https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-src.tgz
 Source100: %{name}-tarball.sh
 
 # The native module Requires generator remains in the nodejs SRPM, so it knows
@@ -171,10 +173,7 @@ Provides: bundled(llhttp) = %{llhttp_version}
 
 %endif
 
-
-%if 0%{?fedora} >= 29
-BuildRequires: libicu-devel >= 62.1
-%endif
+BuildRequires: libicu-devel
 
 BuildRequires: openssl-devel >= %{openssl_minimum}
 Requires: openssl >= %{openssl_minimum}
@@ -341,6 +340,13 @@ The API documentation for the Node.js JavaScript runtime.
 # remove bundled dependencies that we aren't building
 rm -rf deps/zlib
 
+%if bundled_icu
+pushd deps/
+rm -rf icu-small
+tar xfz %SOURCE3
+popd
+%endif
+
 # Replace any instances of unversioned python' with python2
 pathfix.py -i %{__python2} -pn $(find -type f ! -name "*.js")
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
@@ -358,6 +364,9 @@ sed -i "s~which('python')~which('python2')~" configure
 # library linking
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
+
+export CC='gcc'
+export CXX='g++'
 
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
@@ -427,17 +436,6 @@ for soname in libv8 libv8_libbase libv8_libplatform; do
     ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
     ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
 done
-
-# When using small-icu, carry the icudt64{l,b}.dat
-%if 0%{?bundled_icu}
-%if 0%{?little_endian}
-cp -a out/Release/obj/gen/icutmp/icudt64l.dat \
-      %{buildroot}%{_libdir}/icudt64l.dat
-%else
-cp -a out/Release/obj/gen/icutmp/icudt64b.dat \
-      %{buildroot}%{_libdir}/icudt64b.dat
-%endif
-%endif
 
 # own the sitelib directory
 mkdir -p %{buildroot}%{_prefix}/lib/node_modules
@@ -520,6 +518,9 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(
 
 # Ensure we have npm and that the version matches
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
+
+# Make sure i18n support is working
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node %{SOURCE2}
 
 
 %pretrans -n npm -p <lua>
@@ -638,14 +639,6 @@ end
 %{_libdir}/libv8_libbase.so.%{v8_major}
 %{_libdir}/libv8_libplatform.so.%{v8_major}
 
-%if 0%{?bundled_icu}
-%if 0%{?little_endian}
-%{_libdir}/icudt64l.dat
-%else
-%{_libdir}/icudt64b.dat
-%endif
-%endif
-
 
 %files -n v8-devel
 %{_includedir}/libplatform
@@ -678,6 +671,9 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Tue Oct 29 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-6
+- Add proper i18n support
+
 * Tue Oct 29 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-5
 - Fix issue with NPM docs being replaced with a symlink
 
