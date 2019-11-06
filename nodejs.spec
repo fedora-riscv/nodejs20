@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 6
+%global baserelease 7
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -78,7 +78,7 @@
 
 %global sys_icu_version %(/usr/bin/icu-config --version)
 
-%if sys_icu_version >= icu_version
+%if "%{sys_icu_version}" >= "%{icu_version}"
 %global bundled_icu 0
 %global icu_flag system-icu
 %else
