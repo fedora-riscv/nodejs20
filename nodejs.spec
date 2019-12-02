@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 7
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -20,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 12
 %global nodejs_minor 13
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -61,8 +61,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 32
-%global libuv_patch 0
+%global libuv_minor 33
+%global libuv_patch 1
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -102,7 +102,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 12
-%global npm_patch 0
+%global npm_patch 1
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -671,6 +671,10 @@ end
 %{_pkgdocdir}/npm/doc
 
 %changelog
+* Mon Dec 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.1-1
+- Update to 12.13.1
+- https://github.com/nodejs/node/blob/v12.13.1/doc/changelogs/CHANGELOG_V12.md
+
 * Tue Oct 29 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.0-6
 - Add proper i18n support
 
