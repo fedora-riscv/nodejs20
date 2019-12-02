@@ -101,6 +101,7 @@ assign_positional_args 1 "${_positionals[@]}"
 # [ <-- needed because of Argbash
 
 
+set -e
 
 echo $_arg_version
 
@@ -111,18 +112,33 @@ else
 fi
 
 rm -f node-v${version}.tar.gz node-v${version}-stripped.tar.gz
-wget http://nodejs.org/dist/v${version}/node-v${version}.tar.gz
+wget http://nodejs.org/dist/v${version}/node-v${version}.tar.gz \
+     http://nodejs.org/dist/v${version}/SHASUMS256.txt
+sha256sum -c SHASUMS256.txt --ignore-missing
 tar -zxf node-v${version}.tar.gz
 rm -rf node-v${version}/deps/openssl
 tar -zcf node-v${version}-stripped.tar.gz node-v${version}
 
-fedpkg new-sources node-v${version}-stripped.tar.gz
+# Download the matching version of ICU
+rm -f icu4c*-src.tgz icu.md5
+ICUMD5=$(cat node-v${version}/tools/icu/current_ver.dep |jq -r '.[0].md5')
+wget $(cat node-v${version}/tools/icu/current_ver.dep |jq -r '.[0].url')
+ICUTARBALL=$(ls -1 icu4c*-src.tgz)
+echo "$ICUMD5  $ICUTARBALL" > icu.md5
+md5sum -c icu.md5
+rm -f icu.md5 SHASUMS256.txt
+
+fedpkg new-sources node-v${version}-stripped.tar.gz icu4c*-src.tgz
 
 rm -f node-v${version}.tar.gz
 
 # Determine the bundled versions of the various packages
 echo "Bundled software versions"
 echo "-------------------------"
+echo
+echo "libnode shared object version"
+echo "========================="
+grep "define NODE_MODULE_VERSION" node-v${version}/src/node_version.h
 echo
 echo "V8"
 echo "========================="
@@ -172,4 +188,6 @@ echo "========================="
 grep "\"version\":" node-v${version}/deps/npm/package.json
 echo
 echo "Make sure these versions match what is in the RPM spec file"
+
+rm -rf node-v${version}
 # ] <-- needed because of Argbash
