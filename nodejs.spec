@@ -524,20 +524,6 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 
 
 %pretrans -n npm -p <lua>
--- Remove all of the symlinks from the bundled npm node_modules directory
--- Drop this scriptlet when F29 is EOL
-base_path = "%{_prefix}/lib/node_modules/npm/node_modules/"
-d_st = posix.stat(base_path)
-if d_st then
-  for f in posix.files(base_path) do
-    path = base_path..f
-    st = posix.stat(path)
-    if st and st.type == "link" then
-      os.remove(path)
-    end
-  end
-end
-
 -- Replace the npm docs directory with a symlink
 -- Drop this scriptlet when F31 is EOL
 path = "%{_prefix}/lib/node_modules/npm/doc"
