@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,13 +19,15 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 13
-%global nodejs_patch 1
+%global nodejs_minor 14
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
+
+%global nodejs_datadir %{_datarootdir}/nodejs
 
 # == Bundled Dependency Versions ==
 # v8 - from deps/v8/include/v8-version.h
@@ -76,15 +78,9 @@
 %global icu_minor 2
 %global icu_version %{icu_major}.%{icu_minor}
 
-%global sys_icu_version %(/usr/bin/icu-config --version)
-
-%if "%{sys_icu_version}" >= "%{icu_version}"
-%global bundled_icu 0
-%global icu_flag system-icu
-%else
-%global bundled_icu 1
-%global icu_flag full-icu
-%endif
+%global icudatadir %{nodejs_datadir}/icudata
+%{!?little_endian: %global little_endian %(%{__python3} -c "import sys;print (0 if sys.byteorder=='big' else 1)")}
+# " this line just fixes syntax highlighting for vim that is confused by the above and continues literal
 
 
 # OpenSSL minimum version
@@ -101,8 +97,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 12
-%global npm_patch 1
+%global npm_minor 13
+%global npm_patch 4
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -141,7 +137,11 @@ Source7: nodejs_native.attr
 Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
-Patch3: 0003-Install-both-binaries-and-use-libdir.patch
+Patch2: 0002-Install-both-binaries-and-use-libdir.patch
+
+# Upstream patch to enable auto-detection of full ICU data
+# https://github.com/nodejs/node/pull/30825
+Patch3: 0003-build-auto-load-ICU-data-from-with-icu-default-data-.patch
 
 BuildRequires: python2-devel
 BuildRequires: python3-devel
@@ -173,8 +173,6 @@ Provides: bundled(llhttp) = %{llhttp_version}
 
 %endif
 
-BuildRequires: libicu-devel
-
 BuildRequires: openssl-devel >= %{openssl_minimum}
 Requires: openssl >= %{openssl_minimum}
 
@@ -183,6 +181,8 @@ Requires: ca-certificates
 
 Requires: nodejs-libs%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 
+# Pull in the full-icu data by default
+Recommends: nodejs-full-i18n%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 
 #we need ABI virtual provides where SONAMEs aren't enough/not present so deps
 #break when binary compatibility is broken
@@ -285,6 +285,17 @@ Obsoletes: v8 < 1:6.7.17-10
 %description libs
 Libraries to support Node.js and provide stable v8 interfaces.
 
+
+%package full-i18n
+Summary: Non-English locale data for Node.js
+Requires: %{name}%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+
+
+%description full-i18n
+Optional data files to provide full-icu support for Node.js. Remove this
+package to save space if non-English locales are not needed.
+
+
 %package -n v8-devel
 Summary: v8 - development headers
 Epoch: %{v8_epoch}
@@ -340,12 +351,6 @@ The API documentation for the Node.js JavaScript runtime.
 # remove bundled dependencies that we aren't building
 rm -rf deps/zlib
 
-%if bundled_icu
-pushd deps/
-rm -rf icu-small
-tar xfz %SOURCE3
-popd
-%endif
 
 # Replace any instances of unversioned python' with python2
 pathfix.py -i %{__python2} -pn $(find -type f ! -name "*.js")
@@ -407,12 +412,43 @@ export LDFLAGS="%{build_ldflags}"
            --shared-libuv \
            --shared-nghttp2 \
            --with-dtrace \
-           --with-intl=%{icu_flag} \
+           --with-intl=small-icu \
+           --with-icu-default-data-dir=%{icudatadir} \
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %endif
 
 make BUILDTYPE=Release %{?_smp_mflags}
+
+
+# Extract the ICU data and convert it to the appropriate endianness
+pushd deps/
+tar xfz %SOURCE3
+
+pushd icu/source
+
+mkdir -p converted
+%if 0%{?little_endian}
+# The little endian data file is included in the ICU sources
+install -Dpm0644 data/in/icudt%{icu_major}l.dat converted/
+
+%else
+# For the time being, we need to build ICU and use the included `icupkg` tool
+# to convert the little endian data file into a big-endian one.
+# At some point in the future, ICU releases will start including both data
+# files and we should switch to those.
+mkdir -p data/out/tmp
+
+%configure
+%make_build
+
+icu_root=$(pwd)
+LD_LIBRARY_PATH=./lib ./bin/icupkg -tb data/in/icudt%{icu_major}l.dat \
+                                       converted/icudt%{icu_major}b.dat
+%endif
+
+popd # icu/source
+popd # deps
 
 
 %install
@@ -425,16 +461,16 @@ chmod 0755 %{buildroot}/%{_bindir}/node
 chrpath --delete %{buildroot}%{_bindir}/node
 
 # Install library symlink
-ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/libnode.so
+ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/libnode.so
 
 # Install v8 compatibility symlinks
 for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_includedir}/node/v8*.h; do
     header=$(basename ${header})
-    ln -s %{_includedir}/node/${header} %{buildroot}%{_includedir}/${header}
+    ln -s ${header} %{buildroot}%{_includedir}/${header}
 done
 for soname in libv8 libv8_libbase libv8_libplatform; do
-    ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
-    ln -s %{_libdir}/libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
+    ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
+    ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
 done
 
 # own the sitelib directory
@@ -470,13 +506,11 @@ cp -pr deps/npm/man/* %{buildroot}%{_mandir}/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/man
 ln -sf %{_mandir}  %{buildroot}%{_prefix}/lib/node_modules/npm/man
 
-# Install Markdown and HTML documentation to %{_pkgdocdir}
-cp -pr deps/npm/html deps/npm/doc %{buildroot}%{_pkgdocdir}/npm/
-rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/html \
-       %{buildroot}%{_prefix}/lib/node_modules/npm/doc
+# Install Gatsby HTML documentation to %{_pkgdocdir}
+cp -pr deps/npm/docs %{buildroot}%{_pkgdocdir}/npm/
+rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
-ln -sf %{_pkgdocdir} %{buildroot}%{_prefix}/lib/node_modules/npm/html
-ln -sf %{_pkgdocdir}/npm/html %{buildroot}%{_prefix}/lib/node_modules/npm/doc
+ln -sf %{_pkgdocdir}/npm %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
 
 # Node tries to install some python files into a documentation directory
@@ -507,6 +541,9 @@ cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
 mkdir -p %{buildroot}%{_prefix}/etc
 ln -s %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
 
+# Install the full-icu data files
+install -Dpm0644 -t %{buildroot}%{icudatadir} deps/icu/source/converted/*
+
 %check
 # Fail the build if the versions don't match
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require('assert').equal(process.versions.node, '%{nodejs_version}')"
@@ -520,43 +557,11 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
 
 # Make sure i18n support is working
-NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node %{SOURCE2}
+NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE2}
 
 
 %pretrans -n npm -p <lua>
--- Replace the npm docs directory with a symlink
--- Drop this scriptlet when F31 is EOL
-path = "%{_prefix}/lib/node_modules/npm/doc"
-st = posix.stat(path)
-if st and st.type == "directory" then
-  status = os.rename(path, path .. ".rpmmoved")
-  if not status then
-    suffix = 0
-    while not status do
-      suffix = suffix + 1
-      status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
-    end
-    os.rename(path, path .. ".rpmmoved")
-  end
-end
-
--- Replace the npm HTML docs directory with a symlink
--- Drop this scriptlet when F31 is EOL
-path = "%{_prefix}/lib/node_modules/npm/html"
-st = posix.stat(path)
-if st and st.type == "directory" then
-  status = os.rename(path, path .. ".rpmmoved")
-  if not status then
-    suffix = 0
-    while not status do
-      suffix = suffix + 1
-      status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
-    end
-    os.rename(path, path .. ".rpmmoved")
-  end
-end
-
--- Replace the npm HTML man directory with a symlink
+-- Replace the npm man directory with a symlink
 -- Drop this scriptlet when F31 is EOL
 path = "%{_prefix}/lib/node_modules/npm/man"
 st = posix.stat(path)
@@ -590,6 +595,7 @@ if st and st.type == "directory" then
   end
 end
 
+
 %files
 %{_bindir}/node
 %dir %{_prefix}/lib/node_modules
@@ -607,7 +613,6 @@ end
 
 %{_rpmconfigdir}/fileattrs/nodejs_native.attr
 %{_rpmconfigdir}/nodejs_native.req
-%license LICENSE
 %doc AUTHORS CHANGELOG.md COLLABORATOR_GUIDE.md GOVERNANCE.md README.md
 %doc %{_mandir}/man1/node.1*
 
@@ -619,11 +624,17 @@ end
 %{_pkgdocdir}/gdbinit
 
 
+%files full-i18n
+%dir %{icudatadir}
+%{icudatadir}/icudt%{icu_major}*.dat
+
 %files libs
+%license LICENSE
 %{_libdir}/libnode.so.%{nodejs_soversion}
 %{_libdir}/libv8.so.%{v8_major}
 %{_libdir}/libv8_libbase.so.%{v8_major}
 %{_libdir}/libv8_libplatform.so.%{v8_major}
+%dir %{nodejs_datadir}/
 
 
 %files -n v8-devel
@@ -642,21 +653,39 @@ end
 %config(noreplace) %{_sysconfdir}/npmrc
 %{_prefix}/etc/npmrc
 %ghost %{_sysconfdir}/npmignore
-%doc %{_mandir}/man*/npm*
-%doc %{_mandir}/man*/npx*
-%doc %{_mandir}/man5/package.json.5*
-%doc %{_mandir}/man5/package-lock.json.5*
-%doc %{_mandir}/man7/removing-npm.7*
+%doc %{_mandir}/man1/npm*.1*
+%doc %{_mandir}/man1/npx.1*
+%doc %{_mandir}/man5/folders.5*
+%doc %{_mandir}/man5/install.5*
+%doc %{_mandir}/man5/npmrc.5*
+%doc %{_mandir}/man5/package-json.5*
+%doc %{_mandir}/man5/package-lock-json.5*
+%doc %{_mandir}/man5/package-locks.5*
+%doc %{_mandir}/man5/shrinkwrap-json.5*
+%doc %{_mandir}/man7/config.7*
+%doc %{_mandir}/man7/developers.7*
+%doc %{_mandir}/man7/disputes.7*
+%doc %{_mandir}/man7/orgs.7*
+%doc %{_mandir}/man7/registry.7*
+%doc %{_mandir}/man7/removal.7*
+%doc %{_mandir}/man7/scope.7*
+%doc %{_mandir}/man7/scripts.7*
 %doc %{_mandir}/man7/semver.7*
 
 
 %files docs
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
-%{_pkgdocdir}/npm/html
-%{_pkgdocdir}/npm/doc
+%{_pkgdocdir}/npm/docs
 
 %changelog
+* Mon Jan 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.0-2
+- Update to 12.14.0
+- https://github.com/nodejs/node/blob/v12.14.0/doc/changelogs/CHANGELOG_V12.md
+- Add new subpackage nodejs-full-i18n to enable optional non-English locale
+  support
+- Update documentation packaging for NPM
+
 * Mon Dec 02 2019 Stephen Gallagher <sgallagh@redhat.com> - 1:12.13.1-1
 - Update to 12.13.1
 - https://github.com/nodejs/node/blob/v12.13.1/doc/changelogs/CHANGELOG_V12.md

@@ -1,0 +1,128 @@
+From 30e8730b88afc2c3ac46503a8cc668b367c70e3e Mon Sep 17 00:00:00 2001
+From: Stephen Gallagher <sgallagh@redhat.com>
+Date: Fri, 6 Dec 2019 16:40:25 -0500
+Subject: [PATCH 3/3] build: auto-load ICU data from
+ --with-icu-default-data-dir
+
+When compiled with `--with-intl=small` and
+`--with-icu-default-data-dir=PATH`, Node.js will use PATH as a
+fallback location for the ICU data.
+
+We will first perform an access check using fopen(PATH, 'r') to
+ensure that the file is readable. If it is, we'll set the
+icu_data_directory and proceed. There's a slight overhead for the
+fopen() check, but it should be barely measurable.
+
+This will be useful for Linux distribution packagers who want to
+be able to ship a minimal node binary in a container image but
+also be able to add on the full i18n support where needed. With
+this patch, it becomes possible to ship the interpreter as
+/usr/bin/node in one package for the distribution and to ship the
+data files in another package (without a strict dependency
+between the two). This means that users of the distribution will
+not need to explicitly direct Node.js to locate the ICU data. It
+also means that in environments where full internationalization is
+not required, they do not need to carry the extra content (with
+the associated storage costs).
+
+Refs: https://github.com/nodejs/node/issues/3460
+
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+
+PR-URL: https://github.com/nodejs/node/pull/30825
+Reviewed-By: Steven R Loomis <srloomis@us.ibm.com>
+Reviewed-By: Ben Noordhuis <info@bnoordhuis.nl>
+Reviewed-By: Richard Lau <riclau@uk.ibm.com>
+Reviewed-By: Rich Trott <rtrott@gmail.com>
+---
+ configure.py |  9 +++++++++
+ node.gypi    |  7 +++++++
+ src/node.cc  | 20 ++++++++++++++++++++
+ 3 files changed, 36 insertions(+)
+
+diff --git a/configure.py b/configure.py
+index e2d78a2a51ef81621618cb20fa76f4a1421bf9e0..cbf0d3ad567ea7beea86f56844d950e50c98c35c 100755
+--- a/configure.py
++++ b/configure.py
+@@ -444,6 +444,14 @@ intl_optgroup.add_option('--with-icu-source',
+         'the icu4c source archive. '
+         'v%d.x or later recommended.' % icu_versions['minimum_icu'])
+ 
++intl_optgroup.add_option('--with-icu-default-data-dir',
++    action='store',
++    dest='with_icu_default_data_dir',
++    help='Path to the icuXXdt{lb}.dat file. If unspecified, ICU data will '
++         'only be read if the NODE_ICU_DATA environment variable or the '
++         '--icu-data-dir runtime argument is used. This option has effect '
++         'only when Node.js is built with --with-intl=small-icu.')
++
+ parser.add_option('--with-ltcg',
+     action='store_true',
+     dest='with_ltcg',
+@@ -1380,6 +1388,7 @@ def configure_intl(o):
+     locs.add('root')  # must have root
+     o['variables']['icu_locales'] = ','.join(str(loc) for loc in locs)
+     # We will check a bit later if we can use the canned deps/icu-small
++    o['variables']['icu_default_data'] = options.with_icu_default_data_dir or ''
+   elif with_intl == 'full-icu':
+     # full ICU
+     o['variables']['v8_enable_i18n_support'] = 1
+diff --git a/node.gypi b/node.gypi
+index 05d80e846cffd31a0a61943e5ab391ad79cddab0..144544214316a3a5ce256e8772d57d14817c5185 100644
+--- a/node.gypi
++++ b/node.gypi
+@@ -103,6 +103,13 @@
+       'conditions': [
+         [ 'icu_small=="true"', {
+           'defines': [ 'NODE_HAVE_SMALL_ICU=1' ],
++          'conditions': [
++            [ 'icu_default_data!=""', {
++              'defines': [
++                'NODE_ICU_DEFAULT_DATA_DIR="<(icu_default_data)"',
++              ],
++            }],
++          ],
+       }]],
+     }],
+     [ 'node_no_browser_globals=="true"', {
+diff --git a/src/node.cc b/src/node.cc
+index ae53d0c31c3568d04387da89ab6e9d049e41c919..cbd1c632008f89f2c4aedccb00db19f686693c75 100644
+--- a/src/node.cc
++++ b/src/node.cc
+@@ -79,6 +79,7 @@
+ 
+ #if defined(NODE_HAVE_I18N_SUPPORT)
+ #include <unicode/uvernum.h>
++#include <unicode/utypes.h>
+ #endif
+ 
+ 
+@@ -848,6 +849,25 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
+   if (per_process::cli_options->icu_data_dir.empty())
+     credentials::SafeGetenv("NODE_ICU_DATA",
+                             &per_process::cli_options->icu_data_dir);
++
++#ifdef NODE_ICU_DEFAULT_DATA_DIR
++  // If neither the CLI option nor the environment variable was specified,
++  // fall back to the configured default
++  if (per_process::cli_options->icu_data_dir.empty()) {
++    // Check whether the NODE_ICU_DEFAULT_DATA_DIR contains the right data
++    // file and can be read.
++    static const char full_path[] =
++        NODE_ICU_DEFAULT_DATA_DIR "/" U_ICUDATA_NAME ".dat";
++
++    FILE* f = fopen(full_path, "rb");
++
++    if (f != nullptr) {
++      fclose(f);
++      per_process::cli_options->icu_data_dir = NODE_ICU_DEFAULT_DATA_DIR;
++    }
++  }
++#endif  // NODE_ICU_DEFAULT_DATA_DIR
++
+   // Initialize ICU.
+   // If icu_data_dir is empty here, it will load the 'minimal' data.
+   if (!i18n::InitializeICUDirectory(per_process::cli_options->icu_data_dir)) {
+-- 
+2.23.0
+

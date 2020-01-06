@@ -1,7 +1,7 @@
-From 5bfeffdf4b5de1c60a2ff0d1ddf65db2bb9a1533 Mon Sep 17 00:00:00 2001
+From cf581096dd350cf7267e5a12ff26159120274c5c Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH 3/3] Install both binaries and use libdir.
+Subject: [PATCH 2/3] Install both binaries and use libdir.
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.
@@ -13,10 +13,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index 473bbfeb294b34e0cb4ead9db607adfc3781be29..a1f98be9a68c360f3bd17c8f5e0a1478adce9a55 100755
+index 20cce214dbb113aeef8f1044d7af88d842a11fd7..e2d78a2a51ef81621618cb20fa76f4a1421bf9e0 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -556,6 +556,12 @@ parser.add_option('--shared',
+@@ -559,6 +559,12 @@ parser.add_option('--shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -29,7 +29,7 @@ index 473bbfeb294b34e0cb4ead9db607adfc3781be29..a1f98be9a68c360f3bd17c8f5e0a1478
  parser.add_option('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-@@ -1098,6 +1104,7 @@ def configure_node(o):
+@@ -1103,6 +1109,7 @@ def configure_node(o):
    if o['variables']['want_separate_host_toolset'] == 0:
      o['variables']['node_code_cache'] = 'yes' # For testing
    o['variables']['node_shared'] = b(options.shared)
