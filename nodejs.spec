@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -20,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 12
 %global nodejs_minor 14
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -679,6 +679,10 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Tue Jan 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.1-1
+- Update to 12.14.1
+- https://github.com/nodejs/node/blob/v12.14.1/doc/changelogs/CHANGELOG_V12.md
+
 * Mon Jan 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.0-2
 - Update to 12.14.0
 - https://github.com/nodejs/node/blob/v12.14.0/doc/changelogs/CHANGELOG_V12.md
