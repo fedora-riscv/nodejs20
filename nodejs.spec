@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -158,8 +158,6 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
 BuildRequires: nodejs-packaging
 BuildRequires: systemtap-sdt-devel
-BuildRequires: http-parser-devel >= 2.9.0
-Requires: http-parser >= 2.9.0
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
@@ -256,7 +254,6 @@ Requires: nodejs-packaging
 %if %{with bootstrap}
 # deps are bundled
 %else
-Requires: http-parser-devel%{?_isa}
 Requires: libuv-devel%{?_isa}
 %endif
 
@@ -679,6 +676,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Tue Jan 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.1-2
+- Drop unneeded dependency on http-parser-devel
+
 * Tue Jan 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.1-1
 - Update to 12.14.1
 - https://github.com/nodejs/node/blob/v12.14.1/doc/changelogs/CHANGELOG_V12.md
