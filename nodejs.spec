@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -463,7 +463,7 @@ ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/libnode.so
 # Install v8 compatibility symlinks
 for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_includedir}/node/v8*.h; do
     header=$(basename ${header})
-    ln -s ${header} %{buildroot}%{_includedir}/${header}
+    ln -s %{_includedir}/node/${header} %{buildroot}%{_includedir}/${header}
 done
 for soname in libv8 libv8_libbase libv8_libplatform; do
     ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
@@ -676,6 +676,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Mon Jan 13 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.1-3
+- Fix issue with header symlinks in v8-devel
+
 * Tue Jan 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.1-2
 - Drop unneeded dependency on http-parser-devel
 
