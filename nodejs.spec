@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 4
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -676,6 +676,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Wed Jan 29 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:12.14.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_32_Mass_Rebuild
+
 * Mon Jan 13 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.1-3
 - Fix issue with header symlinks in v8-devel
 
