@@ -1,4 +1,4 @@
-From cf581096dd350cf7267e5a12ff26159120274c5c Mon Sep 17 00:00:00 2001
+From 4c96b8cdb6690dc0ce329aaddf1a41e58afbd5b4 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/3] Install both binaries and use libdir.
@@ -82,5 +82,5 @@ index 655802980a6ea94d1d4ca1dc63c8c8e905fbb83a..fe4723bf15012c8aacacb0393dc8294c
    if 'true' == variables.get('node_use_dtrace'):
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
 -- 
-2.23.0
+2.24.1
 

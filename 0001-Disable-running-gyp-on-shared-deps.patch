@@ -1,4 +1,4 @@
-From a560ff12ff44d9732ce325ca4bcde6e536fe3ed0 Mon Sep 17 00:00:00 2001
+From 5f69e0ff5cd84daec8d6ed49868d0c2a01337107 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Thu, 27 Apr 2017 14:25:42 +0200
 Subject: [PATCH 1/3] Disable running gyp on shared deps
@@ -8,7 +8,7 @@ Subject: [PATCH 1/3] Disable running gyp on shared deps
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 0947300f24028d00bcfb79b38d96bded136228e3..5d4f88a705053fbdd6b56ec85e9997670c6a69c5 100644
+index 56f53582d1f494a05571e3228c4585647e1a30a7..2fb80e742637fdbd039714bda9a9022be7ea259b 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -141,9 +141,9 @@ test-code-cache: with-code-cache
@@ -25,5 +25,5 @@ index 0947300f24028d00bcfb79b38d96bded136228e3..5d4f88a705053fbdd6b56ec85e999767
  
  # node_version.h is listed because the N-API version is taken from there
 -- 
-2.23.0
+2.24.1
 
