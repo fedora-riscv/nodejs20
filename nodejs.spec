@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 12
-%global nodejs_minor 14
-%global nodejs_patch 1
+%global nodejs_minor 15
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -51,13 +51,13 @@
 
 # http-parser - from deps/http_parser/http_parser.h
 %global http_parser_major 2
-%global http_parser_minor 8
-%global http_parser_patch 0
+%global http_parser_minor 9
+%global http_parser_patch 3
 %global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_major 1
-%global llhttp_minor 1
+%global llhttp_major 2
+%global llhttp_minor 0
 %global llhttp_patch 4
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
@@ -69,8 +69,8 @@
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 39
-%global nghttp2_patch 2
+%global nghttp2_minor 40
+%global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
@@ -676,6 +676,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Thu Feb 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.15.0-1
+- Update to 12.15.0
+
 * Mon Jan 13 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.14.1-3
 - Fix issue with header symlinks in v8-devel
 

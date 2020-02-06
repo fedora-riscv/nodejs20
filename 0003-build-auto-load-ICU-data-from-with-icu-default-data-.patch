@@ -1,4 +1,4 @@
-From 30e8730b88afc2c3ac46503a8cc668b367c70e3e Mon Sep 17 00:00:00 2001
+From c811931a72908b90608fbdc6669da482ac5e7fd9 Mon Sep 17 00:00:00 2001
 From: Stephen Gallagher <sgallagh@redhat.com>
 Date: Fri, 6 Dec 2019 16:40:25 -0500
 Subject: [PATCH 3/3] build: auto-load ICU data from
@@ -86,7 +86,7 @@ index 05d80e846cffd31a0a61943e5ab391ad79cddab0..144544214316a3a5ce256e8772d57d14
      }],
      [ 'node_no_browser_globals=="true"', {
 diff --git a/src/node.cc b/src/node.cc
-index ae53d0c31c3568d04387da89ab6e9d049e41c919..cbd1c632008f89f2c4aedccb00db19f686693c75 100644
+index 9d182d2aeb48c8b600bace036df868fb695dfa7c..bfad9a633ceab2493b8fa79badfe8c6c9110e001 100644
 --- a/src/node.cc
 +++ b/src/node.cc
 @@ -79,6 +79,7 @@
@@ -97,7 +97,7 @@ index ae53d0c31c3568d04387da89ab6e9d049e41c919..cbd1c632008f89f2c4aedccb00db19f6
  #endif
  
  
-@@ -848,6 +849,25 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
+@@ -823,6 +824,25 @@ int InitializeNodeWithArgs(std::vector<std::string>* argv,
    if (per_process::cli_options->icu_data_dir.empty())
      credentials::SafeGetenv("NODE_ICU_DATA",
                              &per_process::cli_options->icu_data_dir);
@@ -124,5 +124,5 @@ index ae53d0c31c3568d04387da89ab6e9d049e41c919..cbd1c632008f89f2c4aedccb00db19f6
    // If icu_data_dir is empty here, it will load the 'minimal' data.
    if (!i18n::InitializeICUDirectory(per_process::cli_options->icu_data_dir)) {
 -- 
-2.23.0
+2.24.1
 
