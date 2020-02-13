@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 4
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -361,8 +361,8 @@ find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
 
-export CC='gcc'
-export CXX='g++'
+export CC='%{__cc}'
+export CXX='%{__cxx}'
 
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
@@ -670,6 +670,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Tue Mar 17 2020 Tom Stellard <tstellar@redhat.com> - 1:12.16.1-4
+- Replace hard-coded gcc and g++ with __cc and __cxx macros
+
 * Mon Mar 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-3
 - Set npmrc to use python3 explicitly
 
