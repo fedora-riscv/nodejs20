@@ -34,9 +34,9 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major 7
-%global v8_minor 7
-%global v8_build 299
-%global v8_patch 13
+%global v8_minor 8
+%global v8_build 279
+%global v8_patch 23
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -63,8 +63,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 33
-%global libuv_patch 1
+%global libuv_minor 34
+%global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -138,10 +138,6 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
-
-# Upstream patch to enable auto-detection of full ICU data
-# https://github.com/nodejs/node/pull/30825
-Patch3: 0003-build-auto-load-ICU-data-from-with-icu-default-data-.patch
 
 BuildRequires: python2-devel
 BuildRequires: python3-devel
@@ -676,6 +672,10 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Fri Feb 14 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.0-1
+- Update to 12.16.0
+- Drop upstreamed patch
+
 * Thu Feb 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.15.0-1
 - Update to 12.15.0
 
