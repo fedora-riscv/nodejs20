@@ -132,6 +132,8 @@ fedpkg new-sources node-v${version}-stripped.tar.gz icu4c*-src.tgz
 
 rm -f node-v${version}.tar.gz
 
+set +e
+
 # Determine the bundled versions of the various packages
 echo "Bundled software versions"
 echo "-------------------------"
@@ -152,12 +154,6 @@ echo "========================="
 grep "define ARES_VERSION_MAJOR" node-v${version}/deps/cares/include/ares_version.h
 grep "define ARES_VERSION_MINOR" node-v${version}/deps/cares/include/ares_version.h
 grep "define ARES_VERSION_PATCH" node-v${version}/deps/cares/include/ares_version.h
-echo
-echo "http-parser"
-echo "========================="
-grep "define HTTP_PARSER_VERSION_MAJOR" node-v${version}/deps/http_parser/http_parser.h
-grep "define HTTP_PARSER_VERSION_MINOR" node-v${version}/deps/http_parser/http_parser.h
-grep "define HTTP_PARSER_VERSION_PATCH" node-v${version}/deps/http_parser/http_parser.h
 echo
 echo "llhttp"
 echo "========================="

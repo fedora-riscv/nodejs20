@@ -1,4 +1,4 @@
-From 11512edeb046b64be4daca76f061a3a918251ee0 Mon Sep 17 00:00:00 2001
+From 0b315d55b13d098ce8f3e96d501aeb33152a9e00 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -13,10 +13,10 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index 6537a62d3954d83927c698db3fb80c9fc05faba7..b9a894bec9e5fd954004bcb423822ca984066dc5 100755
+index beb08df0884f7693b6c07d7fb5e85ae7bdcd1d7d..9e364586d4f79322fe53f41915ed7aad0e23a30d 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -571,6 +571,12 @@ parser.add_option('--shared',
+@@ -582,6 +582,12 @@ parser.add_option('--shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -29,7 +29,7 @@ index 6537a62d3954d83927c698db3fb80c9fc05faba7..b9a894bec9e5fd954004bcb423822ca9
  parser.add_option('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-@@ -1105,6 +1111,7 @@ def configure_node(o):
+@@ -1124,6 +1130,7 @@ def configure_node(o):
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
  
    o['variables']['node_shared'] = b(options.shared)

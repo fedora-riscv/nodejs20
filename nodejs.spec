@@ -18,12 +18,12 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 12
-%global nodejs_minor 16
-%global nodejs_patch 1
+%global nodejs_major 13
+%global nodejs_minor 9
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
-%global nodejs_soversion 72
+%global nodejs_soversion 79
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 
@@ -34,9 +34,9 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major 7
-%global v8_minor 8
-%global v8_build 279
-%global v8_patch 23
+%global v8_minor 9
+%global v8_build 317
+%global v8_patch 25
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -49,12 +49,6 @@
 %global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
-# http-parser - from deps/http_parser/http_parser.h
-%global http_parser_major 2
-%global http_parser_minor 9
-%global http_parser_patch 3
-%global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
-
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 2
 %global llhttp_minor 0
@@ -64,7 +58,7 @@
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
 %global libuv_minor 34
-%global libuv_patch 0
+%global libuv_patch 2
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -74,8 +68,8 @@
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 64
-%global icu_minor 2
+%global icu_major 65
+%global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
 %global icudatadir %{nodejs_datadir}/icudata
@@ -98,7 +92,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 13
-%global npm_patch 4
+%global npm_patch 7
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
@@ -148,7 +142,6 @@ BuildRequires: chrpath
 BuildRequires: libatomic
 
 %if %{with bootstrap}
-Provides: bundled(http-parser) = %{http_parser_version}
 Provides: bundled(libuv) = %{libuv_version}
 Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
@@ -158,14 +151,11 @@ BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
-
-# Temporarily bundle http-parser and llhttp because the latter
-# isn't packaged yet and they are controlled by the same
-# configure flag.
-Provides: bundled(http-parser) = %{http_parser_version}
-Provides: bundled(llhttp) = %{llhttp_version}
-
 %endif
+
+# Temporarily bundle llhttp because the upstream doesn't
+# provide releases for it.
+Provides: bundled(llhttp) = %{llhttp_version}
 
 BuildRequires: openssl-devel >= %{openssl_minimum}
 Requires: openssl >= %{openssl_minimum}
@@ -672,6 +662,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.9.0--1
+- Release Node.js 13.9.0
+
 * Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-1
 - Update to 12.16.1
 - Fixes six regressions introduced in 12.16.0
