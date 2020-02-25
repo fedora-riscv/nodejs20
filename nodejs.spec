@@ -20,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 12
 %global nodejs_minor 16
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -672,6 +672,10 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-1
+- Update to 12.16.1
+- Fixes six regressions introduced in 12.16.0
+
 * Fri Feb 14 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.0-1
 - Update to 12.16.0
 - Drop upstreamed patch
