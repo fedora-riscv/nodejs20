@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -133,7 +133,6 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 
-BuildRequires: python2-devel
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
 BuildRequires: gcc >= 4.9.4
@@ -335,15 +334,14 @@ The API documentation for the Node.js JavaScript runtime.
 rm -rf deps/zlib
 
 
-# Replace any instances of unversioned python' with python2
-pathfix.py -i %{__python2} -pn $(find -type f ! -name "*.js")
-find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python2~" {} \;
-find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python2~" {} \;
-sed -i "s~python~python2~" $(find . -type f | grep "gyp$")
+# Replace any instances of unversioned python' with python3
+pathfix.py -i %{__python3} -pn $(find -type f ! -name "*.js")
+find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
+find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
+sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
 sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
-sed -i "s~usr\/bin\/python.*$~usr\/bin\/python2~" ./deps/v8/tools/mb/mb_unittest.py
-find . -type f -exec sed -i "s~python -c~python2 -c~" {} \;
-sed -i "s~which('python')~which('python2')~" configure
+sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
+find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 
 %build
 
@@ -377,7 +375,7 @@ export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
 export LDFLAGS="%{build_ldflags}"
 
 %if %{with bootstrap}
-./configure --prefix=%{_prefix} \
+%{__python3} configure.py --prefix=%{_prefix} \
            --shared \
            --libdir=%{_lib} \
            --shared-openssl \
@@ -387,7 +385,7 @@ export LDFLAGS="%{build_ldflags}"
            --debug-nghttp2 \
            --openssl-use-def-ca-store
 %else
-./configure --prefix=%{_prefix} \
+%{__python3} configure.py --prefix=%{_prefix} \
            --shared \
            --libdir=%{_lib} \
            --shared-openssl \
