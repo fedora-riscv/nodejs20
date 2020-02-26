@@ -660,7 +660,10 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
-* Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.9.0--1
+* Wed Feb 26 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.9.0-2
+- Build with python 3 only
+
+* Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.9.0-1
 - Release Node.js 13.9.0
 
 * Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-1
