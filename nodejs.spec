@@ -670,6 +670,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Wed Feb 26 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-2
+- Build with Python 3 only
+
 * Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-1
 - Update to 12.16.1
 - Fixes six regressions introduced in 12.16.0
