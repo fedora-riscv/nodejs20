@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,7 +19,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 13
-%global nodejs_minor 9
+%global nodejs_minor 11
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -660,6 +660,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Mon Mar 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.11.0-1
+- Update to 13.11.0
+
 * Wed Feb 26 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.9.0-2
 - Build with python 3 only
 
