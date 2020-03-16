@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -670,6 +670,9 @@ end
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Mon Mar 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-3
+- Set npmrc to use python3 explicitly
+
 * Wed Feb 26 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-2
 - Build with Python 3 only
 
