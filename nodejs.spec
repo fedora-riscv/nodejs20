@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -132,6 +132,10 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
+
+# Patch to fix python3 issues with icustrip.py
+# https://github.com/nodejs/node/pull/31659
+Patch3: 0003-icustrip.py-fix-use-of-string-and-byte-objects.patch
 
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
@@ -594,7 +598,7 @@ end
 
 %{_rpmconfigdir}/fileattrs/nodejs_native.attr
 %{_rpmconfigdir}/nodejs_native.req
-%doc AUTHORS CHANGELOG.md COLLABORATOR_GUIDE.md GOVERNANCE.md README.md
+%doc AUTHORS CHANGELOG.md onboarding.md GOVERNANCE.md README.md
 %doc %{_mandir}/man1/node.1*
 
 
@@ -655,11 +659,15 @@ end
 
 
 %files docs
+%doc doc
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
 %{_pkgdocdir}/npm/docs
 
 %changelog
+* Tue Mar 17 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.11.0-2
+- Fix python3 issue in icustrip.py
+
 * Mon Mar 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.11.0-1
 - Update to 13.11.0
 
