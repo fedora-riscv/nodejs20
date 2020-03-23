@@ -355,8 +355,8 @@ find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
 
-export CC='gcc'
-export CXX='g++'
+export CC='%{__cc}'
+export CXX='%{__cxx}'
 
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
