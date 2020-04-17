@@ -167,7 +167,7 @@ grep "define UV_VERSION_MAJOR" node-v${version}/deps/uv/include/uv/version.h
 grep "define UV_VERSION_MINOR" node-v${version}/deps/uv/include/uv/version.h
 grep "define UV_VERSION_PATCH" node-v${version}/deps/uv/include/uv/version.h
 echo
-echo "libuv"
+echo "nghttp2"
 echo "========================="
 grep "define NGHTTP2_VERSION " node-v${version}/deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 echo
@@ -178,6 +178,12 @@ echo
 echo "punycode"
 echo "========================="
 grep "'version'" node-v${version}/lib/punycode.js
+echo
+echo "uvwasi"
+echo "========================="
+grep "define UVWASI_VERSION_MAJOR" node-v${version}/deps/uvwasi/include/uvwasi.h
+grep "define UVWASI_VERSION_MINOR" node-v${version}/deps/uvwasi/include/uvwasi.h
+grep "define UVWASI_VERSION_PATCH" node-v${version}/deps/uvwasi/include/uvwasi.h
 echo
 echo "npm"
 echo "========================="
