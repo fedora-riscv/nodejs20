@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 4
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -20,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 12
 %global nodejs_minor 16
-%global nodejs_patch 1
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -64,7 +64,7 @@
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
 %global libuv_minor 34
-%global libuv_patch 0
+%global libuv_patch 2
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -74,8 +74,8 @@
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 64
-%global icu_minor 2
+%global icu_major 65
+%global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
 %global icudatadir %{nodejs_datadir}/icudata
@@ -97,9 +97,21 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 6
-%global npm_minor 13
+%global npm_minor 14
 %global npm_patch 4
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
+
+# uvwasi - from deps/uvwasi/include/uvwasi.h
+%global uvwasi_major 0
+%global uvwasi_minor 0
+%global uvwasi_patch 5
+%global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
+
+# histogram_c - assumed from timestamps
+%global histogram_major 0
+%global histogram_minor 9
+%global histogram_patch 7
+%global histogram_version %{histogram_major}.%{histogram_minor}.%{histogram_patch}
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -141,6 +153,7 @@ Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
+BuildRequires: brotli-devel
 BuildRequires: gcc >= 4.9.4
 BuildRequires: gcc-c++ >= 4.9.4
 BuildRequires: chrpath
@@ -177,14 +190,14 @@ Requires: nodejs-libs%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 # Pull in the full-icu data by default
 Recommends: nodejs-full-i18n%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 
-#we need ABI virtual provides where SONAMEs aren't enough/not present so deps
-#break when binary compatibility is broken
+# we need ABI virtual provides where SONAMEs aren't enough/not present so deps
+# break when binary compatibility is broken
 Provides: nodejs(abi) = %{nodejs_abi}
 Provides: nodejs(abi%{nodejs_major}) = %{nodejs_abi}
 Provides: nodejs(v8-abi) = %{v8_abi}
 Provides: nodejs(v8-abi%{v8_major}) = %{v8_abi}
 
-#this corresponds to the "engine" requirement in package.json
+# this corresponds to the "engine" requirement in package.json
 Provides: nodejs(engine) = %{nodejs_version}
 
 # Node.js currently has a conflict with the 'node' package in Fedora
@@ -222,6 +235,11 @@ Provides: bundled(v8) = %{v8_version}
 # an ABI-break, so we'll use the bundled copy.
 Provides: bundled(icu) = %{icu_version}
 
+# Upstream added new dependencies, but so far they are not available in Fedora
+# or there's no option to built it as a shared dependency, so we bundle them
+Provides: bundled(uvwasi) = %{uvwasi_version}
+Provides: bundled(histogram) = %{histogram_version}
+
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?rhel} < 8
 # EPEL doesn't support Recommends, so make it strict
@@ -244,6 +262,7 @@ Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
 Requires: zlib-devel%{?_isa}
+Requires: brotli-devel%{?_isa}
 Requires: nodejs-packaging
 
 %if %{with bootstrap}
@@ -342,6 +361,7 @@ The API documentation for the Node.js JavaScript runtime.
 
 # remove bundled dependencies that we aren't building
 rm -rf deps/zlib
+rm -rf deps/brotli
 
 
 # Replace any instances of unversioned python' with python3
@@ -390,6 +410,7 @@ export LDFLAGS="%{build_ldflags}"
            --libdir=%{_lib} \
            --shared-openssl \
            --shared-zlib \
+           --shared-brotli \
            --without-dtrace \
            --with-intl=small-icu \
            --debug-nghttp2 \
@@ -400,6 +421,7 @@ export LDFLAGS="%{build_ldflags}"
            --libdir=%{_lib} \
            --shared-openssl \
            --shared-zlib \
+           --shared-brotli \
            --shared-libuv \
            --shared-nghttp2 \
            --with-dtrace \
@@ -477,12 +499,12 @@ echo 'nodejs(v8-abi%{v8_major}) >= %v8_abi'
 EOF
 chmod 0755 %{buildroot}%{_rpmconfigdir}/nodejs_native.req
 
-#install documentation
+# install documentation
 mkdir -p %{buildroot}%{_pkgdocdir}/html
 cp -pr doc/* %{buildroot}%{_pkgdocdir}/html
 rm -f %{buildroot}%{_pkgdocdir}/html/nodejs.1
 
-#node-gyp needs common.gypi too
+# node-gyp needs common.gypi too
 mkdir -p %{buildroot}%{_datadir}/node
 cp -p common.gypi %{buildroot}%{_datadir}/node
 
@@ -527,13 +549,14 @@ chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin
 mkdir -p %{buildroot}%{_sysconfdir}
 cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
 
-# NPM upstream expectes it to be in /usr/etc/npmrc, so we'll put a symlink here
+# NPM upstream expects it to be in /usr/etc/npmrc, so we'll put a symlink here
 # This is done in the interests of keeping /usr read-only.
 mkdir -p %{buildroot}%{_prefix}/etc
 ln -s %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
 
 # Install the full-icu data files
 install -Dpm0644 -t %{buildroot}%{icudatadir} deps/icu/source/converted/*
+
 
 %check
 # Fail the build if the versions don't match
@@ -604,7 +627,7 @@ end
 
 %{_rpmconfigdir}/fileattrs/nodejs_native.attr
 %{_rpmconfigdir}/nodejs_native.req
-%doc AUTHORS CHANGELOG.md COLLABORATOR_GUIDE.md GOVERNANCE.md README.md
+%doc AUTHORS CHANGELOG.md onboarding.md GOVERNANCE.md README.md
 %doc %{_mandir}/man1/node.1*
 
 
@@ -618,6 +641,7 @@ end
 %files full-i18n
 %dir %{icudatadir}
 %{icudatadir}/icudt%{icu_major}*.dat
+
 
 %files libs
 %license LICENSE
@@ -669,7 +693,13 @@ end
 %{_pkgdocdir}/html
 %{_pkgdocdir}/npm/docs
 
+
 %changelog
+* Wed Apr 15 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:12.16.2-1
+- Update to 12.16.2
+- Add bundled uvwasi and histogram_c provides
+- Add shared brotli dependency
+
 * Tue Mar 17 2020 Tom Stellard <tstellar@redhat.com> - 1:12.16.1-4
 - Replace hard-coded gcc and g++ with __cc and __cxx macros
 
