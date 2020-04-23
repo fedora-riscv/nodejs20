@@ -18,12 +18,12 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 13
-%global nodejs_minor 13
+%global nodejs_major 14
+%global nodejs_minor 0
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
-%global nodejs_soversion 79
+%global nodejs_soversion 83
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 
@@ -33,10 +33,10 @@
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
-%global v8_major 7
-%global v8_minor 9
-%global v8_build 317
-%global v8_patch 25
+%global v8_major 8
+%global v8_minor 1
+%global v8_build 307
+%global v8_patch 30
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -57,7 +57,7 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 35
+%global libuv_minor 37
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -355,13 +355,13 @@ rm -rf deps/brotli
 
 
 # Replace any instances of unversioned python' with python3
-pathfix.py -i %{__python3} -pn $(find -type f ! -name "*.js")
-find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
-find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
-sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
-sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
-sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
-find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
+# pathfix.py -i %%{__python3} -pn $(find -type f ! -name "*.js")
+# find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
+# find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
+# sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
+# sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
+# sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
+# find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 
 %build
 
@@ -685,6 +685,10 @@ end
 
 
 %changelog
+* Thu Apr 23 2020 zsvetlik@redhat.com - 1:14.0.0-1
+- Update to 14.0.0
+- v14.x should be python3 compatible, so commented out py sed scripts
+
 * Wed Apr 15 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:13.13.0-1
 - Update to 13.13.0
 - Add bundled uvwasi and histogram_c provides
