@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -355,13 +355,13 @@ rm -rf deps/brotli
 
 
 # Replace any instances of unversioned python' with python3
-# pathfix.py -i %%{__python3} -pn $(find -type f ! -name "*.js")
-# find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
-# find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
-# sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
-# sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
-# sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
-# find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
+pathfix.py -i %{__python3} -pn $(find -type f ! -name "*.js")
+find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
+find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
+sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
+sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
+sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
+find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 
 %build
 
@@ -685,6 +685,9 @@ end
 
 
 %changelog
+* Fri Apr 24 2020 zsvetlik@redhat.com - 1:14.0.0-2
+- Keep the fix scripts for Koji
+
 * Thu Apr 23 2020 zsvetlik@redhat.com - 1:14.0.0-1
 - Update to 14.0.0
 - v14.x should be python3 compatible, so commented out py sed scripts
