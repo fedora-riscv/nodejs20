@@ -3,12 +3,13 @@
 
 # bundle dependencies that are not available as Fedora modules
 %bcond_with bootstrap
+%bcond_without python3_fixup
 
 # == Master Relase ==
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,7 +20,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 0
+%global nodejs_minor 1
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -36,7 +37,7 @@
 %global v8_major 8
 %global v8_minor 1
 %global v8_build 307
-%global v8_patch 30
+%global v8_patch 31
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -231,12 +232,7 @@ Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
 
 # Make sure we keep NPM up to date when we update Node.js
-%if 0%{?rhel} < 8
-# EPEL doesn't support Recommends, so make it strict
-Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
-%else
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
-%endif
 
 
 %description
@@ -319,9 +315,7 @@ Release: %{npm_release}%{?dist}
 Obsoletes: npm < 0:3.5.4-6
 Provides: npm = %{npm_epoch}:%{npm_version}
 Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-%if 0%{?fedora} || 0%{?rhel} >= 8
 Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-%endif
 
 # Do not add epoch to the virtual NPM provides or it will break
 # the automatic dependency-generation script.
@@ -355,6 +349,7 @@ rm -rf deps/brotli
 
 
 # Replace any instances of unversioned python' with python3
+%if %{with python3_fixup}
 pathfix.py -i %{__python3} -pn $(find -type f ! -name "*.js")
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
 find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
@@ -362,6 +357,7 @@ sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
 sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
 sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
 find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
+%endif
 
 %build
 
@@ -685,6 +681,9 @@ end
 
 
 %changelog
+* Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.1.0-1
+- Update to 14.1.0
+
 * Fri Apr 24 2020 zsvetlik@redhat.com - 1:14.0.0-2
 - Keep the fix scripts for Koji
 
