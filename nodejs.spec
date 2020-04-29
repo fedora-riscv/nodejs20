@@ -4,6 +4,7 @@
 # bundle dependencies that are not available as Fedora modules
 %bcond_with bootstrap
 
+
 # == Master Relase ==
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
@@ -20,7 +21,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 12
 %global nodejs_minor 16
-%global nodejs_patch 2
+%global nodejs_patch 3
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 72
@@ -45,7 +46,7 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 15
+%global c_ares_minor 16
 %global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
@@ -104,7 +105,7 @@
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_major 0
 %global uvwasi_minor 0
-%global uvwasi_patch 5
+%global uvwasi_patch 6
 %global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
 
 # histogram_c - assumed from timestamps
@@ -241,12 +242,7 @@ Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
 
 # Make sure we keep NPM up to date when we update Node.js
-%if 0%{?rhel} < 8
-# EPEL doesn't support Recommends, so make it strict
-Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
-%else
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
-%endif
 
 
 %description
@@ -329,9 +325,7 @@ Release: %{npm_release}%{?dist}
 Obsoletes: npm < 0:3.5.4-6
 Provides: npm = %{npm_epoch}:%{npm_version}
 Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-%if 0%{?fedora} || 0%{?rhel} >= 8
 Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-%endif
 
 # Do not add epoch to the virtual NPM provides or it will break
 # the automatic dependency-generation script.
@@ -695,6 +689,9 @@ end
 
 
 %changelog
+* Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.3-1
+- Update to 12.16.3
+
 * Wed Apr 15 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:12.16.2-1
 - Update to 12.16.2
 - Add bundled uvwasi and histogram_c provides
