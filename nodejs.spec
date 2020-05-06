@@ -20,7 +20,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 1
+%global nodejs_minor 2
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -99,7 +99,7 @@
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_major 0
 %global uvwasi_minor 0
-%global uvwasi_patch 6
+%global uvwasi_patch 8
 %global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
 
 # histogram_c - assumed from timestamps
@@ -681,6 +681,9 @@ end
 
 
 %changelog
+* Wed May 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.2.0-1
+- Update to 14.2.0
+
 * Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.1.0-1
 - Update to 14.1.0
 
