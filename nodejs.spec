@@ -69,7 +69,7 @@
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 66
+%global icu_major 67
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
@@ -93,7 +93,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 14
-%global npm_patch 4
+%global npm_patch 5
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -681,6 +681,9 @@ end
 
 
 %changelog
+* Thu May 21 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:4.3.0-1
+- Update to 14.3.0
+
 * Wed May 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.2.0-1
 - Update to 14.2.0
 
