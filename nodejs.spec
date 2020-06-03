@@ -1,6 +1,3 @@
-# uncomment to enable bootstrap mode
-# %%global _with_bootstrap 1
-
 # bundle dependencies that are not available as Fedora modules
 %bcond_with bootstrap
 %bcond_without python3_fixup
@@ -20,7 +17,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 3
+%global nodejs_minor 4
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -64,7 +61,7 @@
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 40
+%global nghttp2_minor 41
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
@@ -149,8 +146,12 @@ Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
-BuildRequires: gcc >= 4.9.4
-BuildRequires: gcc-c++ >= 4.9.4
+BuildRequires: gcc >= 6.3.0
+BuildRequires: gcc-c++ >= 6.3.0
+# needed to generate bundled provides for npm dependencies
+# https://src.fedoraproject.org/rpms/nodejs/pull-request/2
+# https://pagure.io/nodejs-packaging/pull-request/10
+BuildRequires: nodejs-packaging
 BuildRequires: chrpath
 BuildRequires: libatomic
 
@@ -158,7 +159,6 @@ BuildRequires: libatomic
 Provides: bundled(libuv) = %{libuv_version}
 Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
-BuildRequires: nodejs-packaging
 BuildRequires: systemtap-sdt-devel
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
@@ -208,7 +208,6 @@ Conflicts: node <= 0.3.2-12
 Provides: nodejs-punycode = %{punycode_version}
 Provides: npm(punycode) = %{punycode_version}
 
-
 # Node.js has forked c-ares from upstream in an incompatible way, so we need
 # to carry the bundled version internally.
 # See https://github.com/nodejs/node/commit/766d063e0578c0f7758c3a965c971763f43fec85
@@ -234,13 +233,13 @@ Provides: bundled(histogram) = %{histogram_version}
 # Make sure we keep NPM up to date when we update Node.js
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 
-
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
 for easily building fast, scalable network applications.
 Node.js uses an event-driven, non-blocking I/O model that
 makes it lightweight and efficient, perfect for data-intensive
 real-time applications that run across distributed devices.
+
 
 %package devel
 Summary: JavaScript runtime - development headers
@@ -259,6 +258,7 @@ Requires: libuv-devel%{?_isa}
 
 %description devel
 Development headers for the Node.js JavaScript runtime.
+
 
 %package libs
 Summary: Node.js and v8 libraries
@@ -287,7 +287,6 @@ Libraries to support Node.js and provide stable v8 interfaces.
 Summary: Non-English locale data for Node.js
 Requires: %{name}%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
-
 %description full-i18n
 Optional data files to provide full-icu support for Node.js. Remove this
 package to save space if non-English locales are not needed.
@@ -302,6 +301,7 @@ Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_rel
 
 %description -n v8-devel
 Development headers for the v8 runtime.
+
 
 %package -n npm
 Summary: Node.js Package Manager
@@ -325,6 +325,7 @@ Provides: npm(npm) = %{npm_version}
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
 
+
 %package docs
 Summary: Node.js API documentation
 Group: Documentation
@@ -346,7 +347,6 @@ The API documentation for the Node.js JavaScript runtime.
 # remove bundled dependencies that we aren't building
 rm -rf deps/zlib
 rm -rf deps/brotli
-
 
 # Replace any instances of unversioned python' with python3
 %if %{with python3_fixup}
@@ -418,7 +418,6 @@ export LDFLAGS="%{build_ldflags}"
 %endif
 
 make BUILDTYPE=Release %{?_smp_mflags}
-
 
 # Extract the ICU data and convert it to the appropriate endianness
 pushd deps/
@@ -511,7 +510,6 @@ rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
 ln -sf %{_pkgdocdir}/npm %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
-
 # Node tries to install some python files into a documentation directory
 # (and not the proper one). Remove them for now until we figure out what to
 # do with them.
@@ -530,7 +528,6 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin/node-gyp
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
 
-
 # Drop the NPM default configuration in place
 mkdir -p %{buildroot}%{_sysconfdir}
 cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
@@ -542,6 +539,7 @@ ln -s %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
 
 # Install the full-icu data files
 install -Dpm0644 -t %{buildroot}%{icudatadir} deps/icu/source/converted/*
+
 
 %check
 # Fail the build if the versions don't match
@@ -681,7 +679,10 @@ end
 
 
 %changelog
-* Thu May 21 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:4.3.0-1
+* Wed Jun 03 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.4.0-1
+- Security update to 14.4.0
+
+* Thu May 21 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.3.0-1
 - Update to 14.3.0
 
 * Wed May 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.2.0-1
@@ -690,10 +691,10 @@ end
 * Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.1.0-1
 - Update to 14.1.0
 
-* Fri Apr 24 2020 zsvetlik@redhat.com - 1:14.0.0-2
+* Fri Apr 24 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-2
 - Keep the fix scripts for Koji
 
-* Thu Apr 23 2020 zsvetlik@redhat.com - 1:14.0.0-1
+* Thu Apr 23 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-1
 - Update to 14.0.0
 - v14.x should be python3 compatible, so commented out py sed scripts
 
