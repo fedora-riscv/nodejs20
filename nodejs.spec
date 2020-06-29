@@ -1,8 +1,6 @@
-# uncomment to enable bootstrap mode
-# %%global _with_bootstrap 1
-
 # bundle dependencies that are not available as Fedora modules
 %bcond_with bootstrap
+%bcond_without python3_fixup
 
 
 # == Master Relase ==
@@ -19,12 +17,12 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 12
-%global nodejs_minor 16
-%global nodejs_patch 3
+%global nodejs_major 14
+%global nodejs_minor 4
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
-%global nodejs_soversion 72
+%global nodejs_soversion 83
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 
@@ -34,10 +32,10 @@
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
-%global v8_major 7
-%global v8_minor 8
-%global v8_build 279
-%global v8_patch 23
+%global v8_major 8
+%global v8_minor 1
+%global v8_build 307
+%global v8_patch 31
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -50,12 +48,6 @@
 %global c_ares_patch 0
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
-# http-parser - from deps/http_parser/http_parser.h
-%global http_parser_major 2
-%global http_parser_minor 9
-%global http_parser_patch 3
-%global http_parser_version %{http_parser_major}.%{http_parser_minor}.%{http_parser_patch}
-
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 2
 %global llhttp_minor 0
@@ -64,18 +56,18 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 34
-%global libuv_patch 2
+%global libuv_minor 37
+%global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 40
+%global nghttp2_minor 41
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 65
+%global icu_major 67
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
@@ -99,13 +91,13 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 14
-%global npm_patch 4
+%global npm_patch 5
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_major 0
 %global uvwasi_minor 0
-%global uvwasi_patch 6
+%global uvwasi_patch 8
 %global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
 
 # histogram_c - assumed from timestamps
@@ -155,30 +147,29 @@ Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 BuildRequires: python3-devel
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
-BuildRequires: gcc >= 4.9.4
-BuildRequires: gcc-c++ >= 4.9.4
+BuildRequires: gcc >= 6.3.0
+BuildRequires: gcc-c++ >= 6.3.0
+# needed to generate bundled provides for npm dependencies
+# https://src.fedoraproject.org/rpms/nodejs/pull-request/2
+# https://pagure.io/nodejs-packaging/pull-request/10
+BuildRequires: nodejs-packaging
 BuildRequires: chrpath
 BuildRequires: libatomic
 
 %if %{with bootstrap}
-Provides: bundled(http-parser) = %{http_parser_version}
 Provides: bundled(libuv) = %{libuv_version}
 Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
-BuildRequires: nodejs-packaging
 BuildRequires: systemtap-sdt-devel
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
-
-# Temporarily bundle http-parser and llhttp because the latter
-# isn't packaged yet and they are controlled by the same
-# configure flag.
-Provides: bundled(http-parser) = %{http_parser_version}
-Provides: bundled(llhttp) = %{llhttp_version}
-
 %endif
+
+# Temporarily bundle llhttp because the upstream doesn't
+# provide releases for it.
+Provides: bundled(llhttp) = %{llhttp_version}
 
 BuildRequires: openssl-devel >= %{openssl_minimum}
 Requires: openssl >= %{openssl_minimum}
@@ -218,7 +209,6 @@ Conflicts: node <= 0.3.2-12
 Provides: nodejs-punycode = %{punycode_version}
 Provides: npm(punycode) = %{punycode_version}
 
-
 # Node.js has forked c-ares from upstream in an incompatible way, so we need
 # to carry the bundled version internally.
 # See https://github.com/nodejs/node/commit/766d063e0578c0f7758c3a965c971763f43fec85
@@ -244,13 +234,13 @@ Provides: bundled(histogram) = %{histogram_version}
 # Make sure we keep NPM up to date when we update Node.js
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 
-
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
 for easily building fast, scalable network applications.
 Node.js uses an event-driven, non-blocking I/O model that
 makes it lightweight and efficient, perfect for data-intensive
 real-time applications that run across distributed devices.
+
 
 %package devel
 Summary: JavaScript runtime - development headers
@@ -269,6 +259,7 @@ Requires: libuv-devel%{?_isa}
 
 %description devel
 Development headers for the Node.js JavaScript runtime.
+
 
 %package libs
 Summary: Node.js and v8 libraries
@@ -297,7 +288,6 @@ Libraries to support Node.js and provide stable v8 interfaces.
 Summary: Non-English locale data for Node.js
 Requires: %{name}%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 
-
 %description full-i18n
 Optional data files to provide full-icu support for Node.js. Remove this
 package to save space if non-English locales are not needed.
@@ -312,6 +302,7 @@ Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_rel
 
 %description -n v8-devel
 Development headers for the v8 runtime.
+
 
 %package -n npm
 Summary: Node.js Package Manager
@@ -335,6 +326,7 @@ Provides: npm(npm) = %{npm_version}
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
 
+
 %package docs
 Summary: Node.js API documentation
 Group: Documentation
@@ -357,8 +349,8 @@ The API documentation for the Node.js JavaScript runtime.
 rm -rf deps/zlib
 rm -rf deps/brotli
 
-
 # Replace any instances of unversioned python' with python3
+%if %{with python3_fixup}
 pathfix.py -i %{__python3} -pn $(find -type f ! -name "*.js")
 find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
 find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
@@ -366,6 +358,7 @@ sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
 sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
 sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
 find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
+%endif
 
 %build
 
@@ -426,7 +419,6 @@ export LDFLAGS="%{build_ldflags}"
 %endif
 
 make BUILDTYPE=Release %{?_smp_mflags}
-
 
 # Extract the ICU data and convert it to the appropriate endianness
 pushd deps/
@@ -519,7 +511,6 @@ rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
 ln -sf %{_pkgdocdir}/npm %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
-
 # Node tries to install some python files into a documentation directory
 # (and not the proper one). Remove them for now until we figure out what to
 # do with them.
@@ -537,7 +528,6 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
 # The above command is a little overzealous. Add a few permissions back.
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin/node-gyp
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
-
 
 # Drop the NPM default configuration in place
 mkdir -p %{buildroot}%{_sysconfdir}
@@ -683,28 +673,49 @@ end
 
 
 %files docs
+%doc doc
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
 %{_pkgdocdir}/npm/docs
 
 
 %changelog
-* Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.3-1
-- Update to 12.16.3
+* Wed Jun 03 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.4.0-1
+- Security update to 14.4.0
 
-* Wed Apr 15 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:12.16.2-1
-- Update to 12.16.2
+* Thu May 21 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.3.0-1
+- Update to 14.3.0
+
+* Wed May 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.2.0-1
+- Update to 14.2.0
+
+* Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.1.0-1
+- Update to 14.1.0
+
+* Fri Apr 24 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-2
+- Keep the fix scripts for Koji
+
+* Thu Apr 23 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-1
+- Update to 14.0.0
+- v14.x should be python3 compatible, so commented out py sed scripts
+
+* Wed Apr 15 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:13.13.0-1
+- Update to 13.13.0
 - Add bundled uvwasi and histogram_c provides
 - Add shared brotli dependency
+- Remove icustrip.py patch, which was merged in upstream
 
-* Tue Mar 17 2020 Tom Stellard <tstellar@redhat.com> - 1:12.16.1-4
-- Replace hard-coded gcc and g++ with __cc and __cxx macros
+* Tue Mar 17 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.11.0-2
+- Fix python3 issue in icustrip.py
 
-* Mon Mar 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-3
-- Set npmrc to use python3 explicitly
+* Mon Mar 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.11.0-1
+- Update to 13.11.0
 
-* Wed Feb 26 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-2
-- Build with Python 3 only
+* Wed Feb 26 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.9.0-2
+- Build with python 3 only
+
+* Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:13.9.0-1
+- Release Node.js 13.9.0
 
 * Tue Feb 25 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:12.16.1-1
 - Update to 12.16.1

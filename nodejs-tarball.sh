@@ -155,12 +155,6 @@ grep "define ARES_VERSION_MAJOR" node-v${version}/deps/cares/include/ares_versio
 grep "define ARES_VERSION_MINOR" node-v${version}/deps/cares/include/ares_version.h
 grep "define ARES_VERSION_PATCH" node-v${version}/deps/cares/include/ares_version.h
 echo
-echo "http-parser"
-echo "========================="
-grep "define HTTP_PARSER_VERSION_MAJOR" node-v${version}/deps/http_parser/http_parser.h
-grep "define HTTP_PARSER_VERSION_MINOR" node-v${version}/deps/http_parser/http_parser.h
-grep "define HTTP_PARSER_VERSION_PATCH" node-v${version}/deps/http_parser/http_parser.h
-echo
 echo "llhttp"
 echo "========================="
 grep "define LLHTTP_VERSION_MAJOR" node-v${version}/deps/llhttp/include/llhttp.h
