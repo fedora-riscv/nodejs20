@@ -7,7 +7,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -361,6 +361,9 @@ find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 %endif
 
 %build
+# This package has static probes which do not work with LTO
+# Disable LTO
+%define _lto_cflags %{nil}
 
 %ifarch s390 s390x %{arm} %ix86
 # Decrease debuginfo verbosity to reduce memory consumption during final
@@ -680,6 +683,9 @@ end
 
 
 %changelog
+* Tue Jun 30 2020 Jeff Law <law@redhat.com> - 1:14.4.0-2
+Disable LTO
+
 * Wed Jun 03 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.4.0-1
 - Security update to 14.4.0
 
