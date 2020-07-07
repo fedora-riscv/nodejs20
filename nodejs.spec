@@ -7,7 +7,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -230,6 +230,9 @@ Provides: bundled(icu) = %{icu_version}
 # or there's no option to built it as a shared dependency, so we bundle them
 Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
+
+# Make sure to pull in the appropriate packaging macros when building RPMs
+Requires: (nodejs-packaging if rpm-build)
 
 # Make sure we keep NPM up to date when we update Node.js
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
@@ -683,6 +686,9 @@ end
 
 
 %changelog
+* Tue Jul 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.4.0-3
+- Update for new packaging guidelines
+
 * Tue Jun 30 2020 Jeff Law <law@redhat.com> - 1:14.4.0-2
 - Disable LTO
 
