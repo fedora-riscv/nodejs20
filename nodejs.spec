@@ -7,7 +7,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -18,7 +18,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 4
+%global nodejs_minor 5
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -33,9 +33,9 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major 8
-%global v8_minor 1
-%global v8_build 307
-%global v8_patch 31
+%global v8_minor 3
+%global v8_build 110
+%global v8_patch 9
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -56,7 +56,7 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 37
+%global libuv_minor 38
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -97,7 +97,7 @@
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_major 0
 %global uvwasi_minor 0
-%global uvwasi_patch 8
+%global uvwasi_patch 9
 %global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
 
 # histogram_c - assumed from timestamps
@@ -686,6 +686,9 @@ end
 
 
 %changelog
+* Tue Jul 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.5.0-1
+- Update to 14.5.0
+
 * Tue Jul 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.4.0-3
 - Update for new packaging guidelines
 
