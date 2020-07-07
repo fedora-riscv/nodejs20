@@ -684,7 +684,7 @@ end
 
 %changelog
 * Tue Jun 30 2020 Jeff Law <law@redhat.com> - 1:14.4.0-2
-Disable LTO
+- Disable LTO
 
 * Wed Jun 03 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.4.0-1
 - Security update to 14.4.0
