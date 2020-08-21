@@ -7,7 +7,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -364,9 +364,11 @@ find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 %endif
 
 %build
-# This package has static probes which do not work with LTO
-# Disable LTO
+# When compiled on armv7hl this package generates an out of range
+# reference to the literal pool.  This is most likely a GCC issue.
+%ifarch armv7hl
 %define _lto_cflags %{nil}
+%endif
 
 %ifarch s390 s390x %{arm} %ix86
 # Decrease debuginfo verbosity to reduce memory consumption during final
@@ -686,6 +688,9 @@ end
 
 
 %changelog
+* Fri Aug 21 2020 Jeff Law <law@redhat.com> - 1:14.7.0-2
+- Narrow LTO opt-out to just armv7hl
+
 * Fri Jul 31 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.7.0-1
 - Update to 14.7.0
 
