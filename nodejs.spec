@@ -648,6 +648,7 @@ end
 %files -n v8-devel
 %{_includedir}/libplatform
 %{_includedir}/v8*.h
+%{_includedir}/cppgc
 %{_libdir}/libv8.so
 %{_libdir}/libv8_libbase.so
 %{_libdir}/libv8_libplatform.so
