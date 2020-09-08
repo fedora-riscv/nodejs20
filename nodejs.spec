@@ -7,7 +7,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -18,7 +18,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 7
+%global nodejs_minor 10
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -56,8 +56,8 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 38
-%global libuv_patch 1
+%global libuv_minor 39
+%global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
@@ -91,13 +91,13 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 14
-%global npm_patch 7
+%global npm_patch 8
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_major 0
 %global uvwasi_minor 0
-%global uvwasi_patch 9
+%global uvwasi_patch 10
 %global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
 
 # histogram_c - assumed from timestamps
@@ -473,8 +473,9 @@ ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/libnode.so
 # Install v8 compatibility symlinks
 for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_includedir}/node/v8*.h; do
     header=$(basename ${header})
-    ln -s %{_includedir}/node/${header} %{buildroot}%{_includedir}/${header}
+    ln -s ./node/${header} %{buildroot}%{_includedir}/${header}
 done
+ln -s ./node/cppgc %{buildroot}%{_includedir}/cppgc
 for soname in libv8 libv8_libbase libv8_libplatform; do
     ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
     ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
@@ -688,6 +689,9 @@ end
 
 
 %changelog
+* Tue Sep 08 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.10.0-1
+- Update to 14.10.0
+
 * Fri Aug 21 2020 Jeff Law <law@redhat.com> - 1:14.7.0-2
 - Narrow LTO opt-out to just armv7hl
 
