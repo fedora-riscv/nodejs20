@@ -18,7 +18,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 10
+%global nodejs_minor 11
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -50,8 +50,8 @@
 
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 2
-%global llhttp_minor 0
-%global llhttp_patch 4
+%global llhttp_minor 1
+%global llhttp_patch 2
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
@@ -690,6 +690,9 @@ end
 
 
 %changelog
+* Wed Sep 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.11.0-1
+- Update to 14.11.0
+
 * Tue Sep 08 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.10.0-1
 - Update to 14.10.0
 
