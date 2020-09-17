@@ -585,24 +585,6 @@ if st and st.type == "directory" then
 end
 
 
-%pretrans -n v8-devel -p <lua>
--- Replace the v8 libplatform include directory with a symlink
--- Drop this scriptlet when F30 is EOL
-path = "%{_includedir}/libplatform"
-st = posix.stat(path)
-if st and st.type == "directory" then
-  status = os.rename(path, path .. ".rpmmoved")
-  if not status then
-    suffix = 0
-    while not status do
-      suffix = suffix + 1
-      status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
-    end
-    os.rename(path, path .. ".rpmmoved")
-  end
-end
-
-
 %files
 %{_bindir}/node
 %dir %{_prefix}/lib/node_modules
@@ -652,7 +634,6 @@ end
 %{_libdir}/libv8.so
 %{_libdir}/libv8_libbase.so
 %{_libdir}/libv8_libplatform.so
-%ghost %{_includedir}/libplatform.rpmmoved
 
 
 %files -n npm
