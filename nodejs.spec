@@ -18,7 +18,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 11
+%global nodejs_minor 13
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -45,7 +45,7 @@
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
 %global c_ares_minor 16
-%global c_ares_patch 0
+%global c_ares_patch 1
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
 # llhttp - from deps/llhttp/include/llhttp.h
@@ -56,7 +56,7 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 39
+%global libuv_minor 40
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
@@ -97,7 +97,7 @@
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_major 0
 %global uvwasi_minor 0
-%global uvwasi_patch 10
+%global uvwasi_patch 11
 %global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
 
 # histogram_c - assumed from timestamps
@@ -671,6 +671,9 @@ end
 
 
 %changelog
+* Thu Oct 01 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.0-1
+- Update to 14.13.0
+
 * Wed Sep 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.11.0-1
 - Update to 14.11.0
 
