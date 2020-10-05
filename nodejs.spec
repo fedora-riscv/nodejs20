@@ -145,6 +145,7 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 
 BuildRequires: python3-devel
+BuildRequires: python3-setuptools
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
 BuildRequires: gcc >= 6.3.0
