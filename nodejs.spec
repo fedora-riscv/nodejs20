@@ -19,7 +19,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 14
 %global nodejs_minor 13
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 83
@@ -51,7 +51,7 @@
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 2
 %global llhttp_minor 1
-%global llhttp_patch 2
+%global llhttp_patch 3
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
@@ -672,6 +672,9 @@ end
 
 
 %changelog
+* Fri Oct 09 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.1-1
+- Update to 14.13.1
+
 * Thu Oct 01 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.0-1
 - Update to 14.13.0
 
