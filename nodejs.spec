@@ -18,8 +18,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 13
-%global nodejs_patch 1
+%global nodejs_minor 14
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 83
@@ -672,6 +672,9 @@ end
 
 
 %changelog
+* Mon Oct 19 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-1
+- Update to 14.14.0
+
 * Fri Oct 09 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.1-1
 - Update to 14.13.1
 
