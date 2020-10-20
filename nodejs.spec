@@ -2,12 +2,17 @@
 %bcond_with bootstrap
 %bcond_without python3_fixup
 
+# LTO is currently broken on aarch64 builds
+%ifarch aarch64
+%define _lto_cflags %{nil}
+%endif
+
 
 # == Master Relase ==
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -672,6 +677,9 @@ end
 
 
 %changelog
+* Tue Oct 20 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-2
+- Don't build with LTO on aarch64
+
 * Mon Oct 19 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-1
 - Update to 14.14.0
 
