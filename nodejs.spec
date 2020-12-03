@@ -12,7 +12,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -23,8 +23,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 14
-%global nodejs_patch 0
+%global nodejs_minor 15
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 83
@@ -677,6 +677,9 @@ end
 
 
 %changelog
+* Wed Dec 02 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.15.1-1
+- Update to 14.15.1
+
 * Tue Oct 20 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-2
 - Don't build with LTO on aarch64
 
