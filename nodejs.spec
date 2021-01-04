@@ -2,11 +2,8 @@
 %bcond_with bootstrap
 %bcond_without python3_fixup
 
-# LTO is currently broken on aarch64 builds
-%ifarch aarch64
+# LTO is currently broken on Node.js builds
 %define _lto_cflags %{nil}
-%endif
-
 
 # == Master Relase ==
 # This is used by both the nodejs package and the npm subpackage thar
