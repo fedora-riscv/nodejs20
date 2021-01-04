@@ -1,4 +1,4 @@
-From 0b315d55b13d098ce8f3e96d501aeb33152a9e00 Mon Sep 17 00:00:00 2001
+From 45a9bca165f6ed76c4e43cc2cc3fdf596814bc77 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -9,14 +9,16 @@ still providing the normal executable.
 Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 ---
  configure.py     |  7 +++++++
- tools/install.py | 29 +++++++++++++----------------
- 2 files changed, 20 insertions(+), 16 deletions(-)
+ tools/install.py | 21 +++++++++------------
+ 2 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index beb08df0884f7693b6c07d7fb5e85ae7bdcd1d7d..9e364586d4f79322fe53f41915ed7aad0e23a30d 100755
+index e6f7e4db0040dda00e432352afa7576535d9b672..6cf5c45dde79ce355b532c2f11b5b7ed80fde88a 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -582,6 +582,12 @@ parser.add_option('--shared',
+@@ -624,10 +624,16 @@ parser.add_option('--shared',
+     action='store_true',
+     dest='shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -29,7 +31,11 @@ index beb08df0884f7693b6c07d7fb5e85ae7bdcd1d7d..9e364586d4f79322fe53f41915ed7aad
  parser.add_option('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-@@ -1124,6 +1130,7 @@ def configure_node(o):
+     default=False,
+     help='do not initialize v8 platform during node.js startup. ' +
+@@ -1200,10 +1206,11 @@ def configure_node(o):
+     o['variables']['debug_nghttp2'] = 'false'
+ 
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
  
    o['variables']['node_shared'] = b(options.shared)
@@ -37,11 +43,15 @@ index beb08df0884f7693b6c07d7fb5e85ae7bdcd1d7d..9e364586d4f79322fe53f41915ed7aad
    node_module_version = getmoduleversion.get_version()
  
    if options.dest_os == 'android':
+     shlib_suffix = 'so'
+   elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 655802980a6ea94d1d4ca1dc63c8c8e905fbb83a..fe4723bf15012c8aacacb0393dc8294c049b0503 100755
+index 729b416fc47d3ff3317ae3671dee977c719a8841..9bfc6234edb7732f9b90f063c2ee4a276e840636 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -121,26 +121,23 @@ def subdir_files(path, dest, action):
+@@ -119,26 +119,23 @@ def subdir_files(path, dest, action):
+   for subdir, files_in_path in ret.items():
+     action(files_in_path, subdir + '/')
  
  def files(action):
    is_windows = sys.platform == 'win32'
@@ -60,16 +70,8 @@ index 655802980a6ea94d1d4ca1dc63c8c8e905fbb83a..fe4723bf15012c8aacacb0393dc8294c
 -      output_file += '.dll'
 -    else:
 -      output_file = 'lib' + output_file + '.' + variables.get('shlib_suffix')
--      # GYP will output to lib.target except on OS X, this is hardcoded
--      # in its source - see the _InstallableTargetInstallPath function.
--      if sys.platform != 'darwin':
--        output_prefix += 'lib.target/'
 +    output_bin = 'node'
 +    output_lib = 'libnode.' + variables.get('shlib_suffix')
-+    # GYP will output to lib.target except on OS X, this is hardcoded
-+    # in its source - see the _InstallableTargetInstallPath function.
-+    if sys.platform != 'darwin':
-+      output_libprefix += 'lib.target/'
  
 -  if 'false' == variables.get('node_shared'):
 -    action([output_prefix + output_file], 'bin/' + output_file)
@@ -81,6 +83,8 @@ index 655802980a6ea94d1d4ca1dc63c8c8e905fbb83a..fe4723bf15012c8aacacb0393dc8294c
  
    if 'true' == variables.get('node_use_dtrace'):
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
+ 
+   # behave similarly for systemtap
 -- 
-2.24.1
+2.29.2
 
