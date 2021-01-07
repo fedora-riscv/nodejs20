@@ -146,6 +146,7 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 
+BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 BuildRequires: zlib-devel
