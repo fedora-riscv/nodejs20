@@ -1,6 +1,5 @@
 # bundle dependencies that are not available as Fedora modules
 %bcond_with bootstrap
-%bcond_without python3_fixup
 
 # LTO is currently broken on Node.js builds
 %define _lto_cflags %{nil}
@@ -149,6 +148,7 @@ Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
+BuildRequires: python-unversioned-command
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
 BuildRequires: gcc >= 6.3.0
@@ -358,16 +358,6 @@ The API documentation for the Node.js JavaScript runtime.
 rm -rf deps/zlib
 rm -rf deps/brotli
 
-# Replace any instances of unversioned python' with python3
-%if %{with python3_fixup}
-pathfix.py -i %{__python3} -pn $(find -type f ! -name "*.js")
-find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
-find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
-sed -i "s~python~python3~" $(find . -type f | grep "gyp$")
-sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
-sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
-find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
-%endif
 
 %build
 # When compiled on armv7hl this package generates an out of range
