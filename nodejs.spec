@@ -20,8 +20,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 15
-%global nodejs_patch 4
+%global nodejs_minor 16
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 83
@@ -93,7 +93,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 14
-%global npm_patch 10
+%global npm_patch 11
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -675,6 +675,9 @@ end
 
 
 %changelog
+* Mon Jan 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.0-1
+- Update to 14.16.0
+
 * Tue Jan 26 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:14.15.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_34_Mass_Rebuild
 
