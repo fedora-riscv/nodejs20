@@ -9,7 +9,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -159,12 +159,12 @@ BuildRequires: gcc-c++ >= 6.3.0
 BuildRequires: nodejs-packaging
 BuildRequires: chrpath
 BuildRequires: libatomic
+BuildRequires: systemtap-sdt-devel
 
 %if %{with bootstrap}
 Provides: bundled(libuv) = %{libuv_version}
 Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
-BuildRequires: systemtap-sdt-devel
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
@@ -235,8 +235,10 @@ Provides: bundled(icu) = %{icu_version}
 Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
 
+%if 0%{?fedora}
 # Make sure to pull in the appropriate packaging macros when building RPMs
 Requires: (nodejs-packaging if rpm-build)
+%endif
 
 # Make sure we keep NPM up to date when we update Node.js
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
@@ -412,7 +414,6 @@ export LDFLAGS="%{build_ldflags}"
            --shared-brotli \
            --without-dtrace \
            --with-intl=small-icu \
-           --debug-nghttp2 \
            --openssl-use-def-ca-store
 %else
 %{__python3} configure.py --prefix=%{_prefix} \
@@ -426,7 +427,6 @@ export LDFLAGS="%{build_ldflags}"
            --with-dtrace \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
-           --debug-nghttp2 \
            --openssl-use-def-ca-store
 %endif
 
@@ -675,6 +675,11 @@ end
 
 
 %changelog
+* Tue Mar 09 2021 Zuzana Svetlikova <zsvetlik@redhat.com - 1:14.16.0-3
+- Only require nodejs-packaging on Fedora
+- remove --debug-nghttp2 (#1930775)
+- always build with systemtap
+
 * Mon Jan 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.0-1
 - Update to 14.16.0
 
