@@ -9,7 +9,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 4
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -675,6 +675,9 @@ end
 
 
 %changelog
+* Wed Mar 31 2021 Jonathan Wakely <jwakely@redhat.com> - 1:14.16.0-4
+- Rebuilt for removed libstdc++ symbols (#1937698)
+
 * Tue Mar 09 2021 Zuzana Svetlikova <zsvetlik@redhat.com - 1:14.16.0-3
 - Only require nodejs-packaging on Fedora
 - remove --debug-nghttp2 (#1930775)
