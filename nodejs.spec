@@ -9,7 +9,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -21,7 +21,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 14
 %global nodejs_minor 16
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 83
@@ -93,7 +93,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 14
-%global npm_patch 11
+%global npm_patch 12
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -675,6 +675,9 @@ end
 
 
 %changelog
+* Thu Apr 08 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-1
+- Update to 14.16.1
+
 * Tue Mar 09 2021 Zuzana Svetlikova <zsvetlik@redhat.com - 1:14.16.0-3
 - Only require nodejs-packaging on Fedora
 - remove --debug-nghttp2 (#1930775)
