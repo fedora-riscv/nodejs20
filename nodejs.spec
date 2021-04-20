@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -144,6 +144,10 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
+
+# Patch to disable stack execution. Merged from one upstream patch and
+# one upstream proposed patch
+Patch3: 0003-src-add-.note.GNU-stack-section.patch
 
 BuildRequires: make
 BuildRequires: python3-devel
@@ -665,6 +669,9 @@ end
 
 
 %changelog
+* Tue Apr 20 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-2
+- Disable stack execution (bz#1950528)
+
 * Thu Apr 08 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-1
 - Update to 14.16.1
 
