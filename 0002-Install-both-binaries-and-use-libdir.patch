@@ -1,4 +1,4 @@
-From 4012d5b9ae521f36c8b0155f591a38383e84407b Mon Sep 17 00:00:00 2001
+From d5009b7659e101c76f782003e184ba72bce4686b Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/3] Install both binaries and use libdir.
@@ -7,33 +7,34 @@ This allows us to build with a shared library for other users while
 still providing the normal executable.
 
 Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
 ---
  configure.py     |  7 +++++++
  tools/install.py | 21 +++++++++------------
  2 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index e6f7e4db0040dda00e432352afa7576535d9b672..6cf5c45dde79ce355b532c2f11b5b7ed80fde88a 100755
+index 6798b4a445c3878e63a47e078f3cb4e0dc5b5543..14867568d8552d70b92373fadac28d31682d708b 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -624,10 +624,16 @@ parser.add_option('--shared',
-     action='store_true',
+@@ -715,10 +715,16 @@ parser.add_argument('--shared',
      dest='shared',
+     default=None,
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
-+parser.add_option('--libdir',
++parser.add_argument('--libdir',
 +    action='store',
 +    dest='libdir',
 +    default='lib',
 +    help='a directory to install the shared library into')
 +
- parser.add_option('--without-v8-platform',
+ parser.add_argument('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
      default=False,
      help='do not initialize v8 platform during node.js startup. ' +
-@@ -1200,10 +1206,11 @@ def configure_node(o):
+@@ -1286,10 +1292,11 @@ def configure_node(o):
      o['variables']['debug_nghttp2'] = 'false'
  
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
@@ -46,7 +47,7 @@ index e6f7e4db0040dda00e432352afa7576535d9b672..6cf5c45dde79ce355b532c2f11b5b7ed
      shlib_suffix = 'so'
    elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 729b416fc47d3ff3317ae3671dee977c719a8841..9bfc6234edb7732f9b90f063c2ee4a276e840636 100755
+index 045d406d84be301722f3de62abc448db84e751f8..b3ef4541999126c512e3811881388e0ec8d401c4 100755
 --- a/tools/install.py
 +++ b/tools/install.py
 @@ -119,26 +119,23 @@ def subdir_files(path, dest, action):

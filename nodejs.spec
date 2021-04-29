@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -18,12 +18,12 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 14
-%global nodejs_minor 16
-%global nodejs_patch 1
+%global nodejs_major 16
+%global nodejs_minor 0
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
-%global nodejs_soversion 83
+%global nodejs_soversion 93
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 
@@ -33,10 +33,10 @@
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
-%global v8_major 8
-%global v8_minor 4
-%global v8_build 371
-%global v8_patch 19
+%global v8_major 9
+%global v8_minor 0
+%global v8_build 257
+%global v8_patch 17
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -45,30 +45,30 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 16
+%global c_ares_minor 17
 %global c_ares_patch 1
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_major 2
-%global llhttp_minor 1
-%global llhttp_patch 3
+%global llhttp_major 6
+%global llhttp_minor 0
+%global llhttp_patch 0
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 40
+%global libuv_minor 41
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 41
+%global nghttp2_minor 42
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 67
+%global icu_major 69
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
@@ -90,9 +90,9 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_major 6
-%global npm_minor 14
-%global npm_patch 12
+%global npm_major 7
+%global npm_minor 10
+%global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -533,7 +533,6 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
     -exec chmod -x {} \;
 
 # The above command is a little overzealous. Add a few permissions back.
-chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin/node-gyp
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
 
 # Drop the NPM default configuration in place
@@ -669,81 +668,6 @@ end
 
 
 %changelog
-* Tue Apr 20 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-2
-- Disable stack execution (bz#1950528)
-
-* Thu Apr 08 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-1
-- Update to 14.16.1
-
-* Wed Mar 31 2021 Jonathan Wakely <jwakely@redhat.com> - 1:14.16.0-4
-- Rebuilt for removed libstdc++ symbols (#1937698)
-
-* Tue Mar 09 2021 Zuzana Svetlikova <zsvetlik@redhat.com - 1:14.16.0-3
-- Only require nodejs-packaging on Fedora
-- remove --debug-nghttp2 (#1930775)
-- always build with systemtap
-
-* Mon Jan 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.0-1
-- Update to 14.16.0
-
-* Mon Jan 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.15.4-1
-- Update to 14.15.4
-
-* Wed Dec 02 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.15.1-1
-- Update to 14.15.1
-
-* Tue Oct 20 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-2
-- Don't build with LTO on aarch64
-
-* Mon Oct 19 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-1
-- Update to 14.14.0
-
-* Fri Oct 09 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.1-1
-- Update to 14.13.1
-
-* Thu Oct 01 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.0-1
-- Update to 14.13.0
-
-* Wed Sep 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.11.0-1
-- Update to 14.11.0
-
-* Tue Sep 08 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.10.0-1
-- Update to 14.10.0
-
-* Fri Aug 21 2020 Jeff Law <law@redhat.com> - 1:14.7.0-2
-- Narrow LTO opt-out to just armv7hl
-
-* Fri Jul 31 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.7.0-1
-- Update to 14.7.0
-
-* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:14.5.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Tue Jul 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.5.0-1
-- Update to 14.5.0
-
-* Tue Jul 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.4.0-3
-- Update for new packaging guidelines
-
-* Tue Jun 30 2020 Jeff Law <law@redhat.com> - 1:14.4.0-2
-- Disable LTO
-
-* Wed Jun 03 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.4.0-1
-- Security update to 14.4.0
-
-* Thu May 21 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.3.0-1
-- Update to 14.3.0
-
-* Wed May 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.2.0-1
-- Update to 14.2.0
-
-* Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.1.0-1
-- Update to 14.1.0
-
-* Fri Apr 24 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-2
-- Keep the fix scripts for Koji
-
-* Thu Apr 23 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-1
-- Update to 14.0.0
-- v14.x should be python3 compatible, so commented out py sed scripts
+* Thu Apr 29 2021 Stephen Gallagher <sgallagh@redhat.com> - 16.0.0-1
+- First release of Node.js 16.x
 
