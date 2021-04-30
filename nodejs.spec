@@ -645,19 +645,17 @@ end
 %doc %{_mandir}/man5/folders.5*
 %doc %{_mandir}/man5/install.5*
 %doc %{_mandir}/man5/npmrc.5*
+%doc %{_mandir}/man5/npm-shrinkwrap-json.5*
 %doc %{_mandir}/man5/package-json.5*
 %doc %{_mandir}/man5/package-lock-json.5*
-%doc %{_mandir}/man5/package-locks.5*
-%doc %{_mandir}/man5/shrinkwrap-json.5*
 %doc %{_mandir}/man7/config.7*
 %doc %{_mandir}/man7/developers.7*
-%doc %{_mandir}/man7/disputes.7*
 %doc %{_mandir}/man7/orgs.7*
 %doc %{_mandir}/man7/registry.7*
 %doc %{_mandir}/man7/removal.7*
 %doc %{_mandir}/man7/scope.7*
 %doc %{_mandir}/man7/scripts.7*
-%doc %{_mandir}/man7/semver.7*
+%doc %{_mandir}/man7/workspaces.7*
 
 
 %files docs
