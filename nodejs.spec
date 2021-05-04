@@ -19,7 +19,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 0
+%global nodejs_minor 1
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -36,7 +36,7 @@
 %global v8_major 9
 %global v8_minor 0
 %global v8_build 257
-%global v8_patch 17
+%global v8_patch 24
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -52,7 +52,7 @@
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 6
 %global llhttp_minor 0
-%global llhttp_patch 0
+%global llhttp_patch 1
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
@@ -91,8 +91,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 7
-%global npm_minor 10
-%global npm_patch 0
+%global npm_minor 11
+%global npm_patch 2
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -144,10 +144,6 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
-
-# Patch to disable stack execution. Merged from one upstream patch and
-# one upstream proposed patch
-Patch3: 0003-src-add-.note.GNU-stack-section.patch
 
 BuildRequires: make
 BuildRequires: python3-devel
@@ -666,6 +662,11 @@ end
 
 
 %changelog
+* Tue May 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 16.1.0-1
+- Update to 16.1.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.1.0
+- Drop upstreamed patch
+
 * Thu Apr 29 2021 Stephen Gallagher <sgallagh@redhat.com> - 16.0.0-1
 - First release of Node.js 16.x
 
