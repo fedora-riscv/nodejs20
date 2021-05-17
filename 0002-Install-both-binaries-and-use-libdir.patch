@@ -1,4 +1,4 @@
-From 4012d5b9ae521f36c8b0155f591a38383e84407b Mon Sep 17 00:00:00 2001
+From ea59ced68789dc24c95572b84091afcebe9acb98 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/3] Install both binaries and use libdir.
@@ -13,7 +13,7 @@ Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
  2 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index e6f7e4db0040dda00e432352afa7576535d9b672..6cf5c45dde79ce355b532c2f11b5b7ed80fde88a 100755
+index a477bd1c9578d03cd81456c513486620435749ee..3067eb9fc3e5c3eb22eb4ff3d20f87415b115bb8 100755
 --- a/configure.py
 +++ b/configure.py
 @@ -624,10 +624,16 @@ parser.add_option('--shared',
@@ -46,7 +46,7 @@ index e6f7e4db0040dda00e432352afa7576535d9b672..6cf5c45dde79ce355b532c2f11b5b7ed
      shlib_suffix = 'so'
    elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 729b416fc47d3ff3317ae3671dee977c719a8841..9bfc6234edb7732f9b90f063c2ee4a276e840636 100755
+index 693faff4c37ac4d83a47e818f4412900497a2b62..7c0b1ba999cdeacd3431b5334d650677754a9752 100755
 --- a/tools/install.py
 +++ b/tools/install.py
 @@ -119,26 +119,23 @@ def subdir_files(path, dest, action):

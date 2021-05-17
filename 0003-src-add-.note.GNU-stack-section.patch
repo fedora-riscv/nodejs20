@@ -1,4 +1,4 @@
-From 6aa11a8cf48463432c0b5c6bfca5c2a5b18b1cc7 Mon Sep 17 00:00:00 2001
+From 7388d30b111414507b1353da12529f23daec4ee3 Mon Sep 17 00:00:00 2001
 From: James Addison <jay@jp-hosting.net>
 Date: Tue, 9 Mar 2021 13:08:47 +0000
 Subject: [PATCH 3/3] src: add .note.GNU-stack section
@@ -24,22 +24,22 @@ Related: https://github.com/nodejs/node/pull/37688
 
 Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
 ---
- src/large_pages/node_text_start.S | 3 +++
- 1 file changed, 3 insertions(+)
+ src/large_pages/node_text_start.S | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/large_pages/node_text_start.S b/src/large_pages/node_text_start.S
-index 1609b254f0495a32f8896ba96d96bad03f6f2321..d27dd39cc236f0e6be4e68113bfff7b531a37455 100644
+index 3227b62464932ced6d42916a4300ddbd9b4a4fbb..d27dd39cc236f0e6be4e68113bfff7b531a37455 100644
 --- a/src/large_pages/node_text_start.S
 +++ b/src/large_pages/node_text_start.S
-@@ -1,5 +1,8 @@
-+#if defined(__ELF__)
+@@ -1,7 +1,7 @@
+ #if defined(__ELF__)
+-.section .note.GNU-stack,"",@progbits
 +.section .note.GNU-stack,"",%progbits
-+#endif
+ #endif
  .text
  .align 0x2000
  .global __node_text_start
  .hidden __node_text_start
- __node_text_start:
 -- 
 2.31.1
 

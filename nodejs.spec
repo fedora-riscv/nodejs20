@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 14
-%global nodejs_minor 16
-%global nodejs_patch 1
+%global nodejs_minor 17
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 83
@@ -36,7 +36,7 @@
 %global v8_major 8
 %global v8_minor 4
 %global v8_build 371
-%global v8_patch 19
+%global v8_patch 23
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -45,7 +45,7 @@
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
-%global c_ares_minor 16
+%global c_ares_minor 17
 %global c_ares_patch 1
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
@@ -57,19 +57,19 @@
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_major 1
-%global libuv_minor 40
+%global libuv_minor 41
 %global libuv_patch 0
 %global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 41
+%global nghttp2_minor 42
 %global nghttp2_patch 0
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 67
-%global icu_minor 1
+%global icu_major 68
+%global icu_minor 2
 %global icu_version %{icu_major}.%{icu_minor}
 
 %global icudatadir %{nodejs_datadir}/icudata
@@ -92,7 +92,7 @@
 %global npm_epoch 1
 %global npm_major 6
 %global npm_minor 14
-%global npm_patch 12
+%global npm_patch 13
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -669,6 +669,10 @@ end
 
 
 %changelog
+* Mon May 17 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.17.0-2
+- Update to 14.17.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V14.md#14.17.0
+
 * Tue Apr 20 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-2
 - Disable stack execution (bz#1950528)
 
