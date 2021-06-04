@@ -1,4 +1,4 @@
-From efd1e3e6e56c3874c7c5b19434223d094d598254 Mon Sep 17 00:00:00 2001
+From c483da788bde23870ba1115220d40ec911196d4c Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -14,10 +14,10 @@ Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
  2 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index 6798b4a445c3878e63a47e078f3cb4e0dc5b5543..14867568d8552d70b92373fadac28d31682d708b 100755
+index 05d43150524946fac12bf5786afbacd90122d4a7..4cd90ed78af7f6ec5e2e0d713ac1231c8862db5d 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -715,10 +715,16 @@ parser.add_argument('--shared',
+@@ -720,10 +720,16 @@ parser.add_argument('--shared',
      dest='shared',
      default=None,
      help='compile shared library for embedding node in another project. ' +
@@ -34,7 +34,7 @@ index 6798b4a445c3878e63a47e078f3cb4e0dc5b5543..14867568d8552d70b92373fadac28d31
      dest='without_v8_platform',
      default=False,
      help='do not initialize v8 platform during node.js startup. ' +
-@@ -1286,10 +1292,11 @@ def configure_node(o):
+@@ -1300,10 +1306,11 @@ def configure_node(o):
      o['variables']['debug_nghttp2'] = 'false'
  
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)

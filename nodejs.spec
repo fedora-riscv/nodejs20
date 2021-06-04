@@ -19,7 +19,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 2
+%global nodejs_minor 3
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -52,7 +52,7 @@
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 6
 %global llhttp_minor 0
-%global llhttp_patch 1
+%global llhttp_patch 2
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
@@ -91,8 +91,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 7
-%global npm_minor 13
-%global npm_patch 0
+%global npm_minor 15
+%global npm_patch 1
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -662,6 +662,11 @@ end
 
 
 %changelog
+* Fri Jun 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.3.0-1
+- Update to 16.3.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.3.0
+
+
 * Wed May 19 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.2.0-1
 - Update to 16.2.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.2.0
