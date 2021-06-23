@@ -18,12 +18,12 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 14
-%global nodejs_minor 17
+%global nodejs_major 16
+%global nodejs_minor 4
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
-%global nodejs_soversion 83
+%global nodejs_soversion 93
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 
@@ -33,10 +33,10 @@
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
-%global v8_major 8
-%global v8_minor 4
-%global v8_build 371
-%global v8_patch 23
+%global v8_major 9
+%global v8_minor 1
+%global v8_build 269
+%global v8_patch 36
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -50,9 +50,9 @@
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_major 2
-%global llhttp_minor 1
-%global llhttp_patch 3
+%global llhttp_major 6
+%global llhttp_minor 0
+%global llhttp_patch 2
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
@@ -68,8 +68,8 @@
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 68
-%global icu_minor 2
+%global icu_major 69
+%global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
 %global icudatadir %{nodejs_datadir}/icudata
@@ -90,9 +90,9 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_major 6
-%global npm_minor 14
-%global npm_patch 13
+%global npm_major 7
+%global npm_minor 18
+%global npm_patch 1
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -144,10 +144,6 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
-
-# Patch to disable stack execution. Merged from one upstream patch and
-# one upstream proposed patch
-Patch3: 0003-src-add-.note.GNU-stack-section.patch
 
 BuildRequires: make
 BuildRequires: python3-devel
@@ -533,7 +529,6 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
     -exec chmod -x {} \;
 
 # The above command is a little overzealous. Add a few permissions back.
-chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin/node-gyp
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
 
 # Drop the NPM default configuration in place
@@ -646,19 +641,17 @@ end
 %doc %{_mandir}/man5/folders.5*
 %doc %{_mandir}/man5/install.5*
 %doc %{_mandir}/man5/npmrc.5*
+%doc %{_mandir}/man5/npm-shrinkwrap-json.5*
 %doc %{_mandir}/man5/package-json.5*
 %doc %{_mandir}/man5/package-lock-json.5*
-%doc %{_mandir}/man5/package-locks.5*
-%doc %{_mandir}/man5/shrinkwrap-json.5*
 %doc %{_mandir}/man7/config.7*
 %doc %{_mandir}/man7/developers.7*
-%doc %{_mandir}/man7/disputes.7*
 %doc %{_mandir}/man7/orgs.7*
 %doc %{_mandir}/man7/registry.7*
 %doc %{_mandir}/man7/removal.7*
 %doc %{_mandir}/man7/scope.7*
 %doc %{_mandir}/man7/scripts.7*
-%doc %{_mandir}/man7/semver.7*
+%doc %{_mandir}/man7/workspaces.7*
 
 
 %files docs
@@ -669,85 +662,25 @@ end
 
 
 %changelog
-* Mon May 17 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.17.0-2
-- Update to 14.17.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V14.md#14.17.0
+* Wed Jun 23 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.0-1
+- Update to 16.4.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.4.0
 
-* Tue Apr 20 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-2
-- Disable stack execution (bz#1950528)
+* Fri Jun 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.3.0-1
+- Update to 16.3.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.3.0
 
-* Thu Apr 08 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.1-1
-- Update to 14.16.1
 
-* Wed Mar 31 2021 Jonathan Wakely <jwakely@redhat.com> - 1:14.16.0-4
-- Rebuilt for removed libstdc++ symbols (#1937698)
+* Wed May 19 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.2.0-1
+- Update to 16.2.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.2.0
+- Fix changelog version numbers
 
-* Tue Mar 09 2021 Zuzana Svetlikova <zsvetlik@redhat.com - 1:14.16.0-3
-- Only require nodejs-packaging on Fedora
-- remove --debug-nghttp2 (#1930775)
-- always build with systemtap
+* Tue May 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.1.0-1
+- Update to 16.1.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.1.0
+- Drop upstreamed patch
 
-* Mon Jan 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.16.0-1
-- Update to 14.16.0
-
-* Mon Jan 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:14.15.4-1
-- Update to 14.15.4
-
-* Wed Dec 02 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.15.1-1
-- Update to 14.15.1
-
-* Tue Oct 20 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-2
-- Don't build with LTO on aarch64
-
-* Mon Oct 19 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.14.0-1
-- Update to 14.14.0
-
-* Fri Oct 09 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.1-1
-- Update to 14.13.1
-
-* Thu Oct 01 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.13.0-1
-- Update to 14.13.0
-
-* Wed Sep 16 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.11.0-1
-- Update to 14.11.0
-
-* Tue Sep 08 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.10.0-1
-- Update to 14.10.0
-
-* Fri Aug 21 2020 Jeff Law <law@redhat.com> - 1:14.7.0-2
-- Narrow LTO opt-out to just armv7hl
-
-* Fri Jul 31 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.7.0-1
-- Update to 14.7.0
-
-* Tue Jul 28 2020 Fedora Release Engineering <releng@fedoraproject.org> - 1:14.5.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_33_Mass_Rebuild
-
-* Tue Jul 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.5.0-1
-- Update to 14.5.0
-
-* Tue Jul 07 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.4.0-3
-- Update for new packaging guidelines
-
-* Tue Jun 30 2020 Jeff Law <law@redhat.com> - 1:14.4.0-2
-- Disable LTO
-
-* Wed Jun 03 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.4.0-1
-- Security update to 14.4.0
-
-* Thu May 21 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.3.0-1
-- Update to 14.3.0
-
-* Wed May 06 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.2.0-1
-- Update to 14.2.0
-
-* Wed Apr 29 2020 Stephen Gallagher <sgallagh@redhat.com> - 1:14.1.0-1
-- Update to 14.1.0
-
-* Fri Apr 24 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-2
-- Keep the fix scripts for Koji
-
-* Thu Apr 23 2020 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:14.0.0-1
-- Update to 14.0.0
-- v14.x should be python3 compatible, so commented out py sed scripts
+* Thu Apr 29 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.0.0-1
+- First release of Node.js 16.x
 
