@@ -148,6 +148,7 @@ Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
+BuildRequires: python3-jinja2
 BuildRequires: python-unversioned-command
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
@@ -357,6 +358,8 @@ The API documentation for the Node.js JavaScript runtime.
 # remove bundled dependencies that we aren't building
 rm -rf deps/zlib
 rm -rf deps/brotli
+rm -rf deps/v8/third_party/jinja2
+rm -rf tools/inspector_protocol/jinja2
 
 
 %build
