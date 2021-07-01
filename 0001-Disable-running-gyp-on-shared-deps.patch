@@ -1,4 +1,4 @@
-From 081c89ebc1a3fd1796708f46e32154079a15cf27 Mon Sep 17 00:00:00 2001
+From dcc5e9723343bb540ed678e6e3cb93d9a6f00391 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Fri, 17 Apr 2020 12:59:44 +0200
 Subject: [PATCH 1/2] Disable running gyp on shared deps
