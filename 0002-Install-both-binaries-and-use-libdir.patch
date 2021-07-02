@@ -1,7 +1,7 @@
 From 8506b9411c41dd525249f6b728fd9b91131e8c7c Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH 2/2] Install both binaries and use libdir.
+Subject: [PATCH 2/3] Install both binaries and use libdir.
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.

@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -144,6 +144,10 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
+
+# Upstream no longer ships all of the v8 headers, but Fedora has packages
+# that require them.
+Patch3: 0003-Revert-build-include-minimal-V8-headers-in-distribut.patch
 
 BuildRequires: make
 BuildRequires: python3-devel
@@ -665,10 +669,12 @@ end
 
 
 %changelog
+* Fri Jul 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.1-2
+- Re-add support for v8 development headers
+
 * Thu Jul 01 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.1-1
 - Update to 16.4.1
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.4.1
-
 
 * Wed Jun 23 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.0-1
 - Update to 16.4.0
