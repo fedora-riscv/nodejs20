@@ -1,7 +1,7 @@
-From 8506b9411c41dd525249f6b728fd9b91131e8c7c Mon Sep 17 00:00:00 2001
+From 75126d1a069e58e4fd659d411bdf9f60f9ae94fc Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH 2/3] Install both binaries and use libdir.
+Subject: [PATCH 2/2] Install both binaries and use libdir.
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.
@@ -14,7 +14,7 @@ Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
  2 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index 4bc790e2f24219fdd57d59cbf2359f51c02707c5..c3802868080920ef5306aef4d6d632ca88f6efcf 100755
+index d69c52521d80fb3a24f79bcc4d4a364aceb6fa81..83274ac51613cfc3e37fa563aad19447a4028416 100755
 --- a/configure.py
 +++ b/configure.py
 @@ -720,10 +720,16 @@ parser.add_argument('--shared',
@@ -34,7 +34,7 @@ index 4bc790e2f24219fdd57d59cbf2359f51c02707c5..c3802868080920ef5306aef4d6d632ca
      dest='without_v8_platform',
      default=False,
      help='do not initialize v8 platform during node.js startup. ' +
-@@ -1300,10 +1306,11 @@ def configure_node(o):
+@@ -1307,10 +1313,11 @@ def configure_node(o):
      o['variables']['debug_nghttp2'] = 'false'
  
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
@@ -47,7 +47,7 @@ index 4bc790e2f24219fdd57d59cbf2359f51c02707c5..c3802868080920ef5306aef4d6d632ca
      shlib_suffix = 'so'
    elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 045d406d84be301722f3de62abc448db84e751f8..b3ef4541999126c512e3811881388e0ec8d401c4 100755
+index 24cf51e73199e60b4c24700e1074fe9bd0a399e6..cce482738804a563b5701ae25039b3d72b0aca73 100755
 --- a/tools/install.py
 +++ b/tools/install.py
 @@ -119,26 +119,23 @@ def subdir_files(path, dest, action):
