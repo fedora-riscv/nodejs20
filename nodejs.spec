@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 4
-%global nodejs_patch 1
+%global nodejs_minor 5
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -36,7 +36,7 @@
 %global v8_major 9
 %global v8_minor 1
 %global v8_build 269
-%global v8_patch 36
+%global v8_patch 38
 # V8 presently breaks ABI at least every x.y release while never bumping SONAME
 %global v8_abi %{v8_major}.%{v8_minor}
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
@@ -91,7 +91,7 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 7
-%global npm_minor 18
+%global npm_minor 19
 %global npm_patch 1
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
@@ -144,10 +144,6 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
-
-# Upstream no longer ships all of the v8 headers, but Fedora has packages
-# that require them.
-Patch3: 0003-Revert-build-include-minimal-V8-headers-in-distribut.patch
 
 BuildRequires: make
 BuildRequires: python3-devel
@@ -669,6 +665,10 @@ end
 
 
 %changelog
+* Tue Jul 20 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.5.0-1
+- Update to 16.5.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.5.0
+
 * Fri Jul 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.1-2
 - Re-add support for v8 development headers
 
