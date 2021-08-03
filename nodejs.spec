@@ -20,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 16
 %global nodejs_minor 6
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -665,6 +665,11 @@ end
 
 
 %changelog
+* Tue Aug 03 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.6.1-1
+- Update to 16.6.1
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.6.1
+- Fixes v8 regression introduced in 16.6.0
+
 * Mon Aug 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.6.0-1
 - Update to 16.6.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.6.0

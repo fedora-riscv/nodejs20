@@ -1,4 +1,4 @@
-From 1f9fbdd011f93d9b7818fa4c5e0fd366a89613d0 Mon Sep 17 00:00:00 2001
+From 88f468c012528efc5b75587ed543a9e78e336a16 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Fri, 17 Apr 2020 12:59:44 +0200
 Subject: [PATCH 1/2] Disable running gyp on shared deps
@@ -8,7 +8,7 @@ Subject: [PATCH 1/2] Disable running gyp on shared deps
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 81907c9220f2027e8d25f985de585fd2c2e7bac7..d2023f39eb61e9b777e0d1d0162d21a6453a6eb1 100644
+index ec4c774748cd9163143bcbb79c9af78148fada4f..45739d94c20d6afc22f210f3b4605e656f06e4e1 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -142,11 +142,11 @@ endif
