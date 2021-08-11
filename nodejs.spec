@@ -20,7 +20,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 16
 %global nodejs_minor 6
-%global nodejs_patch 1
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -46,7 +46,7 @@
 # https://github.com/nodejs/node/pull/9332
 %global c_ares_major 1
 %global c_ares_minor 17
-%global c_ares_patch 1
+%global c_ares_patch 2
 %global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
 
 # llhttp - from deps/llhttp/include/llhttp.h
@@ -91,8 +91,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 7
-%global npm_minor 19
-%global npm_patch 1
+%global npm_minor 20
+%global npm_patch 3
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -423,7 +423,7 @@ export LDFLAGS="%{build_ldflags}"
            --openssl-use-def-ca-store
 %endif
 
-make BUILDTYPE=Release %{?_smp_mflags}
+%make_build BUILDTYPE=Release
 
 # Extract the ICU data and convert it to the appropriate endianness
 pushd deps/
@@ -665,6 +665,10 @@ end
 
 
 %changelog
+* Wed Aug 11 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.6.2-1
+- Update to 16.6.2
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.6.2
+
 * Tue Aug 03 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.6.1-1
 - Update to 16.6.1
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.6.1
