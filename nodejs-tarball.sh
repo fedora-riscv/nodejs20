@@ -111,7 +111,10 @@ else
     version=$(rpm -q --specfile --qf='%{version}\n' nodejs.spec | head -n1)
 fi
 
-rm -f node-v${version}.tar.gz node-v${version}-stripped.tar.gz
+rm -rf node-v${version}.tar.gz \
+       node-v${version}-stripped.tar.gz \
+       node-v${version}/ \
+       SHASUMS256.txt
 wget http://nodejs.org/dist/v${version}/node-v${version}.tar.gz \
      http://nodejs.org/dist/v${version}/SHASUMS256.txt
 sha256sum -c SHASUMS256.txt --ignore-missing
@@ -188,6 +191,10 @@ echo
 echo "npm"
 echo "========================="
 grep "\"version\":" node-v${version}/deps/npm/package.json
+echo
+echo "corepack"
+echo "========================="
+grep "\"version\":" node-v${version}/deps/corepack/package.json
 echo
 echo "Make sure these versions match what is in the RPM spec file"
 

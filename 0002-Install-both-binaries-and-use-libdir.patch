@@ -1,4 +1,4 @@
-From c93114b805d4dd5860a5bc7dfd6a0a140444aee7 Mon Sep 17 00:00:00 2001
+From c5cf0a60bc07de8fa7a23f98c242a218094a6c9c Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -47,10 +47,10 @@ index 9327d6e5f5da064b4476adcc38dfa170ad6c16a2..3c54f419e34cb9f06bb32bc318be2de3
      shlib_suffix = 'so'
    elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 24cf51e73199e60b4c24700e1074fe9bd0a399e6..cce482738804a563b5701ae25039b3d72b0aca73 100755
+index 41cc1cbc60a9480cc08df3aa0ebe582c2becc3a2..11208f9e7166ab60da46d5ace2257c239a7e9263 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -119,26 +119,23 @@ def subdir_files(path, dest, action):
+@@ -128,26 +128,23 @@ def subdir_files(path, dest, action):
    for subdir, files_in_path in ret.items():
      action(files_in_path, subdir + '/')
  
@@ -87,5 +87,5 @@ index 24cf51e73199e60b4c24700e1074fe9bd0a399e6..cce482738804a563b5701ae25039b3d7
  
    # behave similarly for systemtap
 -- 
-2.31.1
+2.32.0
 
