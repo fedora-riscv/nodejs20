@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -668,6 +668,9 @@ end
 
 
 %changelog
+* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 1:16.9.1-2
+- Rebuilt with OpenSSL 3.0.0
+
 * Mon Sep 13 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.9.1-1
 - Update to 16.9.1
 - Add experimental 'corepack' tool
