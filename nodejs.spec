@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -533,6 +533,11 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
 # The above command is a little overzealous. Add a few permissions back.
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
 
+# Corepack contains a number of executable"shims", including some for Windows
+# PowerShell. Drop the executable bit for those so we don't pick up an
+# automatic dependency on /usr/bin/pwsh that we cannot satisfy.
+chmod -x %{buildroot}%{_prefix}/lib/node_modules/corepack/shims/*.ps1
+
 # Drop the NPM default configuration in place
 mkdir -p %{buildroot}%{_sysconfdir}
 cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
@@ -668,6 +673,9 @@ end
 
 
 %changelog
+* Tue Sep 14 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.9.1-2
+- Drop auto-dependency on PowerShell introduced by corepack
+
 * Mon Sep 13 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.9.1-1
 - Update to 16.9.1
 - Add experimental 'corepack' tool
