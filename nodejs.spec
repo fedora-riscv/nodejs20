@@ -375,11 +375,8 @@ rm -rf tools/inspector_protocol/jinja2
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
 
-#export CC='%{__cc}'
-#export CXX='%{__cxx}'
-
-export CC='ccache gcc'
-export CXX='ccache g++'
+export CC='%{__cc}'
+export CXX='%{__cxx}'
 
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
