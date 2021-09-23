@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage thar
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 4
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 9
-%global nodejs_patch 1
+%global nodejs_minor 10
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -36,7 +36,7 @@
 %global v8_major 9
 %global v8_minor 3
 %global v8_build 345
-%global v8_patch 16
+%global v8_patch 19
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
@@ -89,8 +89,8 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 7
-%global npm_minor 21
-%global npm_patch 1
+%global npm_minor 24
+%global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
@@ -375,8 +375,11 @@ rm -rf tools/inspector_protocol/jinja2
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
 %endif
 
-export CC='%{__cc}'
-export CXX='%{__cxx}'
+#export CC='%{__cc}'
+#export CXX='%{__cxx}'
+
+export CC='ccache gcc'
+export CXX='ccache g++'
 
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
@@ -673,6 +676,10 @@ end
 
 
 %changelog
+* Thu Sep 23 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.10.0-1
+- Update to 16.10.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.10.0
+
 * Tue Sep 14 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.9.1-4
 - Correct the bad merge of corepack fix
 

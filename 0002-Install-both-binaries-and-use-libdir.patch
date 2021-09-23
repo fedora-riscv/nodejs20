@@ -1,4 +1,4 @@
-From c5cf0a60bc07de8fa7a23f98c242a218094a6c9c Mon Sep 17 00:00:00 2001
+From 7f409cba5389bba6bb10f9a0f05cdf68c4a39338 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
