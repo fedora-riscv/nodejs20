@@ -5,7 +5,7 @@
 %define _lto_cflags %{nil}
 
 # == Master Relase ==
-# This is used by both the nodejs package and the npm subpackage thar
+# This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
 %global baserelease 1
@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 10
-%global nodejs_patch 0
+%global nodejs_minor 11
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -34,8 +34,8 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major 9
-%global v8_minor 3
-%global v8_build 345
+%global v8_minor 4
+%global v8_build 146
 %global v8_patch 19
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
@@ -50,7 +50,7 @@
 # llhttp - from deps/llhttp/include/llhttp.h
 %global llhttp_major 6
 %global llhttp_minor 0
-%global llhttp_patch 2
+%global llhttp_patch 4
 %global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
 
 # libuv - from deps/uv/include/uv/version.h
@@ -61,8 +61,8 @@
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_major 1
-%global nghttp2_minor 42
-%global nghttp2_patch 0
+%global nghttp2_minor 45
+%global nghttp2_patch 1
 %global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
 
 # ICU - from tools/icu/current_ver.dep
@@ -88,10 +88,16 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_major 7
-%global npm_minor 24
+%global npm_major 8
+%global npm_minor 0
 %global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
+
+# In order to avoid needing to keep incrementing the release version for the
+# main package forever, we will just construct one for npm that is guaranteed
+# to increment safely. Changing this can only be done during an update when the
+# base npm version number is increasing.
+%global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_major 0
@@ -104,13 +110,6 @@
 %global histogram_minor 9
 %global histogram_patch 7
 %global histogram_version %{histogram_major}.%{histogram_minor}.%{histogram_patch}
-
-# In order to avoid needing to keep incrementing the release version for the
-# main package forever, we will just construct one for npm that is guaranteed
-# to increment safely. Changing this can only be done during an update when the
-# base npm version number is increasing.
-%global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
-
 
 # Node.js 16.9.1 and later comes with an experimental package management tool
 %global corepack_version 0.9.0
@@ -155,6 +154,7 @@ BuildRequires: zlib-devel
 BuildRequires: brotli-devel
 BuildRequires: gcc >= 6.3.0
 BuildRequires: gcc-c++ >= 6.3.0
+BuildRequires: jq
 # needed to generate bundled provides for npm dependencies
 # https://src.fedoraproject.org/rpms/nodejs/pull-request/2
 # https://pagure.io/nodejs-packaging/pull-request/10
@@ -561,7 +561,7 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
 
 # Ensure we have npm and that the version matches
-NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"npm\").version, '%{npm_version}')"
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/npm version --json |jq '. | select(.npm | contains("7.24.0"))'
 
 # Make sure i18n support is working
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE2}
@@ -673,6 +673,11 @@ end
 
 
 %changelog
+* Wed Oct 13 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.11.1-1
+- Update to 16.11.1
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.11.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.11.0
+
 * Thu Sep 23 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.10.0-1
 - Update to 16.10.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.10.0

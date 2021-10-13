@@ -1,4 +1,4 @@
-From 7f409cba5389bba6bb10f9a0f05cdf68c4a39338 Mon Sep 17 00:00:00 2001
+From 62ddf8499747fb1e366477d666c0634ad50039a9 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -14,7 +14,7 @@ Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
  2 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index 9327d6e5f5da064b4476adcc38dfa170ad6c16a2..3c54f419e34cb9f06bb32bc318be2de3cefc4546 100755
+index 6efb98c2316f089f3167e486282593245373af3f..a6d2ec939e4480dfae703f3978067537abf9f0f0 100755
 --- a/configure.py
 +++ b/configure.py
 @@ -721,10 +721,16 @@ parser.add_argument('--shared',
@@ -87,5 +87,5 @@ index 41cc1cbc60a9480cc08df3aa0ebe582c2becc3a2..11208f9e7166ab60da46d5ace2257c23
  
    # behave similarly for systemtap
 -- 
-2.32.0
+2.33.0
 
