@@ -19,8 +19,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 11
-%global nodejs_patch 1
+%global nodejs_minor 12
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -89,7 +89,7 @@
 # npm - from deps/npm/package.json
 %global npm_epoch 1
 %global npm_major 8
-%global npm_minor 0
+%global npm_minor 1
 %global npm_patch 0
 %global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
 
@@ -112,7 +112,7 @@
 %global histogram_version %{histogram_major}.%{histogram_minor}.%{histogram_patch}
 
 # Node.js 16.9.1 and later comes with an experimental package management tool
-%global corepack_version 0.9.0
+%global corepack_version 0.10.0
 
 Name: nodejs
 Epoch: %{nodejs_epoch}
@@ -673,10 +673,14 @@ end
 
 
 %changelog
+* Mon Oct 25 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.12.0-1
+- Update to 16.12.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.12.0
+
 * Wed Oct 13 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.11.1-1
 - Update to 16.11.1
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.11.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.11.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.11.1
 
 * Thu Sep 23 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.10.0-1
 - Update to 16.10.0
