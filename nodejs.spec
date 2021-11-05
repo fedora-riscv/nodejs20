@@ -19,7 +19,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 12
+%global nodejs_minor 13
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -169,8 +169,13 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 %else
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires: libuv >= 1:%{libuv_version}
+%if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires: libnghttp2-devel >= %{nghttp2_version}
 Requires: libnghttp2 >= %{nghttp2_version}
+%define nghttp2_configure --shared-nghttp2
+%else
+%define nghttp2_configure %{nil}
+%endif
 %endif
 
 # Temporarily bundle llhttp because the upstream doesn't
@@ -416,7 +421,7 @@ export LDFLAGS="%{build_ldflags}"
            --shared-zlib \
            --shared-brotli \
            --shared-libuv \
-           --shared-nghttp2 \
+           %{nghttp2_configure} \
            --with-dtrace \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
@@ -673,6 +678,11 @@ end
 
 
 %changelog
+* Mon Oct 25 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.0-1
+- Update to 16.13.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.13.0
+- Add support for epel8
+
 * Mon Oct 25 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.12.0-1
 - Update to 16.12.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.12.0
