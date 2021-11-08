@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -149,7 +149,13 @@ BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 BuildRequires: python3-jinja2
+%if 0%{?fedora} || 0%{?rhel} >= 9
 BuildRequires: python-unversioned-command
+%else
+BuildRequires: python2-devel
+BuildRequires: python2-setuptools
+BuildRequires: python2-jinja2
+%endif
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
 BuildRequires: gcc >= 6.3.0
@@ -678,6 +684,9 @@ end
 
 
 %changelog
+* Mon Nov 01 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.0-2
+- Use python2 for building on EPEL 8
+
 * Mon Nov 01 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.0-1
 - Update to 16.13.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.13.0
