@@ -678,7 +678,7 @@ end
 
 
 %changelog
-* Mon Oct 25 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.0-1
+* Mon Nov 01 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.0-1
 - Update to 16.13.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.13.0
 - Add support for epel8
