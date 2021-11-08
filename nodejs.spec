@@ -181,6 +181,7 @@ Requires: libnghttp2 >= %{nghttp2_version}
 %define nghttp2_configure --shared-nghttp2
 %else
 %define nghttp2_configure %{nil}
+Provides: bundled(nghttp2) = %{nghttp2_version}
 %endif
 %endif
 
