@@ -8,7 +8,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -537,6 +537,7 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
     -exec chmod -x {} \;
 
 # The above command is a little overzealous. Add a few permissions back.
+chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin/node-gyp
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
 
 # Corepack contains a number of executable"shims", including some for Windows
@@ -679,6 +680,10 @@ end
 
 
 %changelog
+* Thu Nov 25 2021 Honza Horak <hhorak@redhat.com> - 1:16.13.0-2
+- Make sure binary node-gyp is executable
+  Resolves: #2026615
+
 * Mon Nov 01 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.0-1
 - Update to 16.13.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.13.0
