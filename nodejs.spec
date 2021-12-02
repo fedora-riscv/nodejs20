@@ -1,6 +1,12 @@
 # bundle dependencies that are not available as Fedora modules
 %bcond_with bootstrap
 
+%if 0%{?rhel} && 0%{?rhel} < 9
+%bcond_without python3_fixup
+%else
+%bcond_with python3_fixup
+%endif
+
 # LTO is currently broken on Node.js builds
 %define _lto_cflags %{nil}
 
@@ -8,7 +14,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -149,7 +155,9 @@ BuildRequires: make
 BuildRequires: python3-devel
 BuildRequires: python3-setuptools
 BuildRequires: python3-jinja2
+%if !%{with python3_fixup}
 BuildRequires: python-unversioned-command
+%endif
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
 BuildRequires: gcc >= 6.3.0
@@ -367,6 +375,16 @@ rm -rf deps/brotli
 rm -rf deps/v8/third_party/jinja2
 rm -rf tools/inspector_protocol/jinja2
 
+# Replace any instances of unversioned python' with python3
+%if %{with python3_fixup}
+pathfix.py -i %{__python3} -pn $(find -type f ! -name "*.js")
+find . -type f -exec sed -i "s~/usr\/bin\/env python~/usr/bin/python3~" {} \;
+find . -type f -exec sed -i "s~/usr\/bin\/python\W~/usr/bin/python3~" {} \;
+sed -i "s~usr\/bin\/python2~usr\/bin\/python3~" ./deps/v8/tools/gen-inlining-tests.py
+sed -i "s~usr\/bin\/python.*$~usr\/bin\/python3~" ./deps/v8/tools/mb/mb_unittest.py
+find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
+%endif
+
 
 %build
 # When compiled on armv7hl this package generates an out of range
@@ -383,6 +401,9 @@ rm -rf tools/inspector_protocol/jinja2
 
 export CC='%{__cc}'
 export CXX='%{__cxx}'
+%if %{with python3_fixup}
+export NODE_GYP_FORCE_PYTHON=%{__python3}
+%endif
 
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
@@ -680,6 +701,9 @@ end
 
 
 %changelog
+* Thu Dec 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.1-2
+- Enable building for EPEL 8 modules
+
 * Thu Dec 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.1-1
 - Update to 16.13.1
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.13.1
