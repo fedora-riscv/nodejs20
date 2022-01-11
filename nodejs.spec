@@ -14,7 +14,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -26,7 +26,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 16
 %global nodejs_minor 13
-%global nodejs_patch 1
+%global nodejs_patch 2
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -701,6 +701,12 @@ end
 
 
 %changelog
+* Tue Jan 11 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-1
+- Improper handling of URI Subject Alternative Names (Medium)(CVE-2021-44531)
+- Certificate Verification Bypass via String Injection (Medium)(CVE-2021-44532)
+- Incorrect handling of certificate subject and issuer fields (Medium)(CVE-2021-44533)
+- Prototype pollution via `console.table` properties (Low)(CVE-2022-21824)
+
 * Thu Dec 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.1-2
 - Enable building for EPEL 8 modules
 
