@@ -10,11 +10,15 @@
 # LTO is currently broken on Node.js builds
 %define _lto_cflags %{nil}
 
+# Heavy-handed approach to avoiding issues with python
+# bytecompiling files in the node_modules/ directory
+%global __python %{__python3}
+
 # == Master Relase ==
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -152,16 +156,22 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
 
 BuildRequires: make
-BuildRequires: python3-devel
-BuildRequires: python3-setuptools
-BuildRequires: python3-jinja2
+BuildRequires: python%{python3_pkgversion}-devel
+BuildRequires: python%{python3_pkgversion}-setuptools
+BuildRequires: python%{python3_pkgversion}-jinja2
 %if !%{with python3_fixup}
 BuildRequires: python-unversioned-command
 %endif
 BuildRequires: zlib-devel
 BuildRequires: brotli-devel
-BuildRequires: gcc >= 6.3.0
-BuildRequires: gcc-c++ >= 6.3.0
+%if 0%{?rhel} && 0%{?rhel} < 8
+BuildRequires: devtoolset-11-gcc
+BuildRequires: devtoolset-11-gcc-c++
+%else
+BuildRequires: gcc >= 8.3.0
+BuildRequires: gcc-c++ >= 8.3.0
+%endif
+
 BuildRequires: jq
 # needed to generate bundled provides for npm dependencies
 # https://src.fedoraproject.org/rpms/nodejs/pull-request/2
@@ -191,8 +201,15 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 # provide releases for it.
 Provides: bundled(llhttp) = %{llhttp_version}
 
+%if 0%{?rhel} && 0%{?rhel} < 8
+BuildRequires: openssl11-devel >= %{openssl_minimum}
+Requires: openssl11 >= %{openssl_minimum}
+%global ssl_configure --shared-openssl --shared-openssl-includes=%{_includedir}/openssl11 --shared-openssl-libpath=%{_libdir}/openssl11
+%else
 BuildRequires: openssl-devel >= %{openssl_minimum}
 Requires: openssl >= %{openssl_minimum}
+%global ssl_configure --shared-openssl
+%endif
 
 # we need the system certificate store
 Requires: ca-certificates
@@ -200,7 +217,11 @@ Requires: ca-certificates
 Requires: nodejs-libs%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 
 # Pull in the full-icu data by default
+%if 0%{?rhel} && 0%{?rhel} < 8
+Requires: nodejs-full-i18n%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
+%else
 Recommends: nodejs-full-i18n%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
+%endif
 
 # we need ABI virtual provides where SONAMEs aren't enough/not present so deps
 # break when binary compatibility is broken
@@ -256,7 +277,12 @@ Requires: (nodejs-packaging if rpm-build)
 %endif
 
 # Make sure we keep NPM up to date when we update Node.js
+%if 0%{?rhel} && 0%{?rhel} < 8
+Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+%else
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+%endif
+
 
 %description
 Node.js is a platform built on Chrome's JavaScript runtime
@@ -340,7 +366,11 @@ Release: %{npm_release}%{?dist}
 Obsoletes: npm < 0:3.5.4-6
 Provides: npm = %{npm_epoch}:%{npm_version}
 Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+%if 0%{?rhel} && 0%{?rhel} < 8
+Requires: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+%else
 Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+%endif
 
 # Do not add epoch to the virtual NPM provides or it will break
 # the automatic dependency-generation script.
@@ -387,6 +417,12 @@ find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 
 
 %build
+
+# Activate DevToolset 11 on EPEL 7
+%if 0%{?rhel} && 0%{?rhel} < 8
+. /opt/rh/devtoolset-11/enable
+%endif
+
 # When compiled on armv7hl this package generates an out of range
 # reference to the literal pool.  This is most likely a GCC issue.
 %ifarch armv7hl
@@ -429,7 +465,7 @@ export LDFLAGS="%{build_ldflags}"
 %{__python3} configure.py --prefix=%{_prefix} \
            --shared \
            --libdir=%{_lib} \
-           --shared-openssl \
+           %{ssl_configure} \
            --shared-zlib \
            --shared-brotli \
            --without-dtrace \
@@ -439,7 +475,7 @@ export LDFLAGS="%{build_ldflags}"
 %{__python3} configure.py --prefix=%{_prefix} \
            --shared \
            --libdir=%{_lib} \
-           --shared-openssl \
+           %{ssl_configure} \
            --shared-zlib \
            --shared-brotli \
            --shared-libuv \
@@ -576,6 +612,7 @@ mkdir -p %{buildroot}%{_prefix}/etc
 ln -s %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
 
 # Install the full-icu data files
+mkdir -p %{buildroot}%{icudatadir}
 install -Dpm0644 -t %{buildroot}%{icudatadir} deps/icu/source/converted/*
 
 
@@ -589,28 +626,10 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
 
 # Ensure we have npm and that the version matches
-LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/npm version --json |jq '. | select(.npm | contains("7.24.0"))'
+LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}%{_bindir}/node %{buildroot}%{_bindir}/npm version --json |jq '. | select(.npm | contains("7.24.0"))'
 
 # Make sure i18n support is working
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE2}
-
-
-%pretrans -n npm -p <lua>
--- Replace the npm man directory with a symlink
--- Drop this scriptlet when F31 is EOL
-path = "%{_prefix}/lib/node_modules/npm/man"
-st = posix.stat(path)
-if st and st.type == "directory" then
-  status = os.rename(path, path .. ".rpmmoved")
-  if not status then
-    suffix = 0
-    while not status do
-      suffix = suffix + 1
-      status = os.rename(path .. ".rpmmoved", path .. ".rpmmoved." .. suffix)
-    end
-    os.rename(path, path .. ".rpmmoved")
-  end
-end
 
 
 %files
@@ -701,6 +720,9 @@ end
 
 
 %changelog
+* Mon Jan 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-2
+- Add support for building on EPEL 7
+
 * Tue Jan 11 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-1
 - Improper handling of URI Subject Alternative Names (Medium)(CVE-2021-44531)
 - Certificate Verification Bypass via String Injection (Medium)(CVE-2021-44532)
