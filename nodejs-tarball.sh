@@ -196,6 +196,10 @@ echo "corepack"
 echo "========================="
 grep "\"version\":" node-v${version}/deps/corepack/package.json
 echo
+echo "zlib"
+echo "========================="
+grep "define ZLIB_VERSION" node-v${version}/deps/zlib/zlib.h
+echo
 echo "Make sure these versions match what is in the RPM spec file"
 
 rm -rf node-v${version}

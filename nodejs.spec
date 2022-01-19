@@ -7,6 +7,13 @@
 %bcond_with python3_fixup
 %endif
 
+%if 0%{?rhel} && 0%{?rhel} < 8
+%bcond_without bundled_zlib
+%else
+%bcond_with bundled_zlib
+%endif
+
+
 # LTO is currently broken on Node.js builds
 %define _lto_cflags %{nil}
 
@@ -18,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -50,30 +57,21 @@
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
+# zlib - from deps/zlib/zlib.h
+%global zlib_version 1.2.11
+
 # c-ares - from deps/cares/include/ares_version.h
 # https://github.com/nodejs/node/pull/9332
-%global c_ares_major 1
-%global c_ares_minor 18
-%global c_ares_patch 1
-%global c_ares_version %{c_ares_major}.%{c_ares_minor}.%{c_ares_patch}
+%global c_ares_version 1.18.1
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_major 6
-%global llhttp_minor 0
-%global llhttp_patch 4
-%global llhttp_version %{llhttp_major}.%{llhttp_minor}.%{llhttp_patch}
+%global llhttp_version 6.0.4
 
 # libuv - from deps/uv/include/uv/version.h
-%global libuv_major 1
-%global libuv_minor 42
-%global libuv_patch 0
-%global libuv_version %{libuv_major}.%{libuv_minor}.%{libuv_patch}
+%global libuv_version 1.42.0
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
-%global nghttp2_major 1
-%global nghttp2_minor 45
-%global nghttp2_patch 1
-%global nghttp2_version %{nghttp2_major}.%{nghttp2_minor}.%{nghttp2_patch}
+%global nghttp2_version 1.45.1
 
 # ICU - from tools/icu/current_ver.dep
 %global icu_major 69
@@ -91,17 +89,11 @@
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
 # Note: this will be unmerged in an upcoming major release
-%global punycode_major 2
-%global punycode_minor 1
-%global punycode_patch 0
-%global punycode_version %{punycode_major}.%{punycode_minor}.%{punycode_patch}
+%global punycode_version 2.1.0
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_major 8
-%global npm_minor 1
-%global npm_patch 2
-%global npm_version %{npm_major}.%{npm_minor}.%{npm_patch}
+%global npm_version 8.1.2
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -110,16 +102,10 @@
 %global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
-%global uvwasi_major 0
-%global uvwasi_minor 0
-%global uvwasi_patch 11
-%global uvwasi_version %{uvwasi_major}.%{uvwasi_minor}.%{uvwasi_patch}
+%global uvwasi_version 0.0.11
 
 # histogram_c - assumed from timestamps
-%global histogram_major 0
-%global histogram_minor 9
-%global histogram_patch 7
-%global histogram_version %{histogram_major}.%{histogram_minor}.%{histogram_patch}
+%global histogram_version 0.9.7
 
 # Node.js 16.9.1 and later comes with an experimental package management tool
 %global corepack_version 0.10.0
@@ -162,7 +148,9 @@ BuildRequires: python%{python3_pkgversion}-jinja2
 %if !%{with python3_fixup}
 BuildRequires: python-unversioned-command
 %endif
+%if !%{with bundled_zlib}
 BuildRequires: zlib-devel
+%endif
 BuildRequires: brotli-devel
 %if 0%{?rhel} && 0%{?rhel} < 8
 BuildRequires: devtoolset-11-gcc
@@ -297,7 +285,9 @@ Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
+%if !%{with bundled_zlib}
 Requires: zlib-devel%{?_isa}
+%endif
 Requires: brotli-devel%{?_isa}
 Requires: nodejs-packaging
 
@@ -400,7 +390,10 @@ The API documentation for the Node.js JavaScript runtime.
 %autosetup -p1 -n node-v%{nodejs_version}
 
 # remove bundled dependencies that we aren't building
+%if !%{with bundled_zlib}
 rm -rf deps/zlib
+%endif
+
 rm -rf deps/brotli
 rm -rf deps/v8/third_party/jinja2
 rm -rf tools/inspector_protocol/jinja2
@@ -466,7 +459,9 @@ export LDFLAGS="%{build_ldflags}"
            --shared \
            --libdir=%{_lib} \
            %{ssl_configure} \
+%if !%{with bundled_zlib}
            --shared-zlib \
+%endif
            --shared-brotli \
            --without-dtrace \
            --with-intl=small-icu \
@@ -476,7 +471,9 @@ export LDFLAGS="%{build_ldflags}"
            --shared \
            --libdir=%{_lib} \
            %{ssl_configure} \
+%if !%{with bundled_zlib}
            --shared-zlib \
+%endif
            --shared-brotli \
            --shared-libuv \
            %{nghttp2_configure} \
@@ -573,7 +570,7 @@ cp -pr deps/npm/man/* %{buildroot}%{_mandir}/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/man
 ln -sf %{_mandir}  %{buildroot}%{_prefix}/lib/node_modules/npm/man
 
-# Install Gatsby HTML documentation to %{_pkgdocdir}
+# Install Gatsby HTML documentation to %%{_pkgdocdir}
 cp -pr deps/npm/docs %{buildroot}%{_pkgdocdir}/npm/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
@@ -631,6 +628,22 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}%{_bindir}/node %{buildroot}%
 # Make sure i18n support is working
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE2}
 
+
+%if 0%{?rhel} && 0%{?rhel} < 8
+%pretrans -n npm -p <lua>
+-- Remove all of the symlinks from the bundled npm node_modules directory
+base_path = "%{_prefix}/lib/node_modules/npm/node_modules/"
+d_st = posix.stat(base_path)
+if d_st then
+  for f in posix.files(base_path) do
+    path = base_path..f
+    st = posix.stat(path)
+    if st and st.type == "link" then
+      os.remove(path)
+    end
+  end
+end
+%endif
 
 %files
 %{_bindir}/node
@@ -720,6 +733,9 @@ NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/nod
 
 
 %changelog
+* Wed Jan 19 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-3
+- Bundle zlib on EPEL 7
+
 * Mon Jan 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-2
 - Add support for building on EPEL 7
 
