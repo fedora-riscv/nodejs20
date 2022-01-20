@@ -14,7 +14,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -701,6 +701,9 @@ end
 
 
 %changelog
+* Thu Jan 20 2022 Fedora Release Engineering <releng@fedoraproject.org> - 1:16.13.2-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_36_Mass_Rebuild
+
 * Tue Jan 11 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-1
 - Improper handling of URI Subject Alternative Names (Medium)(CVE-2021-44531)
 - Certificate Verification Bypass via String Injection (Medium)(CVE-2021-44532)
