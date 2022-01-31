@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 5
+%global baserelease 6
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -730,9 +730,12 @@ end
 
 
 %changelog
-* Mon Jan 31 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-3
+* Mon Jan 31 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-6
+- Rebuild for more architectures
+
+* Mon Jan 31 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-5
 - Tweak some dependencies on EPEL 7 (bz2048589)
-- Add (Provides: bundled(zlib))
+- Add Provides: bundled(zlib)
 
 * Wed Jan 19 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-3
 - Bundle zlib on EPEL 7
