@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 4
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -148,7 +148,9 @@ BuildRequires: python%{python3_pkgversion}-jinja2
 %if !%{with python3_fixup}
 BuildRequires: python-unversioned-command
 %endif
-%if !%{with bundled_zlib}
+%if %{with bundled_zlib}
+Provides: bundled(zlib) = %{zlib_version}
+%else
 BuildRequires: zlib-devel
 %endif
 BuildRequires: brotli-devel
@@ -205,9 +207,7 @@ Requires: ca-certificates
 Requires: nodejs-libs%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 
 # Pull in the full-icu data by default
-%if 0%{?rhel} && 0%{?rhel} < 8
-Requires: nodejs-full-i18n%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
-%else
+%if 0%{?fedora} || 0%{?rhel} >= 8
 Recommends: nodejs-full-i18n%{?_isa} = %{nodejs_epoch}:%{version}-%{release}
 %endif
 
@@ -265,11 +265,10 @@ Requires: (nodejs-packaging if rpm-build)
 %endif
 
 # Make sure we keep NPM up to date when we update Node.js
-%if 0%{?rhel} && 0%{?rhel} < 8
-Requires: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
-%else
+%if 0%{?fedora} || 0%{?rhel} >= 8
 Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 %endif
+Conflicts: npm < %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
 
 
 %description
@@ -356,9 +355,7 @@ Release: %{npm_release}%{?dist}
 Obsoletes: npm < 0:3.5.4-6
 Provides: npm = %{npm_epoch}:%{npm_version}
 Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-%if 0%{?rhel} && 0%{?rhel} < 8
-Requires: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-%else
+%if 0%{?fedora} || 0%{?rhel} >= 8
 Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 %endif
 
@@ -733,6 +730,10 @@ end
 
 
 %changelog
+* Mon Jan 31 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-3
+- Tweak some dependencies on EPEL 7 (bz2048589)
+- Add (Provides: bundled(zlib))
+
 * Wed Jan 19 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-3
 - Bundle zlib on EPEL 7
 
