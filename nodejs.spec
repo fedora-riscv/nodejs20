@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 6
+%global baserelease 7
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -353,7 +353,6 @@ Release: %{npm_release}%{?dist}
 # (and expected to be present on all Node.js systems) that we ship it bundled
 # now.
 Obsoletes: npm < 0:3.5.4-6
-Provides: npm = %{npm_epoch}:%{npm_version}
 Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 %if 0%{?fedora} || 0%{?rhel} >= 8
 Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
@@ -730,6 +729,9 @@ end
 
 
 %changelog
+* Wed Feb 02 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-7
+- Fix incorrect version Provides: for npm (bz#2049873)
+
 * Mon Jan 31 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-6
 - Rebuild for more architectures
 
