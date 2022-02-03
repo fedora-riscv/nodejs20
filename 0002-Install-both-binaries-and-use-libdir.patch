@@ -1,7 +1,7 @@
-From 62ddf8499747fb1e366477d666c0634ad50039a9 Mon Sep 17 00:00:00 2001
+From 73033dbc74778f7bee49f77716968bbac1e80c28 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH 2/2] Install both binaries and use libdir.
+Subject: [PATCH 2/3] Install both binaries and use libdir.
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.
@@ -87,5 +87,5 @@ index 41cc1cbc60a9480cc08df3aa0ebe582c2becc3a2..11208f9e7166ab60da46d5ace2257c23
  
    # behave similarly for systemtap
 -- 
-2.33.0
+2.34.1
 

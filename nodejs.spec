@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 7
+%global baserelease 8
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -140,6 +140,10 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
+
+# Upstream patch to rebase npm to 8.3.1
+# Carrying it until 16.14.0 is released due to CVE-2021-43616
+Patch3: 0003-deps-upgrade-npm-to-8.3.1.patch
 
 BuildRequires: make
 BuildRequires: python%{python3_pkgversion}-devel
@@ -729,6 +733,9 @@ end
 
 
 %changelog
+* Thu Feb 03 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-8
+- Update npm to 8.3.1 (CVE-2021-43616)
+
 * Wed Feb 02 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-7
 - Fix incorrect version Provides: for npm (bz#2049873)
 
