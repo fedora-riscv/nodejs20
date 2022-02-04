@@ -718,6 +718,7 @@ end
 %doc %{_mandir}/man7/config.7*
 %doc %{_mandir}/man7/developers.7*
 %doc %{_mandir}/man7/orgs.7*
+%doc %{_mandir}/man7/logging.7*
 %doc %{_mandir}/man7/registry.7*
 %doc %{_mandir}/man7/removal.7*
 %doc %{_mandir}/man7/scope.7*
