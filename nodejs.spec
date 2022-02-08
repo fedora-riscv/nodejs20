@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 8
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -36,8 +36,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 13
-%global nodejs_patch 2
+%global nodejs_minor 14
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -68,13 +68,13 @@
 %global llhttp_version 6.0.4
 
 # libuv - from deps/uv/include/uv/version.h
-%global libuv_version 1.42.0
+%global libuv_version 1.43.0
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
 %global nghttp2_version 1.45.1
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 69
+%global icu_major 70
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
@@ -93,7 +93,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.1.2
+%global npm_version 8.3.1
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -102,7 +102,7 @@
 %global npm_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
 # uvwasi - from deps/uvwasi/include/uvwasi.h
-%global uvwasi_version 0.0.11
+%global uvwasi_version 0.0.12
 
 # histogram_c - assumed from timestamps
 %global histogram_version 0.9.7
@@ -140,10 +140,6 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
 # Patch to install both node and libnode.so, using the correct libdir
 Patch2: 0002-Install-both-binaries-and-use-libdir.patch
-
-# Upstream patch to rebase npm to 8.3.1
-# Carrying it until 16.14.0 is released due to CVE-2021-43616
-Patch3: 0003-deps-upgrade-npm-to-8.3.1.patch
 
 BuildRequires: make
 BuildRequires: python%{python3_pkgversion}-devel
@@ -734,6 +730,9 @@ end
 
 
 %changelog
+* Tue Feb 08 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.0-1
+- Update to Node.js 16.14.0
+
 * Thu Feb 03 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-8
 - Update npm to 8.3.1 (CVE-2021-43616)
 

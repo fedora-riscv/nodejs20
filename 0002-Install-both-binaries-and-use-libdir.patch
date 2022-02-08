@@ -1,7 +1,7 @@
-From 73033dbc74778f7bee49f77716968bbac1e80c28 Mon Sep 17 00:00:00 2001
+From a1c35106e7e9ab3d4a01779079cf9788a2fe777a Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH 2/3] Install both binaries and use libdir.
+Subject: [PATCH 2/2] Install both binaries and use libdir.
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.
@@ -14,10 +14,10 @@ Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
  2 files changed, 16 insertions(+), 12 deletions(-)
 
 diff --git a/configure.py b/configure.py
-index 6efb98c2316f089f3167e486282593245373af3f..a6d2ec939e4480dfae703f3978067537abf9f0f0 100755
+index 47137d8912dd1439962127a3c1f417eb78572021..c59037a39fcefdfe173d16a7aa9622a32a3c29e7 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -721,10 +721,16 @@ parser.add_argument('--shared',
+@@ -731,10 +731,16 @@ parser.add_argument('--shared',
      dest='shared',
      default=None,
      help='compile shared library for embedding node in another project. ' +
@@ -34,7 +34,7 @@ index 6efb98c2316f089f3167e486282593245373af3f..a6d2ec939e4480dfae703f3978067537
      dest='without_v8_platform',
      default=False,
      help='do not initialize v8 platform during node.js startup. ' +
-@@ -1305,10 +1311,11 @@ def configure_node(o):
+@@ -1332,10 +1338,11 @@ def configure_node(o):
      o['variables']['debug_nghttp2'] = 'false'
  
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
@@ -47,7 +47,7 @@ index 6efb98c2316f089f3167e486282593245373af3f..a6d2ec939e4480dfae703f3978067537
      shlib_suffix = 'so'
    elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 41cc1cbc60a9480cc08df3aa0ebe582c2becc3a2..11208f9e7166ab60da46d5ace2257c239a7e9263 100755
+index eafcb19bf8b29f87c39b0fe7d3c3fd2d175a7b7b..71b5371578711fcc9a1b80069850f0b61bdfebe2 100755
 --- a/tools/install.py
 +++ b/tools/install.py
 @@ -128,26 +128,23 @@ def subdir_files(path, dest, action):
