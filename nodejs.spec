@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 3
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -461,6 +461,7 @@ export LDFLAGS="%{build_ldflags}"
            --shared-brotli \
            --without-dtrace \
            --with-intl=small-icu \
+           --without-corepack \
            --openssl-use-def-ca-store
 %else
 %{__python3} configure.py --prefix=%{_prefix} \
@@ -476,6 +477,7 @@ export LDFLAGS="%{build_ldflags}"
            --with-dtrace \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
+           --without-corepack \
            --openssl-use-def-ca-store
 %endif
 
@@ -730,6 +732,9 @@ end
 
 
 %changelog
+* Thu Mar 03 2022 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:16.14.0-3
+- Build without corepack
+
 * Wed Feb 09 2022 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:16.14.0-2
 - Replace explicit version of npm in %%check with variable and make build fail if it doesn't match
 
