@@ -192,10 +192,6 @@ echo "npm"
 echo "========================="
 grep "\"version\":" node-v${version}/deps/npm/package.json
 echo
-echo "corepack"
-echo "========================="
-grep "\"version\":" node-v${version}/deps/corepack/package.json
-echo
 echo "zlib"
 echo "========================="
 grep "define ZLIB_VERSION" node-v${version}/deps/zlib/zlib.h

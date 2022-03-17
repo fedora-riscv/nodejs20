@@ -107,9 +107,6 @@
 # histogram_c - assumed from timestamps
 %global histogram_version 0.9.7
 
-# Node.js 16.9.1 and later comes with an experimental package management tool
-%global corepack_version 0.10.0
-
 Name: nodejs
 Epoch: %{nodejs_epoch}
 Version: %{nodejs_version}
@@ -257,7 +254,6 @@ Provides: bundled(icu) = %{icu_version}
 # or there's no option to built it as a shared dependency, so we bundle them
 Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
-Provides: bundled(corepack) = %{corepack_version}
 
 %if 0%{?fedora}
 # Make sure to pull in the appropriate packaging macros when building RPMs
@@ -592,11 +588,6 @@ find %{buildroot}%{_prefix}/lib/node_modules/npm \
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/node-gyp-bin/node-gyp
 chmod 0755 %{buildroot}%{_prefix}/lib/node_modules/npm/node_modules/node-gyp/bin/node-gyp.js
 
-# Corepack contains a number of executable"shims", including some for Windows
-# PowerShell. Drop the executable bit for those so we don't pick up an
-# automatic dependency on /usr/bin/pwsh that we cannot satisfy.
-chmod -x %{buildroot}%{_prefix}/lib/node_modules/corepack/shims/*.ps1
-
 # Drop the NPM default configuration in place
 mkdir -p %{buildroot}%{_sysconfdir}
 cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
@@ -650,10 +641,6 @@ end
 %dir %{_datadir}/systemtap
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
-
-# corepack
-%{_bindir}/corepack
-%{_prefix}/lib/node_modules/corepack
 
 %if %{with bootstrap}
 # no dtrace
