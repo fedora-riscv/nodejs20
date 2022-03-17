@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 3
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -37,7 +37,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 16
 %global nodejs_minor 14
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -93,7 +93,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.3.1
+%global npm_version 8.5.0
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -719,11 +719,16 @@ end
 
 
 %changelog
+* Thu Mar 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.1-1
+- Update to Node.js 16.14.1
+- Drop corepack
+
 * Thu Mar 03 2022 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:16.14.0-3
 - Build without corepack
 
 * Wed Feb 09 2022 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:16.14.0-2
-- Replace explicit version of npm in %%check with variable and make build fail if it doesn't match
+- Replace explicit version of npm in %%check with variable and make build fail
+  if it doesn't match
 
 * Tue Feb 08 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.0-1
 - Update to Node.js 16.14.0
