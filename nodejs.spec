@@ -334,6 +334,7 @@ Epoch: %{v8_epoch}
 Version: %{v8_version}
 Release: %{v8_release}%{?dist}
 Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Conflicts: v8-314-devel
 
 %description -n v8-devel
 Development headers for the v8 runtime.
