@@ -1,5 +1,20 @@
-# bundle dependencies that are not available as Fedora modules
+# The following macros control the usage of dependencies bundled from upstream.
+#
+# When to use what:
+# - Regular (presumably non-modular) build: use neither (the default in Fedora)
+# - Early bootstrapping build that is not intended to be shipped:
+#     use --with=bootstrap; this will bundle deps and add `~bootstrap` release suffix
+# - Build with some dependencies not avalaible in necessary versions (i.e. module build):
+#     use --with=bundled; will bundle deps, but do not add the suffix
+#
+# create bootstrapping build with bundled deps and extra release suffix
 %bcond_with bootstrap
+# bundle dependencies that are not available in Fedora modules
+%if %{with bootstrap}
+%bcond_without bundled
+%else
+%bcond_with bundled
+%endif
 
 %if 0%{?rhel} && 0%{?rhel} < 9
 %bcond_without python3_fixup
@@ -168,14 +183,14 @@ BuildRequires: chrpath
 BuildRequires: libatomic
 BuildRequires: systemtap-sdt-devel
 
-%if %{with bootstrap}
+%if %{with bundled}
 Provides:      bundled(libuv) = %{libuv_version}
 %else
 BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires:      libuv >= 1:%{libuv_version}
 %endif
 
-%if %{with bootstrap} || !(0%{?fedora} || 0%{?rhel} >= 9)
+%if %{with bundled} || !(0%{?fedora} || 0%{?rhel} >= 9)
 %define        nghttp2_configure %{nil}
 Provides:      bundled(nghttp2) = %{nghttp2_version}
 %else
@@ -286,7 +301,7 @@ Requires: zlib-devel%{?_isa}
 Requires: brotli-devel%{?_isa}
 Requires: nodejs-packaging
 
-%if %{without bootstrap}
+%if %{without bundled}
 Requires: libuv-devel%{?_isa}
 %endif
 
@@ -443,9 +458,9 @@ export LDFLAGS="%{build_ldflags}"
            %{ssl_configure} \
            %{!?with_bundled_zlib:--shared-zlib} \
            --shared-brotli \
-           %{!?with_bootstrap:--shared-libuv} \
-           %{!?with_bootstrap:%{nghttp2_configure} \
-           %{?with_bootstrap:--without-dtrace}%{!?with_bootstrap:--with-dtrace} \
+           %{!?with_bundled:--shared-libuv} \
+           %{!?with_bundled:%{nghttp2_configure} \
+           %{?with_bundled:--without-dtrace}%{!?with_bundled:--with-dtrace} \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
            --without-corepack \
@@ -616,7 +631,7 @@ end
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
 
-%if %{without bootstrap}
+%if %{without bundled}
 %dir %{_usr}/lib/dtrace
 %{_usr}/lib/dtrace/node.d
 %endif
@@ -694,6 +709,7 @@ end
 * Mon Apr 04 2022 Jan Staněk <jstanek@redhat.com> - 16.14.1-2
 - Unify configure.py calls into single command
 - Refactor bootstrap-related parts
+- Decouple dependency bundling from bootstrapping
 
 * Thu Mar 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.1-1
 - Update to Node.js 16.14.1
