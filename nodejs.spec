@@ -430,53 +430,28 @@ export NODE_GYP_FORCE_PYTHON=%{__python3}
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
 # NULL objects. We need to pass -fno-delete-null-pointer-checks
-export CFLAGS='%{optflags} \
-               -D_LARGEFILE_SOURCE \
-               -D_FILE_OFFSET_BITS=64 \
-               -DZLIB_CONST \
-               -fno-delete-null-pointer-checks'
-export CXXFLAGS='%{optflags} \
-                 -D_LARGEFILE_SOURCE \
-                 -D_FILE_OFFSET_BITS=64 \
-                 -DZLIB_CONST \
-                 -fno-delete-null-pointer-checks'
-
-# Explicit new lines in C(XX)FLAGS can break naive build scripts
-export CFLAGS="$(echo ${CFLAGS} | tr '\n\\' '  ')"
-export CXXFLAGS="$(echo ${CXXFLAGS} | tr '\n\\' '  ')"
-
+extra_cflags=(
+    -D_LARGEFILE_SOURCE
+    -D_FILE_OFFSET_BITS=64
+    -DZLIB_CONST
+    -fno-delete-null-pointer-checks
+)
+export CFLAGS="%{optflags} ${extra_cflags[*]}" CXXFLAGS="%{optflags} ${extra_cflags[*]}"
 export LDFLAGS="%{build_ldflags}"
 
-%if %{with bootstrap}
 %{__python3} configure.py --prefix=%{_prefix} \
            --shared \
            --libdir=%{_lib} \
            %{ssl_configure} \
-%if !%{with bundled_zlib}
-           --shared-zlib \
-%endif
+           %{!?with_bundled_zlib:--shared-zlib} \
            --shared-brotli \
-           --without-dtrace \
-           --with-intl=small-icu \
-           --without-corepack \
-           --openssl-use-def-ca-store
-%else
-%{__python3} configure.py --prefix=%{_prefix} \
-           --shared \
-           --libdir=%{_lib} \
-           %{ssl_configure} \
-%if !%{with bundled_zlib}
-           --shared-zlib \
-%endif
-           --shared-brotli \
-           --shared-libuv \
-           %{nghttp2_configure} \
-           --with-dtrace \
+           %{!?with_bootstrap:--shared-libuv} \
+           %{!?with_bootstrap:%{nghttp2_configure} \
+           %{?with_bootstrap:--without-dtrace}%{!?with_bootstrap:--with-dtrace} \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
            --without-corepack \
            --openssl-use-def-ca-store
-%endif
 
 %make_build BUILDTYPE=Release
 
@@ -721,6 +696,7 @@ end
 
 %changelog
 * Mon Apr 04 2022 Jan Staněk <jstanek@redhat.com> - 16.14.1-2
+- Unify configure.py calls into single command
 
 * Thu Mar 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.1-1
 - Update to Node.js 16.14.1
