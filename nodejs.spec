@@ -25,7 +25,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -720,6 +720,8 @@ end
 
 
 %changelog
+* Mon Apr 04 2022 Jan Staněk <jstanek@redhat.com> - 16.14.1-2
+
 * Thu Mar 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.1-1
 - Update to Node.js 16.14.1
 - Drop corepack
