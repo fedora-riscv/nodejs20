@@ -169,19 +169,19 @@ BuildRequires: libatomic
 BuildRequires: systemtap-sdt-devel
 
 %if %{with bootstrap}
-Provides: bundled(libuv) = %{libuv_version}
-Provides: bundled(nghttp2) = %{nghttp2_version}
+Provides:      bundled(libuv) = %{libuv_version}
 %else
 BuildRequires: libuv-devel >= 1:%{libuv_version}
-Requires: libuv >= 1:%{libuv_version}
-%if 0%{?fedora} || 0%{?rhel} >= 9
-BuildRequires: libnghttp2-devel >= %{nghttp2_version}
-Requires: libnghttp2 >= %{nghttp2_version}
-%define nghttp2_configure --shared-nghttp2
-%else
-%define nghttp2_configure %{nil}
-Provides: bundled(nghttp2) = %{nghttp2_version}
+Requires:      libuv >= 1:%{libuv_version}
 %endif
+
+%if %{with bootstrap} || !(0%{?fedora} || 0%{?rhel} >= 9)
+%define        nghttp2_configure %{nil}
+Provides:      bundled(nghttp2) = %{nghttp2_version}
+%else
+%define        nghttp2_configure --shared-nghttp2
+BuildRequires: libnghttp2-devel >= %{nghttp2_version}
+Requires:      libnghttp2 >= %{nghttp2_version}
 %endif
 
 # Temporarily bundle llhttp because the upstream doesn't
@@ -286,9 +286,7 @@ Requires: zlib-devel%{?_isa}
 Requires: brotli-devel%{?_isa}
 Requires: nodejs-packaging
 
-%if %{with bootstrap}
-# deps are bundled
-%else
+%if %{without bootstrap}
 Requires: libuv-devel%{?_isa}
 %endif
 
@@ -618,9 +616,7 @@ end
 %dir %{_datadir}/systemtap/tapset
 %{_datadir}/systemtap/tapset/node.stp
 
-%if %{with bootstrap}
-# no dtrace
-%else
+%if %{without bootstrap}
 %dir %{_usr}/lib/dtrace
 %{_usr}/lib/dtrace/node.d
 %endif
@@ -697,6 +693,7 @@ end
 %changelog
 * Mon Apr 04 2022 Jan Staněk <jstanek@redhat.com> - 16.14.1-2
 - Unify configure.py calls into single command
+- Refactor bootstrap-related parts
 
 * Thu Mar 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.1-1
 - Update to Node.js 16.14.1
