@@ -459,7 +459,7 @@ export LDFLAGS="%{build_ldflags}"
            %{!?with_bundled_zlib:--shared-zlib} \
            --shared-brotli \
            %{!?with_bundled:--shared-libuv} \
-           %{!?with_bundled:%{nghttp2_configure} \
+           %{!?with_bundled:%{nghttp2_configure}} \
            %{?with_bundled:--without-dtrace}%{!?with_bundled:--with-dtrace} \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
