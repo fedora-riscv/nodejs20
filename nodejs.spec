@@ -40,7 +40,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -51,8 +51,8 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 16
-%global nodejs_minor 14
-%global nodejs_patch 1
+%global nodejs_minor 15
+%global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 93
@@ -86,7 +86,7 @@
 %global libuv_version 1.43.0
 
 # nghttp2 - from deps/nghttp2/lib/includes/nghttp2/nghttp2ver.h
-%global nghttp2_version 1.45.1
+%global nghttp2_version 1.47.0
 
 # ICU - from tools/icu/current_ver.dep
 %global icu_major 70
@@ -108,7 +108,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.5.0
+%global npm_version 8.5.5
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -139,8 +139,10 @@ ExclusiveArch: %{nodejs_arches}
 Source0: node-v%{nodejs_version}-stripped.tar.gz
 Source1: npmrc
 Source2: btest402.js
-Source3: https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-src.tgz
-Source100: %{name}-tarball.sh
+# The binary data that icu-small can use to get icu-full capability
+Source3: https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-b.zip
+Source4: https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-l.zip
+Source100: nodejs-sources.sh
 
 # The native module Requires generator remains in the nodejs SRPM, so it knows
 # the nodejs and v8 versions.  The remainder has migrated to the
@@ -182,6 +184,7 @@ BuildRequires: nodejs-packaging
 BuildRequires: chrpath
 BuildRequires: libatomic
 BuildRequires: systemtap-sdt-devel
+BuildRequires: unzip
 
 %if %{with bundled}
 Provides:      bundled(libuv) = %{libuv_version}
@@ -190,14 +193,9 @@ BuildRequires: libuv-devel >= 1:%{libuv_version}
 Requires:      libuv >= 1:%{libuv_version}
 %endif
 
-%if %{with bundled} || !(0%{?fedora} || 0%{?rhel} >= 9)
-%define        nghttp2_configure %{nil}
-Provides:      bundled(nghttp2) = %{nghttp2_version}
-%else
-%define        nghttp2_configure --shared-nghttp2
-BuildRequires: libnghttp2-devel >= %{nghttp2_version}
-Requires:      libnghttp2 >= %{nghttp2_version}
-%endif
+# Node.js frequently bumps this faster than Fedora can follow,
+# so we will bundle it.
+Provides: bundled(nghttp2) = %{nghttp2_version}
 
 # Temporarily bundle llhttp because the upstream doesn't
 # provide releases for it.
@@ -314,14 +312,14 @@ Summary: Node.js and v8 libraries
 
 # Compatibility for obsolete v8 package
 %if 0%{?__isa_bits} == 64
-Provides: libv8.so.%{v8_major}()(64bit)
-Provides: libv8_libbase.so.%{v8_major}()(64bit)
-Provides: libv8_libplatform.so.%{v8_major}()(64bit)
+Provides: libv8.so.%{v8_major}()(64bit) = %{v8_epoch}:%{v8_version}
+Provides: libv8_libbase.so.%{v8_major}()(64bit) = %{v8_epoch}:%{v8_version}
+Provides: libv8_libplatform.so.%{v8_major}()(64bit) = %{v8_epoch}:%{v8_version}
 %else
 # 32-bits
-Provides: libv8.so.%{v8_major}
-Provides: libv8_libbase.so.%{v8_major}
-Provides: libv8_libplatform.so.%{v8_major}
+Provides: libv8.so.%{v8_major} = %{v8_epoch}:%{v8_version}
+Provides: libv8_libbase.so.%{v8_major} = %{v8_epoch}:%{v8_version}
+Provides: libv8_libplatform.so.%{v8_major} = %{v8_epoch}:%{v8_version}
 %endif
 
 Provides: v8 = %{v8_epoch}:%{v8_version}-%{nodejs_release}%{?dist}
@@ -459,7 +457,6 @@ export LDFLAGS="%{build_ldflags}"
            %{!?with_bundled_zlib:--shared-zlib} \
            --shared-brotli \
            %{!?with_bundled:--shared-libuv} \
-           %{!?with_bundled:%{nghttp2_configure}} \
            %{?with_bundled:--without-dtrace}%{!?with_bundled:--with-dtrace} \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
@@ -467,35 +464,6 @@ export LDFLAGS="%{build_ldflags}"
            --openssl-use-def-ca-store
 
 %make_build BUILDTYPE=Release
-
-# Extract the ICU data and convert it to the appropriate endianness
-pushd deps/
-tar xfz %SOURCE3
-
-pushd icu/source
-
-mkdir -p converted
-%if 0%{?little_endian}
-# The little endian data file is included in the ICU sources
-install -Dpm0644 data/in/icudt%{icu_major}l.dat converted/
-
-%else
-# For the time being, we need to build ICU and use the included `icupkg` tool
-# to convert the little endian data file into a big-endian one.
-# At some point in the future, ICU releases will start including both data
-# files and we should switch to those.
-mkdir -p data/out/tmp
-
-%configure
-%make_build
-
-icu_root=$(pwd)
-LD_LIBRARY_PATH=./lib ./bin/icupkg -tb data/in/icudt%{icu_major}l.dat \
-                                       converted/icudt%{icu_major}b.dat
-%endif
-
-popd # icu/source
-popd # deps
 
 
 %install
@@ -588,7 +556,11 @@ ln -s %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
 
 # Install the full-icu data files
 mkdir -p %{buildroot}%{icudatadir}
-install -Dpm0644 -t %{buildroot}%{icudatadir} deps/icu/source/converted/*
+%if 0%{?little_endian}
+unzip -d %{buildroot}%{icudatadir} %{SOURCE4} icudt%{icu_major}l.dat
+%else
+unzip -d %{buildroot}%{icudatadir} %{SOURCE3} icudt%{icu_major}b.dat
+%endif
 
 
 %check
@@ -706,6 +678,12 @@ end
 
 
 %changelog
+* Wed Apr 27 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.15.0-1
+- Update to Node.js 16.15.0
+- Stop carrying full ICU sources now that the binary data is available
+- Properly version the v8 virtual Provides
+- Bundle nghttp2
+
 * Mon Apr 04 2022 Jan Staněk <jstanek@redhat.com> - 16.14.1-2
 - Unify configure.py calls into single command
 - Refactor bootstrap-related parts

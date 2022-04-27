@@ -122,16 +122,15 @@ tar -zxf node-v${version}.tar.gz
 rm -rf node-v${version}/deps/openssl
 tar -zcf node-v${version}-stripped.tar.gz node-v${version}
 
-# Download the matching version of ICU
-rm -f icu4c*-src.tgz icu.md5
-ICUMD5=$(cat node-v${version}/tools/icu/current_ver.dep |jq -r '.[0].md5')
-wget $(cat node-v${version}/tools/icu/current_ver.dep |jq -r '.[0].url')
-ICUTARBALL=$(ls -1 icu4c*-src.tgz)
-echo "$ICUMD5  $ICUTARBALL" > icu.md5
-md5sum -c icu.md5
-rm -f icu.md5 SHASUMS256.txt
+ICU_MAJOR=$(jq -r '.[0].url' node-v16.15.0/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\1/g')
+ICU_MINOR=$(jq -r '.[0].url' node-v16.15.0/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\2/g')
 
-fedpkg new-sources node-v${version}-stripped.tar.gz icu4c*-src.tgz
+# Download the ICU binary data files
+rm -Rf icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
+wget $(grep Source3 nodejs.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
+wget $(grep Source4 nodejs.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
+
+fedpkg new-sources node-v${version}-stripped.tar.gz icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
 
 rm -f node-v${version}.tar.gz
 
@@ -176,7 +175,7 @@ grep "define NGHTTP2_VERSION " node-v${version}/deps/nghttp2/lib/includes/nghttp
 echo
 echo "ICU"
 echo "========================="
-grep "url" node-v${version}/tools/icu/current_ver.dep
+echo "${ICU_MAJOR}.${ICU_MINOR}"
 echo
 echo "punycode"
 echo "========================="
