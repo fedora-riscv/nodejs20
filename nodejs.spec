@@ -50,12 +50,12 @@
 # feature releases that are only supported for nine months, which is shorter
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
-%global nodejs_major 16
-%global nodejs_minor 15
+%global nodejs_major 18
+%global nodejs_minor 0
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
-%global nodejs_soversion 93
+%global nodejs_soversion 108
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 
@@ -65,10 +65,10 @@
 # v8 - from deps/v8/include/v8-version.h
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
-%global v8_major 9
-%global v8_minor 4
-%global v8_build 146
-%global v8_patch 24
+%global v8_major 10
+%global v8_minor 1
+%global v8_build 124
+%global v8_patch 8
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
@@ -89,7 +89,7 @@
 %global nghttp2_version 1.47.0
 
 # ICU - from tools/icu/current_ver.dep
-%global icu_major 70
+%global icu_major 71
 %global icu_minor 1
 %global icu_version %{icu_major}.%{icu_minor}
 
@@ -99,7 +99,8 @@
 
 
 # OpenSSL minimum version
-%global openssl_minimum 1:1.1.1
+%global openssl11_minimum 1:1.1.1
+%global openssl30_minimum 1:3.0.2
 
 # punycode - from lib/punycode.js
 # Note: this was merged into the mainline since 0.6.x
@@ -108,7 +109,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.5.5
+%global npm_version 8.6.0
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -201,14 +202,24 @@ Provides: bundled(nghttp2) = %{nghttp2_version}
 # provide releases for it.
 Provides: bundled(llhttp) = %{llhttp_version}
 
+
 %if 0%{?rhel} && 0%{?rhel} < 8
-BuildRequires: openssl11-devel >= %{openssl_minimum}
-Requires: openssl11 >= %{openssl_minimum}
+BuildRequires: openssl11-devel >= %{openssl11_minimum}
+Requires: openssl11 >= %{openssl11_minimum}
 %global ssl_configure --shared-openssl --shared-openssl-includes=%{_includedir}/openssl11 --shared-openssl-libpath=%{_libdir}/openssl11
 %else
-BuildRequires: openssl-devel >= %{openssl_minimum}
-Requires: openssl >= %{openssl_minimum}
-%global ssl_configure --shared-openssl
+
+%if 0%{?fedora} && 0%{?fedora} < 36
+BuildRequires: openssl >= %{openssl30_minimum}
+BuildRequires: openssl-devel >= %{openssl30_minimum}
+%global openssl_fips_configure --openssl-is-fips
+%else
+Requires: openssl >= %{openssl11_minimum}
+BuildRequires: openssl-devel >= %{openssl11_minimum}
+%global openssl_fips_configure %{nil}
+%endif
+
+%global ssl_configure --shared-openssl %{openssl_fips_configure}
 %endif
 
 # we need the system certificate store
@@ -678,151 +689,5 @@ end
 
 
 %changelog
-* Wed Apr 27 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.15.0-1
-- Update to Node.js 16.15.0
-- Stop carrying full ICU sources now that the binary data is available
-- Properly version the v8 virtual Provides
-- Bundle nghttp2
-
-* Mon Apr 04 2022 Jan Staněk <jstanek@redhat.com> - 16.14.1-2
-- Unify configure.py calls into single command
-- Refactor bootstrap-related parts
-- Decouple dependency bundling from bootstrapping
-
-* Thu Mar 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.1-1
-- Update to Node.js 16.14.1
-- Drop corepack
-
-* Thu Mar 03 2022 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:16.14.0-3
-- Build without corepack
-
-* Wed Feb 09 2022 Zuzana Svetlikova <zsvetlik@redhat.com> - 1:16.14.0-2
-- Replace explicit version of npm in %%check with variable and make build fail
-  if it doesn't match
-
-* Tue Feb 08 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.14.0-1
-- Update to Node.js 16.14.0
-
-* Thu Feb 03 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-8
-- Update npm to 8.3.1 (CVE-2021-43616)
-
-* Wed Feb 02 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-7
-- Fix incorrect version Provides: for npm (bz#2049873)
-
-* Mon Jan 31 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-6
-- Rebuild for more architectures
-
-* Mon Jan 31 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-5
-- Tweak some dependencies on EPEL 7 (bz2048589)
-- Add Provides: bundled(zlib)
-
-* Wed Jan 19 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-3
-- Bundle zlib on EPEL 7
-
-* Mon Jan 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-2
-- Add support for building on EPEL 7
-
-* Tue Jan 11 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.2-1
-- Improper handling of URI Subject Alternative Names (Medium)(CVE-2021-44531)
-- Certificate Verification Bypass via String Injection (Medium)(CVE-2021-44532)
-- Incorrect handling of certificate subject and issuer fields (Medium)(CVE-2021-44533)
-- Prototype pollution via `console.table` properties (Low)(CVE-2022-21824)
-
-* Thu Dec 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.1-2
-- Enable building for EPEL 8 modules
-
-* Thu Dec 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.1-1
-- Update to 16.13.1
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.13.1
-
-* Thu Nov 25 2021 Honza Horak <hhorak@redhat.com> - 1:16.13.0-3
-- Make sure binary node-gyp is executable
-  Resolves: #2026615
-
-* Mon Nov 01 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.13.0-1
-- Update to 16.13.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.13.0
-- Add support for epel8
-
-* Mon Oct 25 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.12.0-1
-- Update to 16.12.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.12.0
-
-* Wed Oct 13 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.11.1-1
-- Update to 16.11.1
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.11.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.11.1
-
-* Thu Sep 23 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.10.0-1
-- Update to 16.10.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.10.0
-
-* Tue Sep 14 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.9.1-4
-- Correct the bad merge of corepack fix
-
-* Tue Sep 14 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.9.1-3
-- Drop auto-dependency on PowerShell introduced by corepack
-
-* Tue Sep 14 2021 Sahana Prasad <sahana@redhat.com> - 1:16.9.1-2
-- Rebuilt with OpenSSL 3.0.0
-
-* Mon Sep 13 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.9.1-1
-- Update to 16.9.1
-- Add experimental 'corepack' tool
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.9.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.9.1
-
-* Tue Aug 31 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.8.0-1
-- Update to 16.8.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.8.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.7.0
-
-* Wed Aug 11 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.6.2-1
-- Update to 16.6.2
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.6.2
-
-* Tue Aug 03 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.6.1-1
-- Update to 16.6.1
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.6.1
-- Fixes v8 regression introduced in 16.6.0
-
-* Mon Aug 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.6.0-1
-- Update to 16.6.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.6.0
-
-* Thu Jul 22 2021 Fedora Release Engineering <releng@fedoraproject.org> - 1:16.5.0-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_35_Mass_Rebuild
-
-* Tue Jul 20 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.5.0-1
-- Update to 16.5.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.5.0
-
-* Fri Jul 02 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.1-2
-- Re-add support for v8 development headers
-
-* Thu Jul 01 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.1-1
-- Update to 16.4.1
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.4.1
-
-* Wed Jun 23 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.4.0-1
-- Update to 16.4.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.4.0
-
-* Fri Jun 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.3.0-1
-- Update to 16.3.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.3.0
-
-
-* Wed May 19 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.2.0-1
-- Update to 16.2.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.2.0
-- Fix changelog version numbers
-
-* Tue May 04 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.1.0-1
-- Update to 16.1.0
-- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V16.md#16.1.0
-- Drop upstreamed patch
-
-* Thu Apr 29 2021 Stephen Gallagher <sgallagh@redhat.com> - 1:16.0.0-1
-- First release of Node.js 16.x
-
+* Thu Apr 28 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.0.0-1
+- First release of Node.js 18.x
