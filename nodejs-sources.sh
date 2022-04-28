@@ -122,8 +122,8 @@ tar -zxf node-v${version}.tar.gz
 rm -rf node-v${version}/deps/openssl
 tar -zcf node-v${version}-stripped.tar.gz node-v${version}
 
-ICU_MAJOR=$(jq -r '.[0].url' node-v16.15.0/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\1/g')
-ICU_MINOR=$(jq -r '.[0].url' node-v16.15.0/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\2/g')
+ICU_MAJOR=$(jq -r '.[0].url' node-v${version}/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\1/g')
+ICU_MINOR=$(jq -r '.[0].url' node-v${version}/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\2/g')
 
 # Download the ICU binary data files
 rm -Rf icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
