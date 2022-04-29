@@ -209,7 +209,7 @@ Requires: openssl11 >= %{openssl11_minimum}
 %global ssl_configure --shared-openssl --shared-openssl-includes=%{_includedir}/openssl11 --shared-openssl-libpath=%{_libdir}/openssl11
 %else
 
-%if 0%{?fedora} && 0%{?fedora} < 36
+%if 0%{?fedora} >= 36
 BuildRequires: openssl >= %{openssl30_minimum}
 BuildRequires: openssl-devel >= %{openssl30_minimum}
 %global openssl_fips_configure --openssl-is-fips
