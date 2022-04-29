@@ -40,7 +40,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -303,6 +303,9 @@ Requires: nodejs-packaging
 %if %{without bundled}
 Requires: libuv-devel%{?_isa}
 %endif
+
+# Make it conflict with any other version of nodejs-devel
+Conflicts: %{name}-devel
 
 %description devel
 Development headers for the Node.js JavaScript runtime.
@@ -680,6 +683,10 @@ end
 
 
 %changelog
+* Fri Apr 29 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.15.0-2
+- Fix file conflicts.
+- Make dependency on nodejs-libs more strict.
+
 * Wed Apr 27 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:16.15.0-1
 - Update to Node.js 16.15.0
 - Stop carrying full ICU sources now that the binary data is available
