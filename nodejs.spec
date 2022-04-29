@@ -303,6 +303,7 @@ real-time applications that run across distributed devices.
 Summary: JavaScript runtime - development headers
 Group: Development/Languages
 Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Requires: openssl-devel%{?_isa}
 %if !%{with bundled_zlib}
 Requires: zlib-devel%{?_isa}
@@ -356,6 +357,7 @@ Epoch: %{v8_epoch}
 Version: %{v8_version}
 Release: %{v8_release}%{?dist}
 Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Conflicts: v8-314-devel
 
 %description -n v8-devel
