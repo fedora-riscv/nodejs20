@@ -40,7 +40,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 1
+%global baserelease 2
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -357,7 +357,7 @@ Epoch: %{v8_epoch}
 Version: %{v8_version}
 Release: %{v8_release}%{?dist}
 Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: %{name}-libs%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
 Conflicts: v8-314-devel
 
 %description -n v8-devel
@@ -691,7 +691,10 @@ end
 
 
 %changelog
-* Thu May 05 2022 Stephen Gallagher <sgallagh@redhat.com> - %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}-%{baserelease}
+* Fri May 06 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.1.0-2
+- Fix incorrect epoch in v8-devel dependency
+
+* Thu May 05 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.1.0-1
 - Update to Node.js 18.1.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.1.0
 
