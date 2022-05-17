@@ -40,7 +40,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 2
+%global baserelease 1
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -51,7 +51,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 18
-%global nodejs_minor 1
+%global nodejs_minor 2
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -80,7 +80,7 @@
 %global c_ares_version 1.18.1
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_version 6.0.4
+%global llhttp_version 6.0.6
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_version 1.43.0
@@ -109,7 +109,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.8.0
+%global npm_version 8.9.0
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -532,13 +532,13 @@ mkdir -p %{buildroot}%{_mandir} \
 
 cp -pr deps/npm/man/* %{buildroot}%{_mandir}/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/man
-ln -sf %{_mandir}  %{buildroot}%{_prefix}/lib/node_modules/npm/man
+ln -srf %{_mandir}  %{buildroot}%{_prefix}/lib/node_modules/npm/man
 
 # Install Gatsby HTML documentation to %%{_pkgdocdir}
 cp -pr deps/npm/docs %{buildroot}%{_pkgdocdir}/npm/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
-ln -sf %{_pkgdocdir}/npm %{buildroot}%{_prefix}/lib/node_modules/npm/docs
+ln -srf %{_pkgdocdir}/npm %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
 # Node tries to install some python files into a documentation directory
 # (and not the proper one). Remove them for now until we figure out what to
@@ -565,7 +565,7 @@ cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
 # NPM upstream expects it to be in /usr/etc/npmrc, so we'll put a symlink here
 # This is done in the interests of keeping /usr read-only.
 mkdir -p %{buildroot}%{_prefix}/etc
-ln -s %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
+ln -rs %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
 
 # Install the full-icu data files
 mkdir -p %{buildroot}%{icudatadir}
@@ -691,6 +691,10 @@ end
 
 
 %changelog
+* Tue May 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.2.0-1
+- Update to Node.js 18.2.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.2.0
+
 * Fri May 06 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.1.0-2
 - Fix incorrect epoch in v8-devel dependency
 

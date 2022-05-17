@@ -1,4 +1,4 @@
-From a1c35106e7e9ab3d4a01779079cf9788a2fe777a Mon Sep 17 00:00:00 2001
+From 9f8cd8f9ef8a9466e7d315cdf05fb24eab2678b8 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -9,15 +9,15 @@ still providing the normal executable.
 Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
 ---
- configure.py     |  7 +++++++
- tools/install.py | 21 +++++++++------------
- 2 files changed, 16 insertions(+), 12 deletions(-)
+ configure.py     | 7 +++++++
+ tools/install.py | 2 +-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/configure.py b/configure.py
-index 47137d8912dd1439962127a3c1f417eb78572021..c59037a39fcefdfe173d16a7aa9622a32a3c29e7 100755
+index 17ff53ef645493c8090e809b021e1127a07921cd..ad952f6a063d433a76065162baccdca2bab71fbf 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -731,10 +731,16 @@ parser.add_argument('--shared',
+@@ -727,10 +727,16 @@ parser.add_argument('--shared',
      dest='shared',
      default=None,
      help='compile shared library for embedding node in another project. ' +
@@ -34,7 +34,7 @@ index 47137d8912dd1439962127a3c1f417eb78572021..c59037a39fcefdfe173d16a7aa9622a3
      dest='without_v8_platform',
      default=False,
      help='do not initialize v8 platform during node.js startup. ' +
-@@ -1332,10 +1338,11 @@ def configure_node(o):
+@@ -1364,10 +1370,11 @@ def configure_node(o):
      o['variables']['debug_nghttp2'] = 'false'
  
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
@@ -47,45 +47,22 @@ index 47137d8912dd1439962127a3c1f417eb78572021..c59037a39fcefdfe173d16a7aa9622a3
      shlib_suffix = 'so'
    elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index eafcb19bf8b29f87c39b0fe7d3c3fd2d175a7b7b..71b5371578711fcc9a1b80069850f0b61bdfebe2 100755
+index 47e9d8bd7a1ae596a7c6e1d5917f538e81533726..c1afbbf0827ced2e166668e7932504687009bb9e 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -128,26 +128,23 @@ def subdir_files(path, dest, action):
-   for subdir, files_in_path in ret.items():
-     action(files_in_path, subdir + '/')
- 
- def files(action):
-   is_windows = sys.platform == 'win32'
--  output_file = 'node'
-   output_prefix = 'out/Release/'
-+  output_libprefix = output_prefix
- 
--  if 'false' == variables.get('node_shared'):
--    if is_windows:
--      output_file += '.exe'
-+  if is_windows:
-+    output_bin = 'node.exe'
-+    output_lib = 'node.dll'
-   else:
--    if is_windows:
--      output_file += '.dll'
--    else:
--      output_file = 'lib' + output_file + '.' + variables.get('shlib_suffix')
-+    output_bin = 'node'
-+    output_lib = 'libnode.' + variables.get('shlib_suffix')
- 
--  if 'false' == variables.get('node_shared'):
--    action([output_prefix + output_file], 'bin/' + output_file)
--  else:
--    action([output_prefix + output_file], 'lib/' + output_file)
-+  action([output_prefix + output_bin], 'bin/' + output_bin)
-+  if 'true' == variables.get('node_shared'):
-+    action([output_libprefix + output_lib], variables.get('libdir') + '/' + output_lib)
- 
+@@ -141,11 +141,11 @@ def files(action):
+     if is_windows:
+       action([output_prefix + 'libnode.dll'], 'bin/libnode.dll')
+       action([output_prefix + 'libnode.lib'], 'lib/libnode.lib')
+     else:
+       output_lib = 'libnode.' + variables.get('shlib_suffix')
+-      action([output_prefix + output_lib], 'lib/' + output_lib)
++      action([output_prefix + output_lib], variables.get('libdir') + '/' + output_lib)
    if 'true' == variables.get('node_use_dtrace'):
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
  
    # behave similarly for systemtap
+   action(['src/node.stp'], 'share/systemtap/tapset/')
 -- 
-2.34.1
+2.35.1
 
