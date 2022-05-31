@@ -126,11 +126,9 @@ wget http://nodejs.org/dist/v${version}/node-v${version}.tar.gz \
 sha256sum -c SHASUMS256.txt --ignore-missing
 tar -zxf node-v${version}.tar.gz
 
-# Exclude problematic OpenSSL bits
+# Remove bundled OpenSSL
 # We will link to the system version
-rm -rf node-v${version}/deps/openssl/demos node-v${version}/deps/openssl/test
-# Remove every file except the OpenSSL config files
-find node-v${version}/deps/openssl/ ! -name "*.cnf"  -type f  -exec rm -f {} \;
+rm -rf node-v${version}/deps/openssl
 tar -zcf node-v${version}-stripped.tar.gz node-v${version}
 
 ICU_MAJOR=$(jq -r '.[0].url' node-v${version}/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\1/g')

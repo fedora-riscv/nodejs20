@@ -1,25 +1,24 @@
-From 9f8cd8f9ef8a9466e7d315cdf05fb24eab2678b8 Mon Sep 17 00:00:00 2001
+From 6d789d036cf7d997b335d07f19b60c95577ea6e2 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH 2/2] Install both binaries and use libdir.
+Subject: [PATCH] Install both binaries and use libdir.
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.
 
 Signed-off-by: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+Signed-off-by: rpm-build <rpm-build>
 ---
  configure.py     | 7 +++++++
  tools/install.py | 2 +-
  2 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/configure.py b/configure.py
-index 17ff53ef645493c8090e809b021e1127a07921cd..ad952f6a063d433a76065162baccdca2bab71fbf 100755
+index 17ff53e..ad952f6 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -727,10 +727,16 @@ parser.add_argument('--shared',
-     dest='shared',
-     default=None,
+@@ -729,6 +729,12 @@ parser.add_argument('--shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -32,11 +31,7 @@ index 17ff53ef645493c8090e809b021e1127a07921cd..ad952f6a063d433a76065162baccdca2
  parser.add_argument('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-     default=False,
-     help='do not initialize v8 platform during node.js startup. ' +
-@@ -1364,10 +1370,11 @@ def configure_node(o):
-     o['variables']['debug_nghttp2'] = 'false'
- 
+@@ -1366,6 +1372,7 @@ def configure_node(o):
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
  
    o['variables']['node_shared'] = b(options.shared)
@@ -44,15 +39,11 @@ index 17ff53ef645493c8090e809b021e1127a07921cd..ad952f6a063d433a76065162baccdca2
    node_module_version = getmoduleversion.get_version()
  
    if options.dest_os == 'android':
-     shlib_suffix = 'so'
-   elif sys.platform == 'darwin':
 diff --git a/tools/install.py b/tools/install.py
-index 47e9d8bd7a1ae596a7c6e1d5917f538e81533726..c1afbbf0827ced2e166668e7932504687009bb9e 100755
+index 47e9d8b..c1afbbf 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -141,11 +141,11 @@ def files(action):
-     if is_windows:
-       action([output_prefix + 'libnode.dll'], 'bin/libnode.dll')
+@@ -143,7 +143,7 @@ def files(action):
        action([output_prefix + 'libnode.lib'], 'lib/libnode.lib')
      else:
        output_lib = 'libnode.' + variables.get('shlib_suffix')
@@ -61,8 +52,6 @@ index 47e9d8bd7a1ae596a7c6e1d5917f538e81533726..c1afbbf0827ced2e166668e793250468
    if 'true' == variables.get('node_use_dtrace'):
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
  
-   # behave similarly for systemtap
-   action(['src/node.stp'], 'share/systemtap/tapset/')
 -- 
-2.35.1
+2.36.1
 

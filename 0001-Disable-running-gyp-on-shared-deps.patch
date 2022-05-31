@@ -1,19 +1,19 @@
-From 221a54bccf0c373abe711553e5d5a1887c9650bf Mon Sep 17 00:00:00 2001
+From 3ac2a9a2ef115a3375162f2abfd26d5cf3f2ee98 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Fri, 17 Apr 2020 12:59:44 +0200
-Subject: [PATCH 1/2] Disable running gyp on shared deps
+Subject: [PATCH] Disable running gyp on shared deps
 
+Signed-off-by: rpm-build <rpm-build>
 ---
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile |  2 +-
+ node.gyp | 17 -----------------
+ 2 files changed, 1 insertion(+), 18 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 4aace77c7c8c63c652755b4e1d03be51eb53131e..0bad86420d64762f2df225aa2e070befd5801612 100644
+index 4aace77..0bad864 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -145,11 +145,11 @@ endif
- .PHONY: test-code-cache
- with-code-cache test-code-cache:
+@@ -147,7 +147,7 @@ with-code-cache test-code-cache:
  	$(warning '$@' target is a noop)
  
  out/Makefile: config.gypi common.gypi node.gyp \
@@ -22,8 +22,34 @@ index 4aace77c7c8c63c652755b4e1d03be51eb53131e..0bad86420d64762f2df225aa2e070bef
  	tools/v8_gypfiles/toolchain.gypi tools/v8_gypfiles/features.gypi \
  	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
  	$(PYTHON) tools/gyp_node.py -f make
- 
- # node_version.h is listed because the N-API version is taken from there
+diff --git a/node.gyp b/node.gyp
+index 86fe9a6..bfa5093 100644
+--- a/node.gyp
++++ b/node.gyp
+@@ -449,23 +449,6 @@
+               ],
+             },
+           ],
+-         }, {
+-           'variables': {
+-              'opensslconfig_internal': '<(obj_dir)/deps/openssl/openssl.cnf',
+-              'opensslconfig': './deps/openssl/openssl/apps/openssl.cnf',
+-           },
+-           'actions': [
+-             {
+-               'action_name': 'reset_openssl_cnf',
+-               'inputs': [ '<(opensslconfig)', ],
+-               'outputs': [ '<(opensslconfig_internal)', ],
+-               'action': [
+-                 'python', 'tools/copyfile.py',
+-                 './deps/openssl/openssl/apps/openssl.cnf',
+-                 '<(obj_dir)/deps/openssl/openssl.cnf',
+-               ],
+-             },
+-           ],
+          }],
+       ],
+     }, # node_core_target_name
 -- 
-2.35.1
+2.36.1
 
