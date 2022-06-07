@@ -1,7 +1,7 @@
-From 3ac2a9a2ef115a3375162f2abfd26d5cf3f2ee98 Mon Sep 17 00:00:00 2001
+From 39ca2cee62be0561438f8b422662304458e0d16f Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Fri, 17 Apr 2020 12:59:44 +0200
-Subject: [PATCH] Disable running gyp on shared deps
+Subject: [PATCH 1/2] Disable running gyp on shared deps
 
 Signed-off-by: rpm-build <rpm-build>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: rpm-build <rpm-build>
  2 files changed, 1 insertion(+), 18 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 4aace77..0bad864 100644
+index 9f7ab7129d06471760c707a4bf7764cb2bdff862..78f91cf7f57b0de32961b1d491edf28a4ad375d2 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -147,7 +147,7 @@ with-code-cache test-code-cache:
@@ -23,10 +23,10 @@ index 4aace77..0bad864 100644
  	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
  	$(PYTHON) tools/gyp_node.py -f make
 diff --git a/node.gyp b/node.gyp
-index 86fe9a6..bfa5093 100644
+index 103178e2ee9a45c436cf630e17025593cf5aaa78..90ae593ca2c153091044674c77e026cad1370ccf 100644
 --- a/node.gyp
 +++ b/node.gyp
-@@ -449,23 +449,6 @@
+@@ -423,23 +423,6 @@
                ],
              },
            ],
@@ -51,5 +51,5 @@ index 86fe9a6..bfa5093 100644
        ],
      }, # node_core_target_name
 -- 
-2.36.1
+2.35.1
 

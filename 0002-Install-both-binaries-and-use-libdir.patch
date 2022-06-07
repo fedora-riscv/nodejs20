@@ -1,7 +1,7 @@
-From 6d789d036cf7d997b335d07f19b60c95577ea6e2 Mon Sep 17 00:00:00 2001
+From b8aad880b037f42d1f5f26e91277dc58f377d01c Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
-Subject: [PATCH] Install both binaries and use libdir.
+Subject: [PATCH 2/2] Install both binaries and use libdir.
 
 This allows us to build with a shared library for other users while
 still providing the normal executable.
@@ -15,7 +15,7 @@ Signed-off-by: rpm-build <rpm-build>
  2 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/configure.py b/configure.py
-index 17ff53e..ad952f6 100755
+index 187c381660b369bf4d6f9ce7bfddcf23c5b6c46a..3b948a0ffac6653aad12dfb5565ac703adba5f2a 100755
 --- a/configure.py
 +++ b/configure.py
 @@ -729,6 +729,12 @@ parser.add_argument('--shared',
@@ -40,7 +40,7 @@ index 17ff53e..ad952f6 100755
  
    if options.dest_os == 'android':
 diff --git a/tools/install.py b/tools/install.py
-index 47e9d8b..c1afbbf 100755
+index 47e9d8bd7a1ae596a7c6e1d5917f538e81533726..c1afbbf0827ced2e166668e7932504687009bb9e 100755
 --- a/tools/install.py
 +++ b/tools/install.py
 @@ -143,7 +143,7 @@ def files(action):
@@ -53,5 +53,5 @@ index 47e9d8b..c1afbbf 100755
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
  
 -- 
-2.36.1
+2.35.1
 

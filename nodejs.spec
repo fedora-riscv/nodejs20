@@ -51,7 +51,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 18
-%global nodejs_minor 2
+%global nodejs_minor 3
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -66,9 +66,9 @@
 # Epoch is set to ensure clean upgrades from the old v8 package
 %global v8_epoch 2
 %global v8_major 10
-%global v8_minor 1
-%global v8_build 124
-%global v8_patch 8
+%global v8_minor 2
+%global v8_build 154
+%global v8_patch 4
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
@@ -109,7 +109,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.9.0
+%global npm_version 8.11.0
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -691,6 +691,10 @@ end
 
 
 %changelog
+* Tue Jun 07 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.3.0-1
+- Update to Node.js 18.3.0
+- https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.3.0
+
 * Tue May 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.2.0-1
 - Update to Node.js 18.2.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.2.0
