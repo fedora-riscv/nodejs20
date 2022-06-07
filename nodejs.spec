@@ -708,3 +708,4 @@ end
 
 * Thu Apr 28 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.0.0-1
 - First release of Node.js 18.x
+
