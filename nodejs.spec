@@ -523,6 +523,10 @@ rm -f %{buildroot}%{_pkgdocdir}/html/nodejs.1
 mkdir -p %{buildroot}%{_datadir}/node
 cp -p common.gypi %{buildroot}%{_datadir}/node
 
+# The config.gypi file is platform-dependent, so rename it to not conflict
+mv %{buildroot}%{_includedir}/node/config.gypi \
+   %{buildroot}%{_includedir}/node/config-%{_arch}.gypi
+
 # Install the GDB init tool into the documentation directory
 mv %{buildroot}/%{_datadir}/doc/node/gdbinit %{buildroot}/%{_pkgdocdir}/gdbinit
 
@@ -694,6 +698,9 @@ end
 * Fri Jun 17 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.4.0-1
 - Update to Node.js 18.4.0
 - https://github.com/nodejs/node/blob/master/doc/changelogs/CHANGELOG_V18.md#18.4.0
+
+* Thu Jun 09 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.3.0-2
+- Fix conflict between x86_64 and i686 installs of nodejs-devel
 
 * Tue Jun 07 2022 Stephen Gallagher <sgallagh@redhat.com> - 1:18.3.0-1
 - Update to Node.js 18.3.0
