@@ -1,4 +1,4 @@
-From 649a983dc168ff0f7a7157e0e9f5da5cf146837c Mon Sep 17 00:00:00 2001
+From 19844592f46490cd7cff5f58aca73a64a992fb42 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -15,10 +15,10 @@ Signed-off-by: rpm-build <rpm-build>
  2 files changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/configure.py b/configure.py
-index 187c381660b369bf4d6f9ce7bfddcf23c5b6c46a..3b948a0ffac6653aad12dfb5565ac703adba5f2a 100755
+index e53a83f332ffd60cf7b6fe7e079470a52a43a8de..efdda6afce33201976e3811907bf4d7e3c2d4302 100755
 --- a/configure.py
 +++ b/configure.py
-@@ -729,6 +729,12 @@ parser.add_argument('--shared',
+@@ -735,6 +735,12 @@ parser.add_argument('--shared',
      help='compile shared library for embedding node in another project. ' +
           '(This mode is not officially supported for regular applications)')
  
@@ -31,7 +31,7 @@ index 187c381660b369bf4d6f9ce7bfddcf23c5b6c46a..3b948a0ffac6653aad12dfb5565ac703
  parser.add_argument('--without-v8-platform',
      action='store_true',
      dest='without_v8_platform',
-@@ -1366,6 +1372,7 @@ def configure_node(o):
+@@ -1372,6 +1378,7 @@ def configure_node(o):
    o['variables']['node_no_browser_globals'] = b(options.no_browser_globals)
  
    o['variables']['node_shared'] = b(options.shared)
@@ -53,5 +53,5 @@ index 47e9d8bd7a1ae596a7c6e1d5917f538e81533726..c1afbbf0827ced2e166668e793250468
      action(['out/Release/node.d'], 'lib/dtrace/node.d')
  
 -- 
-2.35.1
+2.36.1
 

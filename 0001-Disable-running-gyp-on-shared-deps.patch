@@ -1,4 +1,4 @@
-From b9f76742bb9120ec9ee84dd5833eaf885be8766a Mon Sep 17 00:00:00 2001
+From 5f4369b4448337c034067744711b02a496cb3d39 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Fri, 17 Apr 2020 12:59:44 +0200
 Subject: [PATCH 1/2] Disable running gyp on shared deps
@@ -23,7 +23,7 @@ index 9f7ab7129d06471760c707a4bf7764cb2bdff862..78f91cf7f57b0de32961b1d491edf28a
  	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
  	$(PYTHON) tools/gyp_node.py -f make
 diff --git a/node.gyp b/node.gyp
-index 103178e2ee9a45c436cf630e17025593cf5aaa78..90ae593ca2c153091044674c77e026cad1370ccf 100644
+index 340ffc27ade9f73c1a5b4121bd9184a1fc3976a9..dfed3734eb52936c6e56ae6df533ca94150c7f69 100644
 --- a/node.gyp
 +++ b/node.gyp
 @@ -423,23 +423,6 @@
@@ -33,7 +33,7 @@ index 103178e2ee9a45c436cf630e17025593cf5aaa78..90ae593ca2c153091044674c77e026ca
 -         }, {
 -           'variables': {
 -              'opensslconfig_internal': '<(obj_dir)/deps/openssl/openssl.cnf',
--              'opensslconfig': './deps/openssl/openssl/apps/openssl.cnf',
+-              'opensslconfig': './deps/openssl/nodejs-openssl.cnf',
 -           },
 -           'actions': [
 -             {
@@ -42,8 +42,8 @@ index 103178e2ee9a45c436cf630e17025593cf5aaa78..90ae593ca2c153091044674c77e026ca
 -               'outputs': [ '<(opensslconfig_internal)', ],
 -               'action': [
 -                 'python', 'tools/copyfile.py',
--                 './deps/openssl/openssl/apps/openssl.cnf',
--                 '<(obj_dir)/deps/openssl/openssl.cnf',
+-                 '<(opensslconfig)',
+-                 '<(opensslconfig_internal)',
 -               ],
 -             },
 -           ],
@@ -51,5 +51,5 @@ index 103178e2ee9a45c436cf630e17025593cf5aaa78..90ae593ca2c153091044674c77e026ca
        ],
      }, # node_core_target_name
 -- 
-2.35.1
+2.36.1
 

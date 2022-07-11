@@ -40,7 +40,7 @@
 # This is used by both the nodejs package and the npm subpackage that
 # has a separate version - the name is special so that rpmdev-bumpspec
 # will bump this rather than adding .1 to the end.
-%global baserelease 4
+%global baserelease %autorelease
 
 %{?!_pkgdocdir:%global _pkgdocdir %{_docdir}/%{name}-%{version}}
 
@@ -51,7 +51,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 18
-%global nodejs_minor 4
+%global nodejs_minor 5
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -80,7 +80,7 @@
 %global c_ares_version 1.18.1
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_version 6.0.6
+%global llhttp_version 6.0.7
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_version 1.43.0
@@ -126,7 +126,7 @@
 Name: nodejs
 Epoch: %{nodejs_epoch}
 Version: %{nodejs_version}
-Release: %{nodejs_release}%{?dist}
+Release: %{nodejs_release}
 Summary: JavaScript runtime
 License: MIT and ASL 2.0 and ISC and BSD
 Group: Development/Languages
@@ -286,9 +286,9 @@ Requires: (nodejs-packaging if rpm-build)
 
 # Make sure we keep NPM up to date when we update Node.js
 %if 0%{?fedora} || 0%{?rhel} >= 8
-Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+Recommends: npm >= %{npm_epoch}:%{npm_version}-%{npm_release}
 %endif
-Conflicts: npm < %{npm_epoch}:%{npm_version}-%{npm_release}%{?dist}
+Conflicts: npm < %{npm_epoch}:%{npm_version}-%{npm_release}
 
 
 %description
@@ -302,8 +302,8 @@ real-time applications that run across distributed devices.
 %package devel
 Summary: JavaScript runtime - development headers
 Group: Development/Languages
-Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-Requires: %{name}-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: %{name}%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}
+Requires: %{name}-libs%{?_isa} = %{epoch}:%{nodejs_version}-%{nodejs_release}
 Requires: openssl-devel%{?_isa}
 %if !%{with bundled_zlib}
 Requires: zlib-devel%{?_isa}
@@ -334,8 +334,8 @@ Provides: libv8_libbase.so.%{v8_major} = %{v8_epoch}:%{v8_version}
 Provides: libv8_libplatform.so.%{v8_major} = %{v8_epoch}:%{v8_version}
 %endif
 
-Provides: v8 = %{v8_epoch}:%{v8_version}-%{nodejs_release}%{?dist}
-Provides: v8%{?_isa} = %{v8_epoch}:%{v8_version}-%{nodejs_release}%{?dist}
+Provides: v8 = %{v8_epoch}:%{v8_version}-%{nodejs_release}
+Provides: v8%{?_isa} = %{v8_epoch}:%{v8_version}-%{nodejs_release}
 Obsoletes: v8 < 1:6.7.17-10
 
 %description libs
@@ -344,7 +344,7 @@ Libraries to support Node.js and provide stable v8 interfaces.
 
 %package full-i18n
 Summary: Non-English locale data for Node.js
-Requires: %{name}%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: %{name}%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
 
 %description full-i18n
 Optional data files to provide full-icu support for Node.js. Remove this
@@ -355,9 +355,9 @@ package to save space if non-English locales are not needed.
 Summary: v8 - development headers
 Epoch: %{v8_epoch}
 Version: %{v8_version}
-Release: %{v8_release}%{?dist}
-Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-Requires: %{name}-libs%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Release: %{v8_release}
+Requires: %{name}-devel%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
+Requires: %{name}-libs%{?_isa} = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
 Conflicts: v8-314-devel
 
 %description -n v8-devel
@@ -368,15 +368,15 @@ Development headers for the v8 runtime.
 Summary: Node.js Package Manager
 Epoch: %{npm_epoch}
 Version: %{npm_version}
-Release: %{npm_release}%{?dist}
+Release: %{npm_release}
 
 # We used to ship npm separately, but it is so tightly integrated with Node.js
 # (and expected to be present on all Node.js systems) that we ship it bundled
 # now.
 Obsoletes: npm < 0:3.5.4-6
-Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Requires: nodejs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
 %if 0%{?fedora} || 0%{?rhel} >= 8
-Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Recommends: nodejs-docs = %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
 %endif
 
 # Do not add epoch to the virtual NPM provides or it will break
@@ -396,8 +396,8 @@ BuildArch: noarch
 # We don't require that the main package be installed to
 # use the docs, but if it is installed, make sure the
 # version always matches
-Conflicts: %{name} > %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
-Conflicts: %{name} < %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}%{?dist}
+Conflicts: %{name} > %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
+Conflicts: %{name} < %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
 
 %description docs
 The API documentation for the Node.js JavaScript runtime.
