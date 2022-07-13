@@ -51,7 +51,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 18
-%global nodejs_minor 5
+%global nodejs_minor 6
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -68,7 +68,7 @@
 %global v8_major 10
 %global v8_minor 2
 %global v8_build 154
-%global v8_patch 4
+%global v8_patch 13
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
@@ -109,7 +109,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.12.1
+%global npm_version 8.13.2
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -184,6 +184,7 @@ BuildRequires: jq
 BuildRequires: nodejs-packaging
 BuildRequires: chrpath
 BuildRequires: libatomic
+BuildRequires: ninja-build
 BuildRequires: systemtap-sdt-devel
 BuildRequires: unzip
 
@@ -439,11 +440,9 @@ find . -type f -exec sed -i "s~python -c~python3 -c~" {} \;
 %define _lto_cflags %{nil}
 %endif
 
-%ifarch s390 s390x %{arm} %ix86
 # Decrease debuginfo verbosity to reduce memory consumption during final
 # library linking
 %global optflags %(echo %{optflags} | sed 's/-g /-g1 /')
-%endif
 
 export CC='%{__cc}'
 export CXX='%{__cxx}'
@@ -454,16 +453,24 @@ export NODE_GYP_FORCE_PYTHON=%{__python3}
 # build with debugging symbols and add defines from libuv (#892601)
 # Node's v8 breaks with GCC 6 because of incorrect usage of methods on
 # NULL objects. We need to pass -fno-delete-null-pointer-checks
+# 2022-07-14: There's a bug in either torque or gcc that causes a
+# segmentation fault on ppc64le and s390x if compiled with -O2. Things
+# run fine on -O1 and -O3, so we'll just go with -O3 (like upstream)
+# while this gets sorted out.
 extra_cflags=(
     -D_LARGEFILE_SOURCE
     -D_FILE_OFFSET_BITS=64
     -DZLIB_CONST
     -fno-delete-null-pointer-checks
+    -O3
 )
 export CFLAGS="%{optflags} ${extra_cflags[*]}" CXXFLAGS="%{optflags} ${extra_cflags[*]}"
 export LDFLAGS="%{build_ldflags}"
 
-%{__python3} configure.py --prefix=%{_prefix} \
+%{__python3} configure.py \
+           --ninja \
+           --enable-lto \
+           --prefix=%{_prefix} \
            --shared \
            --libdir=%{_lib} \
            %{ssl_configure} \
@@ -474,15 +481,17 @@ export LDFLAGS="%{build_ldflags}"
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
            --without-corepack \
-           --openssl-use-def-ca-store \
-           --enable-lto
+           --openssl-use-def-ca-store
 
-%make_build BUILDTYPE=Release
+%ninja_build -C out/Release
 
 
 %install
 rm -rf %{buildroot}
 
+# The ninja build does not put the shared library in the expected location, so
+# we will move it.
+mv out/Release/lib/libnode.so.%{nodejs_soversion} out/Release/
 ./tools/install.py install %{buildroot} %{_prefix}
 
 # Set the binary permissions properly
@@ -681,6 +690,7 @@ end
 %doc %{_mandir}/man7/developers.7*
 %doc %{_mandir}/man7/orgs.7*
 %doc %{_mandir}/man7/logging.7*
+%doc %{_mandir}/man7/package-spec.7*
 %doc %{_mandir}/man7/registry.7*
 %doc %{_mandir}/man7/removal.7*
 %doc %{_mandir}/man7/scope.7*
