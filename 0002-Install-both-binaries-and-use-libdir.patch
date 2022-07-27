@@ -1,4 +1,4 @@
-From 19844592f46490cd7cff5f58aca73a64a992fb42 Mon Sep 17 00:00:00 2001
+From 2fffabf30b24a7237c17a57704a8e99d425e98f5 Mon Sep 17 00:00:00 2001
 From: Elliott Sales de Andrade <quantum.analyst@gmail.com>
 Date: Tue, 19 Mar 2019 23:22:40 -0400
 Subject: [PATCH 2/2] Install both binaries and use libdir.
@@ -40,11 +40,11 @@ index e53a83f332ffd60cf7b6fe7e079470a52a43a8de..efdda6afce33201976e3811907bf4d7e
  
    if options.dest_os == 'android':
 diff --git a/tools/install.py b/tools/install.py
-index 47e9d8bd7a1ae596a7c6e1d5917f538e81533726..c1afbbf0827ced2e166668e7932504687009bb9e 100755
+index 5793b581f774db9e2c06495792eb35a3c2f34047..fe16c2bd1f4890919908c7e508451891fce86d0c 100755
 --- a/tools/install.py
 +++ b/tools/install.py
-@@ -143,7 +143,7 @@ def files(action):
-       action([output_prefix + 'libnode.lib'], 'lib/libnode.lib')
+@@ -176,7 +176,7 @@ def files(action):
+       try_symlink(so_name, link_path)
      else:
        output_lib = 'libnode.' + variables.get('shlib_suffix')
 -      action([output_prefix + output_lib], 'lib/' + output_lib)

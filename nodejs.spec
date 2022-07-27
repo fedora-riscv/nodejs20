@@ -28,6 +28,7 @@
 %bcond_with bundled_zlib
 %endif
 
+%bcond npm 1
 
 # LTO is currently broken on Node.js builds
 %define _lto_cflags %{nil}
@@ -51,7 +52,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 18
-%global nodejs_minor 6
+%global nodejs_minor 7
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -109,7 +110,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.13.2
+%global npm_version 8.15.0
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -364,7 +365,7 @@ Conflicts: v8-314-devel
 %description -n v8-devel
 Development headers for the v8 runtime.
 
-
+%if %{with npm}
 %package -n npm
 Summary: Node.js Package Manager
 Epoch: %{npm_epoch}
@@ -387,6 +388,7 @@ Provides: npm(npm) = %{npm_version}
 %description -n npm
 npm is a package manager for node.js. You can use it to install and publish
 your node programs. It manages dependencies and does other cool stuff.
+%endif
 
 
 %package docs
@@ -481,6 +483,7 @@ export LDFLAGS="%{build_ldflags}"
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
            --without-corepack \
+           %{!?with_npm:--without-npm} \
            --openssl-use-def-ca-store
 
 %ninja_build -C out/Release
@@ -540,6 +543,8 @@ mv %{buildroot}%{_includedir}/node/config.gypi \
 # Install the GDB init tool into the documentation directory
 mv %{buildroot}/%{_datadir}/doc/node/gdbinit %{buildroot}/%{_pkgdocdir}/gdbinit
 
+
+%if %{with npm}
 # install NPM docs to mandir
 mkdir -p %{buildroot}%{_mandir} \
          %{buildroot}%{_pkgdocdir}/npm
@@ -548,11 +553,13 @@ cp -pr deps/npm/man/* %{buildroot}%{_mandir}/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/man
 ln -srf %{_mandir}  %{buildroot}%{_prefix}/lib/node_modules/npm/man
 
+
 # Install Gatsby HTML documentation to %%{_pkgdocdir}
 cp -pr deps/npm/docs %{buildroot}%{_pkgdocdir}/npm/
 rm -rf %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 
 ln -srf %{_pkgdocdir}/npm %{buildroot}%{_prefix}/lib/node_modules/npm/docs
+%endif
 
 # Node tries to install some python files into a documentation directory
 # (and not the proper one). Remove them for now until we figure out what to
@@ -560,6 +567,8 @@ ln -srf %{_pkgdocdir}/npm %{buildroot}%{_prefix}/lib/node_modules/npm/docs
 rm -f %{buildroot}/%{_defaultdocdir}/node/lldb_commands.py \
       %{buildroot}/%{_defaultdocdir}/node/lldbinit
 
+
+%if %{with npm}
 # Some NPM bundled deps are executable but should not be. This causes
 # unnecessary automatic dependencies to be added. Make them not executable.
 # Skip the npm bin directory or the npm binary will not work.
@@ -580,6 +589,7 @@ cp %{SOURCE1} %{buildroot}%{_sysconfdir}/npmrc
 # This is done in the interests of keeping /usr read-only.
 mkdir -p %{buildroot}%{_prefix}/etc
 ln -rs %{_sysconfdir}/npmrc %{buildroot}%{_prefix}/etc/npmrc
+%endif
 
 # Install the full-icu data files
 mkdir -p %{buildroot}%{icudatadir}
@@ -599,8 +609,10 @@ LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(
 # Ensure we have punycode and that the version matches
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node -e "require(\"assert\").equal(require(\"punycode\").version, '%{punycode_version}')"
 
+%if %{with npm}
 # Ensure we have npm and that the version matches
 LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}%{_bindir}/node %{buildroot}%{_bindir}/npm version --json |jq -e '.npm == "%{npm_version}"'
+%endif
 
 # Make sure i18n support is working
 NODE_PATH=%{buildroot}%{_prefix}/lib/node_modules:%{buildroot}%{_prefix}/lib/node_modules/npm/node_modules LD_LIBRARY_PATH=%{buildroot}%{_libdir} %{buildroot}/%{_bindir}/node --icu-data-dir=%{buildroot}%{icudatadir} %{SOURCE2}
@@ -671,6 +683,7 @@ end
 %{_libdir}/libv8_libplatform.so
 
 
+%if %{with npm}
 %files -n npm
 %{_bindir}/npm
 %{_bindir}/npx
@@ -696,13 +709,17 @@ end
 %doc %{_mandir}/man7/scope.7*
 %doc %{_mandir}/man7/scripts.7*
 %doc %{_mandir}/man7/workspaces.7*
+%endif
 
 
 %files docs
 %doc doc
 %dir %{_pkgdocdir}
 %{_pkgdocdir}/html
+
+%if %{with npm}
 %{_pkgdocdir}/npm/docs
+%endif
 
 
 %changelog
