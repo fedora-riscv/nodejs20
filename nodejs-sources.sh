@@ -114,8 +114,10 @@ echo $_arg_version
 if [ x$_arg_version != x ]; then
     version=$_arg_version
 else
-    version=$(rpm -q --specfile --qf='%{version}\n' nodejs.spec | head -n1)
+    version=$(rpm -q --specfile --qf='%{version}\n' nodejs*.spec | head -n1)
 fi
+
+NODE_MAJOR=$(echo $version | cut -d. -f1)
 
 rm -rf node-v${version}.tar.gz \
        node-v${version}-stripped.tar.gz \
@@ -137,8 +139,8 @@ ICU_MINOR=$(jq -r '.[0].url' node-v${version}/tools/icu/current_ver.dep | sed --
 
 # Download the ICU binary data files
 rm -Rf icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
-wget $(grep Source3 nodejs.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
-wget $(grep Source4 nodejs.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
+wget $(grep Source3 nodejs${NODE_MAJOR}.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
+wget $(grep Source4 nodejs${NODE_MAJOR}.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
 
 fedpkg new-sources node-v${version}-stripped.tar.gz icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
 
