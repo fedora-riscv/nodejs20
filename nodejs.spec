@@ -140,6 +140,26 @@ Source3: https://github.com/unicode-org/icu/releases/download/release-%{icu_majo
 Source4: https://github.com/unicode-org/icu/releases/download/release-%{icu_major}-%{icu_minor}/icu4c-%{icu_major}_%{icu_minor}-data-bin-l.zip
 Source100: nodejs-sources.sh
 
+# These are full sources for dependencies included as WASM blobs in the source of Node itself.
+# Note: These sources would also include pre-compiled WASM blobs… so they are adjusted not to.
+# Recipes for creating these blobs are included in the sources.
+
+# Version: jq '.version' deps/cjs-module-lexer/package.json
+# Original: https://github.com/nodejs/cjs-module-lexer/archive/refs/tags/1.2.2.tar.gz
+# Adjustments: rm -f cjs-module-lexer-1.2.2/lib/lexer.wasm
+Source101: cjs-module-lexer-1.2.2.tar.gz
+# The WASM blob was made using wasi-sdk v11; compiler libraries are linked in.
+# Version source: Makefile
+Source102: https://github.com/WebAssembly/wasi-sdk/archive/wasi-sdk-11/wasi-sdk-wasi-sdk-11.tar.gz
+
+# Version: jq '.version' deps/undici/src/package.json
+# Original: https://github.com/nodejs/undici/archive/refs/tags/v5.11.0.tar.gz
+# Adjustments: rm -f undici-5.11.0/lib/llhttp/llhttp*.wasm*
+Source111: undici-5.11.0.tar.gz
+# The WASM blob was made using wasi-sdk v14; compiler libraries are linked in.
+# Version source: build/Dockerfile
+Source112: https://github.com/WebAssembly/wasi-sdk/archive/wasi-sdk-14/wasi-sdk-wasi-sdk-14.tar.gz
+
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
