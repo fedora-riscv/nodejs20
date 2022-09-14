@@ -52,7 +52,7 @@
 # than a Fedora release lifecycle.
 %global nodejs_epoch 1
 %global nodejs_major 18
-%global nodejs_minor 7
+%global nodejs_minor 9
 %global nodejs_patch 0
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
@@ -69,7 +69,7 @@
 %global v8_major 10
 %global v8_minor 2
 %global v8_build 154
-%global v8_patch 13
+%global v8_patch 15
 %global v8_version %{v8_major}.%{v8_minor}.%{v8_build}.%{v8_patch}
 %global v8_release %{nodejs_epoch}.%{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}.%{nodejs_release}
 
@@ -81,7 +81,7 @@
 %global c_ares_version 1.18.1
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_version 6.0.7
+%global llhttp_version 6.0.9
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_version 1.43.0
@@ -110,7 +110,7 @@
 
 # npm - from deps/npm/package.json
 %global npm_epoch 1
-%global npm_version 8.15.0
+%global npm_version 8.19.1
 
 # In order to avoid needing to keep incrementing the release version for the
 # main package forever, we will just construct one for npm that is guaranteed
@@ -154,8 +154,8 @@ Source7: nodejs_native.attr
 # Disable running gyp on bundled deps we don't use
 Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 
-# Patch to install both node and libnode.so, using the correct libdir
-Patch2: 0002-Install-both-binaries-and-use-libdir.patch
+# Fix upstream merge error
+Patch2: 0002-build-fix-bad-upstream-merge.patch
 
 BuildRequires: make
 BuildRequires: python%{python3_pkgversion}-devel
