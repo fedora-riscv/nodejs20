@@ -53,7 +53,7 @@
 %global nodejs_epoch 1
 %global nodejs_major 18
 %global nodejs_minor 9
-%global nodejs_patch 0
+%global nodejs_patch 1
 %global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 108
