@@ -81,7 +81,7 @@
 %global c_ares_version 1.18.1
 
 # llhttp - from deps/llhttp/include/llhttp.h
-%global llhttp_version 6.0.9
+%global llhttp_version 6.0.10
 
 # libuv - from deps/uv/include/uv/version.h
 %global libuv_version 1.43.0

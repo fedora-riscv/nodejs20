@@ -124,6 +124,7 @@ rm -rf node-v${version}.tar.gz \
 wget http://nodejs.org/dist/v${version}/node-v${version}.tar.gz \
      http://nodejs.org/dist/v${version}/SHASUMS256.txt
 sha256sum -c SHASUMS256.txt --ignore-missing
+rm -f SHASUMS256.txt
 tar -zxf node-v${version}.tar.gz
 
 # Remove bundled OpenSSL
