@@ -121,6 +121,8 @@
 
 %global npm_envr %{npm_epoch}:%{npm_version}-%{npm_release}
 
+%global npm_obsoletes 1:8.19.2-1.18.12.1.3
+
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_version 0.0.13
 
@@ -425,6 +427,9 @@ Provides: npm(npm) = %{npm_version}
 
 # Satisfy dependency requests for "npm"
 Provides: npm = %{npm_envr}
+
+# Obsolete the old 'npm' package
+Obsoletes: npm < %{npm_obsoletes}
 
 
 %description -n %{pkgname}-npm
