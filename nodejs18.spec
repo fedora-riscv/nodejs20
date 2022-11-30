@@ -128,13 +128,6 @@
 %global histogram_version 0.9.7
 
 
-%if 0%{?nodejs_default}
-%global pkgname nodejs
-%else
-%global pkgname nodejs%{nodejs_major}
-%endif
-
-
 Name: nodejs%{nodejs_major}
 Epoch: %{nodejs_epoch}
 Version: %{nodejs_version}
