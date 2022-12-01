@@ -441,12 +441,7 @@ your node programs. It manages dependencies and does other cool stuff.
 Summary: Node.js API documentation
 Group: Documentation
 BuildArch: noarch
-
-# We don't require that the main package be installed to
-# use the docs, but if it is installed, make sure the
-# version always matches
-Conflicts: %{pkgname} > %{nodejs_envr}
-Conflicts: %{pkgname} < %{nodejs_envr}
+Requires(meta): %{pkgname} = %{nodejs_envr}
 
 Provides: nodejs-docs = %{nodejs_envr}
 
