@@ -422,6 +422,22 @@ rm -rf deps/brotli
 rm -rf deps/v8/third_party/jinja2
 rm -rf tools/inspector_protocol/jinja2
 
+# check for correct versions of dependencies we are bundling
+check_wasm_dep() {
+  local -r name="$1" source="$2" packagejson="$3"
+  local -r expected_version="$(jq -r '.version' "${packagejson}")"
+
+  if ls "${source}"|grep -q --fixed-strings "${expected_version}"; then
+    printf '%s version matches\n' "${name}" >&2
+  else
+    printf '%s version MISMATCH: %s !~ %s\n' "${name}" "${expected_version}" "${source}" >&2
+    return 1
+  fi
+}
+
+check_wasm_dep cjs-module-lexer '%{SOURCE101}' deps/cjs-module-lexer/package.json
+check_wasm_dep undici           '%{SOURCE111}' deps/undici/src/package.json
+
 # Replace any instances of unversioned python with python3
 pfiles=( $(grep -rl python) )
 %py3_shebang_fix ${pfiles[@]}
