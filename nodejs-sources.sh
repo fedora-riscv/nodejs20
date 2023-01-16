@@ -122,6 +122,9 @@ NODE_MAJOR=$(echo $version | cut -d. -f1)
 rm -rf node-v${version}.tar.gz \
        node-v${version}-stripped.tar.gz \
        node-v${version}/ \
+       wasi-sdk-* \
+       cjs-module-lexer* \
+       undici* \
        SHASUMS256.txt
 wget http://nodejs.org/dist/v${version}/node-v${version}.tar.gz \
      http://nodejs.org/dist/v${version}/SHASUMS256.txt
@@ -134,15 +137,49 @@ tar -zxf node-v${version}.tar.gz
 rm -rf node-v${version}/deps/openssl
 tar -zcf node-v${version}-stripped.tar.gz node-v${version}
 
+set -x
+# Download the cjs-module-lexer sources
+LEXER_VERSION=$(jq -r '.version' node-v${version}/deps/cjs-module-lexer/package.json)
+wget https://github.com/nodejs/cjs-module-lexer/archive/refs/tags/${LEXER_VERSION}.tar.gz
+tar -zxf ${LEXER_VERSION}.tar.gz
+rm -f cjs-module-lexer-${LEXER_VERSION}/lib/lexer.wasm
+tar -zcf cjs-module-lexer-${LEXER_VERSION}-stripped.tar.gz cjs-module-lexer-${LEXER_VERSION}/
+rm -f ${LEXER_VERSION}.tar.gz
+
+# Download the WASI compiler used to build cjs-module-lexer
+LEXER_WASI_MAJOR=$(grep -oP '(?<=^\W../wasi-sdk-)\d+\.\d+' cjs-module-lexer-${LEXER_VERSION}/Makefile | cut -d'.'  -f1)
+LEXER_WASI_MINOR=$(grep -oP '(?<=^\W../wasi-sdk-)\d+\.\d+' cjs-module-lexer-${LEXER_VERSION}/Makefile | cut -d'.'  -f2)
+wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${LEXER_WASI_MAJOR}/wasi-sdk-${LEXER_WASI_MAJOR}.${LEXER_WASI_MINOR}-linux.tar.gz
+
+# Download the undici sources
+UNDICI_VERSION=$(jq -r '.version' node-v${version}/deps/undici/src/package.json)
+wget https://github.com/nodejs/undici/archive/refs/tags/v${UNDICI_VERSION}.tar.gz
+tar -zxf v${UNDICI_VERSION}.tar.gz
+rm -f undici-${UNDICI_VERSION}/lib/llhttp/llhttp*.wasm*
+tar -zcf undici-${UNDICI_VERSION}-stripped.tar.gz undici-${UNDICI_VERSION}/
+rm -f v${UNDICI_VERSION}.tar.gz
+
+# Download the WASI compiler used to build undici
+UNDICI_WASI_MAJOR=$(grep -oP '(?<=WASI_SDK_VERSION_MAJOR=).*' undici-${UNDICI_VERSION}/build/Dockerfile)
+UNDICI_WASI_MINOR=$(grep -oP '(?<=WASI_SDK_VERSION_MINOR=).*' undici-${UNDICI_VERSION}/build/Dockerfile)
+wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${UNDICI_WASI_MAJOR}/wasi-sdk-${UNDICI_WASI_MAJOR}.${UNDICI_WASI_MINOR}-linux.tar.gz
+
 ICU_MAJOR=$(jq -r '.[0].url' node-v${version}/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\1/g')
 ICU_MINOR=$(jq -r '.[0].url' node-v${version}/tools/icu/current_ver.dep | sed --expression='s/.*release-\([[:digit:]]\+\)-\([[:digit:]]\+\).*/\2/g')
+
+set +x
 
 # Download the ICU binary data files
 rm -Rf icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
 wget $(grep Source3 nodejs${NODE_MAJOR}.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
 wget $(grep Source4 nodejs${NODE_MAJOR}.spec | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
 
-fedpkg new-sources node-v${version}-stripped.tar.gz icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
+fedpkg new-sources node-v${version}-stripped.tar.gz \
+                   icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip \
+                   cjs-module-lexer-${LEXER_VERSION}-stripped.tar.gz \
+                   wasi-sdk-${LEXER_WASI_MAJOR}.${LEXER_WASI_MINOR}-linux.tar.gz \
+                   undici-${UNDICI_VERSION}-stripped.tar.gz \
+                   wasi-sdk-${UNDICI_WASI_MAJOR}.${UNDICI_WASI_MINOR}-linux.tar.gz
 
 rm -f node-v${version}.tar.gz
 
@@ -206,6 +243,16 @@ echo
 echo "zlib"
 echo "========================="
 grep "define ZLIB_VERSION" node-v${version}/deps/zlib/zlib.h
+echo
+echo "cjs-module-lexer"
+echo "========================="
+echo "${LEXER_VERSION}"
+echo "WASI-SDK: ${LEXER_WASI_MAJOR}.${LEXER_WASI_MINOR}"
+echo
+echo "undici"
+echo "========================="
+echo "${UNDICI_VERSION}"
+echo "WASI-SDK: ${UNDICI_WASI_MAJOR}.${UNDICI_WASI_MINOR}"
 echo
 echo "Make sure these versions match what is in the RPM spec file"
 
