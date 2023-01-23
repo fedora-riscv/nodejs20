@@ -181,7 +181,7 @@ rm -Rf icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
 wget $(grep Source3 packaging/nodejs.spec.in | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
 wget $(grep Source4 packaging/nodejs.spec.in | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
 
-if [ _arg_push = 'on' ]; then
+if [ $_arg_push = 'on' ]; then
   push_flag=''
 else
   push_flag='--offline'
