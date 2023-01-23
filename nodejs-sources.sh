@@ -307,7 +307,7 @@ sed -e "s/@NODE_MAJOR@/${NODE_MAJOR}/g" \
 	-e "s/@UNDICI_VERSION@/${UNDICI_VERSION}/g" \
 	-e "s/@UNDICI_WASI_MAJOR@/${UNDICI_WASI_MAJOR}/g" \
 	-e "s/@UNDICI_WASI_MINOR@/${UNDICI_WASI_MINOR}/g" \
-    ${SCRIPT_DIR}/.packaging/nodejs.spec.in \
+    ${SCRIPT_DIR}/packaging/nodejs.spec.in \
     > ${SCRIPT_DIR}/nodejs${NODE_MAJOR}.spec
 
 rm -rf node-v${version}
