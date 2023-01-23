@@ -592,7 +592,7 @@ ln -srf %{buildroot}%{_libdir}/libnode.so.%{nodejs_soversion} \
 # Install v8 compatibility symlinks
 for header in %{buildroot}%{_includedir}/node/libplatform %{buildroot}%{_includedir}/node/v8*.h; do
     header=$(basename ${header})
-    ln -srf ./node/${header} %{buildroot}%{_includedir}/${header}
+    ln -sf ./node/${header} %{buildroot}%{_includedir}/${header}
 done
 ln -s ./node/cppgc %{buildroot}%{_includedir}/cppgc
 for soname in libv8 libv8_libbase libv8_libplatform; do
