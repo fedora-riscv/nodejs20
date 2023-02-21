@@ -46,9 +46,9 @@
 %global nodejs_major @NODE_MAJOR@
 %global nodejs_minor @NODE_MINOR@
 %global nodejs_patch @NODE_PATCH@
-%global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion @NODE_SOVERSION@
+%global nodejs_abi %{nodejs_soversion}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 %global nodejs_envr %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
