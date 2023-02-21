@@ -296,7 +296,7 @@ echo
 echo "ada"
 echo "========================="
 ADA_VERSION=$(grep -oP '(?<=#define ADA_VERSION ).*\"' node-v${version}/deps/ada/ada.h |sed -e 's/^"//' -e 's/"$//')
-echo "${ADA_VERSION}
+echo "${ADA_VERSION}"
 echo
 echo "Applying versions to spec template"
 
