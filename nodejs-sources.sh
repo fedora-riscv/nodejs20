@@ -293,6 +293,11 @@ echo "========================="
 echo "${UNDICI_VERSION}"
 echo "WASI-SDK: ${UNDICI_WASI_MAJOR}.${UNDICI_WASI_MINOR}"
 echo
+echo "ada"
+echo "========================="
+ADA_VERSION=$(grep -oP '(?<=#define ADA_VERSION ).*\"' node-v${version}/deps/ada/ada.h |sed -e 's/^"//' -e 's/"$//')
+echo "${ADA_VERSION}
+echo
 echo "Applying versions to spec template"
 
 sed -e "s/@NODE_PKG_MAJOR@/${NODE_PKG_MAJOR}/g" \
@@ -322,6 +327,7 @@ sed -e "s/@NODE_PKG_MAJOR@/${NODE_PKG_MAJOR}/g" \
     -e "s/@UNDICI_VERSION@/${UNDICI_VERSION}/g" \
     -e "s/@UNDICI_WASI_MAJOR@/${UNDICI_WASI_MAJOR}/g" \
     -e "s/@UNDICI_WASI_MINOR@/${UNDICI_WASI_MINOR}/g" \
+    -e "s/@ADA_VERSION@/${ADA_VERSION}/g" \
     ${SCRIPT_DIR}/packaging/nodejs.spec.in \
     > ${SCRIPT_DIR}/nodejs${NODE_PKG_MAJOR}.spec
 

@@ -129,6 +129,9 @@
 # histogram_c - assumed from timestamps
 %global histogram_version 0.9.7
 
+# ada URL parser
+%global ada_version @ADA_VERSION@
+
 
 Name: nodejs@NODE_PKG_MAJOR@
 Epoch: %{nodejs_epoch}
@@ -300,6 +303,10 @@ Provides: bundled(icu) = %{icu_version}
 # or there's no option to built it as a shared dependency, so we bundle them
 Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
+
+# Upstream has added a new URL parser that has no option to build as a shared
+# library (19.7.0+)
+Provides: bundled(ada) = ${ada_version}
 
 
 %description

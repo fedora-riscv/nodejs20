@@ -1,4 +1,4 @@
-From dcfc1ddd79e6bf9c7d3066e7c9e466e51011adac Mon Sep 17 00:00:00 2001
+From 694be95b2b7f82ec1f053f652c6f297b3f521fb0 Mon Sep 17 00:00:00 2001
 From: Zuzana Svetlikova <zsvetlik@redhat.com>
 Date: Fri, 17 Apr 2020 12:59:44 +0200
 Subject: [PATCH] Disable running gyp on shared deps
@@ -10,7 +10,7 @@ Signed-off-by: rpm-build <rpm-build>
  2 files changed, 2 insertions(+), 19 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 94013466239e9c43ddce5cebc7a8d0a4dc56db4f..8577570c95d20dcf8d3dfe5d9fe82c1f67b2d70a 100644
+index 830413fdba81da34a56b8a6aabfca3eacda1684d..21f7de35fa36183b30c6f996894b134f80421df4 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -169,7 +169,7 @@ with-code-cache test-code-cache:
@@ -19,10 +19,10 @@ index 94013466239e9c43ddce5cebc7a8d0a4dc56db4f..8577570c95d20dcf8d3dfe5d9fe82c1f
  out/Makefile: config.gypi common.gypi node.gyp \
 -	deps/uv/uv.gyp deps/llhttp/llhttp.gyp deps/zlib/zlib.gyp \
 +	deps/llhttp/llhttp.gyp \
- 	deps/simdutf/simdutf.gyp \
+ 	deps/simdutf/simdutf.gyp deps/ada/ada.gyp \
  	tools/v8_gypfiles/toolchain.gypi tools/v8_gypfiles/features.gypi \
  	tools/v8_gypfiles/inspector.gypi tools/v8_gypfiles/v8.gyp
-@@ -1550,7 +1550,7 @@ CONFLICT_RE=^>>>>>>> [[:xdigit:]]+|^<<<<<<< [[:alpha:]]+
+@@ -1556,7 +1556,7 @@ CONFLICT_RE=^>>>>>>> [[:xdigit:]]+|^<<<<<<< [[:alpha:]]+
  
  # Related CI job: node-test-linter
  lint-ci: lint-js-ci lint-cpp lint-py lint-md lint-addon-docs lint-yaml-build lint-yaml
@@ -32,10 +32,10 @@ index 94013466239e9c43ddce5cebc7a8d0a4dc56db4f..8577570c95d20dcf8d3dfe5d9fe82c1f
  		exit 0 ; \
  	else \
 diff --git a/node.gyp b/node.gyp
-index b0f132efd82edcd114612d25cd3316379b2097a4..f091b165cbb9efccbe16a6e595a32b311248939b 100644
+index 6d1b2bf36902cf54f33513873441c403c2e7ee3d..e5c1f696ffb14421df1a5626be6cf1c6738d870e 100644
 --- a/node.gyp
 +++ b/node.gyp
-@@ -420,23 +420,6 @@
+@@ -421,23 +421,6 @@
                ],
              },
            ],
