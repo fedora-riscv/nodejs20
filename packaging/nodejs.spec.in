@@ -57,7 +57,7 @@
 
 # Determine if this should be the default version for this Fedora release
 # The default version will own /usr/bin/node and friends
-%if 0%{?fedora} == 37 || 0%{?fedora} == 38
+%if 0%{?fedora} == @FEDORA_DEFAULT_RELEASE_LOW@ || 0%{?fedora} == @FEDORA_DEFAULT_RELEASE_HIGH@
 %global nodejs_default %{nodejs_major}
 %endif
 %global nodejs_private_sitelib %{nodejs_sitelib}_%{nodejs_major}
@@ -130,7 +130,7 @@
 %global histogram_version 0.9.7
 
 
-Name: nodejs%{nodejs_major}
+Name: nodejs@NODE_PKG_MAJOR@
 Epoch: %{nodejs_epoch}
 Version: %{nodejs_version}
 Release: %{nodejs_release}
@@ -169,7 +169,7 @@ Patch1: 0001-Disable-running-gyp-on-shared-deps.patch
 %package -n %{pkgname}
 Summary: JavaScript runtime
 %else
-%global pkgname nodejs%{nodejs_major}
+%global pkgname nodejs@NODE_PKG_MAJOR@
 %endif
 
 BuildRequires: make
@@ -203,7 +203,6 @@ BuildRequires: nodejs-packaging
 BuildRequires: chrpath
 BuildRequires: libatomic
 BuildRequires: ninja-build
-BuildRequires: systemtap-sdt-devel
 BuildRequires: unzip
 
 Provides: nodejs = %{nodejs_envr}
@@ -527,7 +526,6 @@ export PATH="${cwd}/.bin:$PATH"
            %{!?with_bundled_zlib:--shared-zlib} \
            --shared-brotli \
            %{!?with_bundled:--shared-libuv} \
-           %{?with_bundled:--without-dtrace}%{!?with_bundled:--with-dtrace} \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
            --without-corepack \
@@ -599,12 +597,6 @@ for soname in libv8 libv8_libbase libv8_libplatform; do
     ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
     ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
 done
-
-# Remove tracing for non-default versions
-%if ! 0%{?nodejs_default}
-rm -rf %{buildroot}%{_usr}/lib/dtrace \
-       %{buildroot}%{_datadir}/systemtap/tapset/node.stp
-%endif
 
 # install documentation
 mkdir -p %{buildroot}%{_pkgdocdir}/html
@@ -755,14 +747,7 @@ end
 %if 0%{?nodejs_default}
 %{_bindir}/node
 %doc %{_mandir}/man1/node.1*
-%dir %{_datadir}/systemtap
-%dir %{_datadir}/systemtap/tapset
 %{nodejs_sitelib}
-%{_datadir}/systemtap/tapset/node.stp
-%if %{without bundled}
-%dir %{_usr}/lib/dtrace
-%{_usr}/lib/dtrace/node.d
-%endif
 %endif
 
 %{_bindir}/node-%{nodejs_major}
