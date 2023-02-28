@@ -193,20 +193,6 @@ rm -Rf icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip
 wget $(grep Source3 packaging/nodejs.spec.in | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
 wget $(grep Source4 packaging/nodejs.spec.in | sed --expression="s/.*http/http/g" --expression="s/\(\%{icu_major}\)/${ICU_MAJOR}/g" --expression="s/\(\%{icu_minor}\)/${ICU_MINOR}/g")
 
-if [ $_arg_push = 'on' ]; then
-  push_flag=''
-else
-  push_flag='--offline'
-fi
-
-fedpkg new-sources ${push_flag} \
-                   node-v${version}-stripped.tar.gz \
-                   icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip \
-                   cjs-module-lexer-${LEXER_VERSION}-stripped.tar.gz \
-                   wasi-sdk-${LEXER_WASI_MAJOR}.${LEXER_WASI_MINOR}-linux.tar.gz \
-                   undici-${UNDICI_VERSION}-stripped.tar.gz \
-                   wasi-sdk-${UNDICI_WASI_MAJOR}.${UNDICI_WASI_MINOR}-linux.tar.gz
-
 rm -f node-v${version}.tar.gz
 
 set +e
@@ -330,6 +316,15 @@ sed -e "s/@NODE_PKG_MAJOR@/${NODE_PKG_MAJOR}/g" \
     -e "s/@ADA_VERSION@/${ADA_VERSION}/g" \
     ${SCRIPT_DIR}/packaging/nodejs.spec.in \
     > ${SCRIPT_DIR}/nodejs${NODE_PKG_MAJOR}.spec
+
+if [ $_arg_push = 'on' ]; then
+  fedpkg new-sources node-v${version}-stripped.tar.gz \
+                     icu4c-${ICU_MAJOR}_${ICU_MINOR}-data-bin-*.zip \
+                     cjs-module-lexer-${LEXER_VERSION}-stripped.tar.gz \
+                     wasi-sdk-${LEXER_WASI_MAJOR}.${LEXER_WASI_MINOR}-linux.tar.gz \
+                     undici-${UNDICI_VERSION}-stripped.tar.gz \
+                     wasi-sdk-${UNDICI_WASI_MAJOR}.${UNDICI_WASI_MINOR}-linux.tar.gz
+fi
 
 rm -rf node-v${version}
 # ] <-- needed because of Argbash
