@@ -46,9 +46,9 @@
 %global nodejs_major 19
 %global nodejs_minor 7
 %global nodejs_patch 0
-%global nodejs_abi %{nodejs_major}.%{nodejs_minor}
 # nodejs_soversion - from NODE_MODULE_VERSION in src/node_version.h
 %global nodejs_soversion 111
+%global nodejs_abi %{nodejs_soversion}
 %global nodejs_version %{nodejs_major}.%{nodejs_minor}.%{nodejs_patch}
 %global nodejs_release %{baserelease}
 %global nodejs_envr %{nodejs_epoch}:%{nodejs_version}-%{nodejs_release}
@@ -121,13 +121,14 @@
 
 %global npm_envr %{npm_epoch}:%{npm_version}-%{npm_release}
 
-%global npm_obsoletes 1:8.19.2-1.18.12.1.3
-
 # uvwasi - from deps/uvwasi/include/uvwasi.h
 %global uvwasi_version 0.0.15
 
 # histogram_c - assumed from timestamps
 %global histogram_version 0.9.7
+
+# ada URL parser
+%global ada_version 1.0.1
 
 
 Name: nodejs20
@@ -298,6 +299,12 @@ Provides: bundled(icu) = %{icu_version}
 Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
 
+%if 0%{?nodejs_major} > 9
+# Upstream has added a new URL parser that has no option to build as a shared
+# library (19.7.0+)
+Provides: bundled(ada) = ${ada_version}
+%endif
+
 
 %description
 Node.js is a platform built on Chrome's JavaScript runtime \
@@ -413,8 +420,10 @@ Provides: npm(npm) = %{npm_version}
 # Satisfy dependency requests for "npm"
 Provides: npm = %{npm_envr}
 
+%if 0%{?nodejs_default}
 # Obsolete the old 'npm' package
-Obsoletes: npm < %{npm_obsoletes}
+Obsoletes: npm < 1:9
+%endif
 
 
 %description -n %{pkgname}-npm
