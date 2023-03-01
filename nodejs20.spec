@@ -1,21 +1,3 @@
-# The following macros control the usage of dependencies bundled from upstream.
-#
-# When to use what:
-# - Regular (presumably non-modular) build: use neither (the default in Fedora)
-# - Early bootstrapping build that is not intended to be shipped:
-#     use --with=bootstrap; this will bundle deps and add `~bootstrap` release suffix
-# - Build with some dependencies not avalaible in necessary versions (i.e. module build):
-#     use --with=bundled; will bundle deps, but do not add the suffix
-#
-# create bootstrapping build with bundled deps and extra release suffix
-%bcond_with bootstrap
-# bundle dependencies that are not available in Fedora modules
-%if %{with bootstrap}
-%bcond_without bundled
-%else
-%bcond_with bundled
-%endif
-
 %if 0%{?rhel} && 0%{?rhel} < 8
 %bcond_without bundled_zlib
 %else
@@ -528,7 +510,7 @@ export PATH="${cwd}/.bin:$PATH"
            %{ssl_configure} \
            %{!?with_bundled_zlib:--shared-zlib} \
            --shared-brotli \
-           %{!?with_bundled:--shared-libuv} \
+           --shared-libuv \
            --with-intl=small-icu \
            --with-icu-default-data-dir=%{icudatadir} \
            --without-corepack \
