@@ -127,9 +127,6 @@
 # histogram_c - assumed from timestamps
 %global histogram_version 0.9.7
 
-# ada URL parser
-%global ada_version 1.0.1
-
 
 Name: nodejs20
 Epoch: %{nodejs_epoch}
@@ -161,6 +158,8 @@ Source101: cjs-module-lexer-1.2.2-stripped.tar.gz
 Source102: wasi-sdk-11.0-linux.tar.gz
 Source111: undici-5.20.0-stripped.tar.gz
 Source112: wasi-sdk-14.0-linux.tar.gz
+
+Patch: 0001-Remove-unused-OpenSSL-config.patch
 
 %if 0%{?nodejs_default}
 %global pkgname nodejs
@@ -299,11 +298,9 @@ Provides: bundled(icu) = %{icu_version}
 Provides: bundled(uvwasi) = %{uvwasi_version}
 Provides: bundled(histogram) = %{histogram_version}
 
-%if 0%{?nodejs_major} > 9
 # Upstream has added a new URL parser that has no option to build as a shared
 # library (19.7.0+)
-Provides: bundled(ada) = ${ada_version}
-%endif
+Provides: bundled(ada) = 1.0.1
 
 
 %description
