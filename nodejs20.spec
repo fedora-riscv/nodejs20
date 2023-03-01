@@ -184,6 +184,8 @@ BuildRequires: libatomic
 BuildRequires: ninja-build
 BuildRequires: unzip
 
+
+
 Provides: nodejs = %{nodejs_envr}
 
 %if %{with bundled}
@@ -220,6 +222,11 @@ BuildRequires: openssl-devel >= %{openssl11_minimum}
 
 %global ssl_configure --shared-openssl %{openssl_fips_configure}
 %endif
+
+
+# dtrace is not supported on Node.js 19+
+%global dtrace_configure %{nil}
+
 
 # we need the system certificate store
 Requires: ca-certificates
@@ -508,6 +515,7 @@ export PATH="${cwd}/.bin:$PATH"
            --shared \
            --libdir=%{_lib} \
            %{ssl_configure} \
+           %{dtrace_configure} \
            %{!?with_bundled_zlib:--shared-zlib} \
            --shared-brotli \
            --shared-libuv \
@@ -534,6 +542,8 @@ mv %{buildroot}%{nodejs_sitelib} \
 %if 0%{?nodejs_default}
 ln -srf %{buildroot}%{nodejs_private_sitelib} \
         %{buildroot}%{nodejs_sitelib}
+%else
+rm -f %{buildroot}%{_datadir}/systemtap/tapset/node.stp
 %endif
 
 
@@ -733,6 +743,8 @@ end
 %{_bindir}/node
 %doc %{_mandir}/man1/node.1*
 %{nodejs_sitelib}
+
+
 %endif
 
 %{_bindir}/node-%{nodejs_major}
