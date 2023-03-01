@@ -39,9 +39,10 @@
 
 # Determine if this should be the default version for this Fedora release
 # The default version will own /usr/bin/node and friends
-%if 0%{?fedora} == {{ FEDORA_DEFAULT_RELEASE_LOW }} || 0%{?fedora} == {{ FEDORA_DEFAULT_RELEASE_HIGH }}
+%if 0%{?fedora} == {{ FEDORA_DEFAULT_RELEASE_LOW }} || 0%{?fedora} == {{ FEDORA_DEFAULT_RELEASE_HIGH }}{{ RHEL_DEFAULT_RELEASE }}
 %global nodejs_default %{nodejs_major}
 %endif
+
 %global nodejs_private_sitelib %{nodejs_sitelib}_%{nodejs_major}
 
 

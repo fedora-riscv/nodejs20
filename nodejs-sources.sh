@@ -137,6 +137,10 @@ fi
 FEDORA_DEFAULT_RELEASE_LOW=$((NODE_PKG_MAJOR + 19))
 FEDORA_DEFAULT_RELEASE_HIGH=$((NODE_PKG_MAJOR + 20))
 
+if [[ $((NODE_PKG_MAJOR)) -eq 20 ]]
+  then RHEL_DEFAULT_RELEASE=" | 0%{?rhel} == 10"
+fi
+
 rm -rf node-v${version}.tar.gz \
        node-v${version}-stripped.tar.gz \
        node-v${version}/ \
@@ -301,6 +305,7 @@ IFS='' read -r -d '' template_json <<EOF
     "NODE_PATCH": $NODE_PATCH,
     "FEDORA_DEFAULT_RELEASE_LOW": $FEDORA_DEFAULT_RELEASE_LOW,
     "FEDORA_DEFAULT_RELEASE_HIGH": $FEDORA_DEFAULT_RELEASE_HIGH,
+	"RHEL_DEFAULT_RELEASE": "$RHEL_DEFAULT_RELEASE",
     "NODE_SOVERSION": $NODE_SOVERSION,
     "V8_MAJOR": $V8_MAJOR,
     "V8_MINOR": $V8_MINOR,
