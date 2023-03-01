@@ -138,7 +138,7 @@ FEDORA_DEFAULT_RELEASE_LOW=$((NODE_PKG_MAJOR + 19))
 FEDORA_DEFAULT_RELEASE_HIGH=$((NODE_PKG_MAJOR + 20))
 
 if [[ $((NODE_PKG_MAJOR)) -eq 20 ]]
-  then RHEL_DEFAULT_RELEASE=" | 0%{?rhel} == 10"
+  then RHEL_DEFAULT_RELEASE=" || 0%{?rhel} == 10"
 fi
 
 rm -rf node-v${version}.tar.gz \
