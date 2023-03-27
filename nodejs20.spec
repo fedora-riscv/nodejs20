@@ -795,11 +795,9 @@ end
 %{_libdir}/%{pkgname}-libv8.so
 %{_libdir}/%{pkgname}-libv8_libbase.so
 %{_libdir}/%{pkgname}-libv8_libplatform.so
-%if 0%{?nodejs_default}
 %{_libdir}/libv8.so
 %{_libdir}/libv8_libbase.so
 %{_libdir}/libv8_libplatform.so
-%endif
 
 
 %files -n %{pkgname}-npm
