@@ -609,7 +609,6 @@ for soname in libv8 libv8_libbase libv8_libplatform; do
     ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so
     ln -s libnode.so.%{nodejs_soversion} %{buildroot}%{_libdir}/${soname}.so.%{v8_major}
 done
-%endif
 
 # install documentation
 mkdir -p %{buildroot}%{_pkgdocdir}/html
