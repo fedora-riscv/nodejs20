@@ -148,6 +148,7 @@ Source111: undici-5.21.0-stripped.tar.gz
 Source112: wasi-sdk-14.0-linux.tar.gz
 
 Patch: 0001-Remove-unused-OpenSSL-config.patch
+Patch: 0002-libstdc-fix-incomplete-type-in-v8-internal-is_subtyp.patch
 
 %if 0%{?nodejs_default}
 %global pkgname nodejs
