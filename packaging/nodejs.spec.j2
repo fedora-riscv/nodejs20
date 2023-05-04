@@ -524,6 +524,7 @@ extra_cflags=(
     -DZLIB_CONST
     -fno-delete-null-pointer-checks
     -O3
+    -fno-ipa-icf
 )
 export CFLAGS="%{optflags} ${extra_cflags[*]}" CXXFLAGS="%{optflags} ${extra_cflags[*]}"
 export LDFLAGS="%{build_ldflags}"

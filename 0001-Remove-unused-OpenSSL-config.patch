@@ -1,4 +1,4 @@
-From ff8035bf1039a63785cbb325b24f1d9520b17854 Mon Sep 17 00:00:00 2001
+From d1e3011bc4fdbc0abcbf80692d84906dce8c4556 Mon Sep 17 00:00:00 2001
 From: Stephen Gallagher <sgallagh@redhat.com>
 Date: Fri, 17 Apr 2020 12:59:44 +0200
 Subject: [PATCH] Remove unused OpenSSL config
@@ -13,10 +13,10 @@ Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
  1 file changed, 17 deletions(-)
 
 diff --git a/node.gyp b/node.gyp
-index 6d1b2bf36902cf54f33513873441c403c2e7ee3d..e5c1f696ffb14421df1a5626be6cf1c6738d870e 100644
+index eb7a43e4a0eb9da8ba352905f4becfb3214be149..6d49a45e731ba146ac9d832618a82c7f5b10284f 100644
 --- a/node.gyp
 +++ b/node.gyp
-@@ -421,23 +421,6 @@
+@@ -729,23 +729,6 @@
                ],
              },
            ],
@@ -41,5 +41,5 @@ index 6d1b2bf36902cf54f33513873441c403c2e7ee3d..e5c1f696ffb14421df1a5626be6cf1c6
        ],
      }, # node_core_target_name
 -- 
-2.39.2
+2.40.1
 
